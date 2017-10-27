@@ -2,7 +2,7 @@
 ESGI Project
 
 ## Getting Started
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+These instructions will get you a copy of the project up and running on your local machine.
 
 ### Prerequisites
 You need to install [Git](https://git-scm.com/downloads) and [Code::Blocks](http://www.codeblocks.org/downloads/26) (with GCC).
