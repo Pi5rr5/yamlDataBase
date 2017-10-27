@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1509138661 source:d:\yamldatabase\main.c
+	<stdio.h>
+	<stdlib.h>
+
