@@ -10,7 +10,7 @@ You need to install [Git](https://git-scm.com/downloads) and [Code::Blocks](http
 ### Installing
 Clone this repo into new project folder (e.g., my-proj).
 ```
-git clone https://github.com/rypall/yamlDataBase.git my-proj
+git clone https://github.com/USER_NAME/yamlDataBase.git my-proj
 cd my-proj
 ```
 
