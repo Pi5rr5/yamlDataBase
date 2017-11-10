@@ -15,4 +15,5 @@ cd my-proj
 ```
 
 ## Compiling
+
 Create locally a C project and import sources
