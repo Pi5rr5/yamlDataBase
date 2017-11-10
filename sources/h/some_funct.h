@@ -3,21 +3,16 @@
 //
 
 #ifndef YAML_SOME_FUNCT_H
-#define YAML_SOME_FUNCT_H
+    #define YAML_SOME_FUNCT_H
 
-typedef struct struct_db {
-    char *database;
-} db_infos;
+    void init();
 
+    void verifFirstInit();
 
-void init();
+    char *upWord(char *);
 
-void verifFirstInit();
+    void showInfo();
 
-char *upWord(char *);
-
-void showInfo();
-
-void changeDatabase(char *);
+    void changeDatabase(char *);
 
 #endif //YAML_SOME_FUNCT_H

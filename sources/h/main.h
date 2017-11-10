@@ -3,9 +3,9 @@
 //
 
 #ifndef MY_PROJ_MAIN_H
-#define MY_PROJ_MAIN_H
+    #define MY_PROJ_MAIN_H
 
-void requestSQL();
+    void requestSQL();
 
 #endif //MY_PROJ_MAIN_H
 
