@@ -7,6 +7,9 @@
 
 void requestSQL();
 
-#endif //MY_PROJ_MAIN_H
+
+
+
+#endif /* MY_PROJ_MAIN_H */
 
 

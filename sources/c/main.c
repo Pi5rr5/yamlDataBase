@@ -1,35 +1,30 @@
-#include <stdio.h>
-#include <string.h>
-#include "../h/main.h"
-#include "../h/parser_SQL.h"
 #include "../h/some_funct.h"
 
-
 int main() {
-    init();
-    requestSQL();
+    menu();
+
     return 0;
 }
-
-void requestSQL() {
-    int counter;
-    int len;
-    counter = 1;
-    char word[255];
-    printf("\n%d : ", counter);
-    while (scanf("%[^\n]%*c", word) == 1) {
-        if (strstr(word, ";") != NULL) {
-            len = strlen(word);
-            word[len - 1] = '\0';
-            parserSQL(word, cmdRequest);
-
-            break;
-        }
-        //traiter le multi-ligne
-        printf("%d : ", ++counter);
-    }
-
-}
+// a mettre dans un autre fichier et dans un while
 
 
-//blop
+
+
+
+
+//test
+
+// base : dossier
+// table : dossier
+
+// yaml nom du champs, null, defaut, pk
+
+// utilisation structure
+
+
+// systeme gestion dossier/fichiers, saisie commande SQL, function print
+
+
+
+
+

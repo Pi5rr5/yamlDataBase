@@ -6,34 +6,27 @@
 #define MY_PROJ_PARSER_H
 
 
-typedef struct struct_command {
+typedef struct commandSQL {
     char *name;
 
-    void (*f)(char *);
-} command_options;
+    void (*functionSQL)(char *);
+} commandSQL;
 
-extern command_options cmdRequest[];
+void parserSQL(char *);
 
+void query_use(char *);
 
-void parse_use(char *);
+void query_create_database(char *);
 
-void parse_create(char *);
+void query_create_table(char *);
 
-void parse_drop(char *);
+void query_drop_database(char *);
 
-void parse_exit(char *);
+void query_drop_table(char *);
 
-void parse_error();
+void query_exit(char *);
 
-void parserSQL(char *, command_options *);
-
-void create_database(char *);
-
-void create_table(char *);
-
-void drop_database(char *);
-
-void drop_table(char *);
+void query_error(char *);
 
 #endif /* MY_PROJ_PARSER_H */
 
