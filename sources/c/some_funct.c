@@ -72,3 +72,21 @@ void verifFirstInit() {
 
 
 }
+
+/*
+ * Description : Renvoie le nombre de caractères présents dans un fichiers.
+ *               Sauvegarde la position du curseur avant le calcul pour pouvoir le remplacer à cet endroit à la fin de l'opération.
+ * Paramètre(s) :
+ *      FILE* file : Pointeur de fichier du fichier concerné.
+ *
+*/
+int fileSize(FILE *file) {
+	int value;
+	int prevCursor;
+
+	prevCursor = ftell(file);           // Sauvegarde de la position du curseur actuelle
+	fseek(file, 0, SEEK_END);           // Déplacement vers la fin du fichier
+	value = ftell(file);                // Renvoi le nombre de charactères dans le fichier
+	fseek(file, prevCursor, SEEK_SET);  // Repositionnement du curseur à son emplacement initial.
+	return value;
+}

@@ -25,5 +25,7 @@
 
     void drop_table(char *);
 
+    int fileSize(FILE*);
+
 #endif /* MY_PROJ_PARSER_H */
 
