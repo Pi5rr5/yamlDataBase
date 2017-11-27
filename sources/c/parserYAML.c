@@ -1,105 +1,226 @@
-#include "../parserYAML.h"
+#include <stdio.h>
+#include <string.h>
+#include "../h/struct.h"
+#include "../h/some_funct.h"
+#include "../h/parserYAML.h"
 
 #ifndef MAX
     #define MAX 255     // Taille maximum utilée pour les chaine de caractères non dynamiques.
 #endif // MAX
 
-
-
 /**
- * Description : Cherche une chaîne de caractères dans un fichier.
- *               Pour ce faire, lit un chaine dans le fichier de la taille de la chaine recherchée.
- *               Si la chaine ne correspond pas, on avance d'un caractère et on recommence.
- * Renvoi :
- *      Succès : renvoie 1 et place le curseur à la fin de la chaine.
- *      Echec  : renvoie -1 et ne bouge pas le curseur si atteint la fin du fichier sans trouver.
- * Paramètres :
- *      FILE* sourceFile :  Pointeur de fichier du fichier concerné.
- *      char* string :      Chaîne de caractère à rechercher dans le fichier.
-*/
-int fSearchStr(FILE *sourceFile, char *string) {
-	char test[MAX];
-	int prevCursor;
-	int initialCursor;
-	int size;
+ * Description : Ajoute un élément à une liste chaînée de type `tableEntity`
+ * Paramètre(s) :
+ *      tableEntity* list : pointeur du début de la liste chaînée.
+ *      value : valeur à ajouter dans le nouvel élément
+ * Retour :
+ *      Succès : pointeur vers la liste chaînée mise à jour.
+ *      Échec  : en cas d'erreur d'allocation, renvoie la liste non mise à jour.
+ *
+ */
+tableEntity* ll_addAtEnd(tableEntity* list, char* value) {
+    tableEntity* new_element;
+    tableEntity* temp;
 
-	size = fileSize(sourceFile)
-	initialCursor = ftell(sourceFile);
-
-	while(ftell(sourceFile) < size) {   // Tant que l'on n'est pas à la fin du fichier.
-		prevCursor = ftell(sourceFile);                 // Sauvegarde de la position du curseur avant la recherche
-		fread(test, 1, strlen(string), sourceFile);     // Lecture dans le fichier de N caractère. N étant la taille de la chaîne recherchée.\
-                                                            Enregistre le résultat dans char test.
-		test[strlen(string)] = '\0';                    // fread ne gère pas la '\0'.
-
-		/* Vérification de la chaîne lue */
-		if(stricmp(test, string) == 0) {
-			return 1;   // Si identique
-		} else {
-            fseek(sourceFile, prevCursor, SEEK_SET);    // Si non, on retourne où l'on était.
-            fseek(sourceFile, 1, SEEK_CUR);             // On avance d'un cran dans le fichier et on recommence.
-		}
-	}
-	fseek(sourceFile, initialCursor, SEEK_SET);
-	return -1;
-
-	/* NB : PEUT ÊTRE AMÉLIORÉE AVEC DE LA RÉCURSIVITÉ */
+    new_element = malloc(sizeof(list));     // Allocation nécessaire pour le nouvel élément.
+    if(new_element != NULL) {               // Si l'allocation s'est bien passée.
+        strcpy(new_element->line, value);   // On affecte la valuer passée en argument à l'attribut du nouvel élement correspondant.
+        new_element->next = NULL;           // On fait pointer le pointeur de structure `next` à NULL, le nouvel élément devenant le dernier de la liste
+        if(list == NULL) {                  // Si la liste donnée est vide.
+            return new_element;             // On retourne le nouvel élément.
+        } else {
+            temp = list;                    // Sinon on ajoute le dernier élément à la fn de la liste
+            while(temp->next != NULL) {     // Parcours de la liste.
+                temp = temp->next;
+            }
+            temp->next = new_element;       // On fait pointer le dernier élément de la liste sur le nouvel élément.
+            return list;                    // On retourne la liste mise  jour.
+        }
+    }
+    return list;                            // Si erreur d'allocation, on retourne liste actuelle.
 }
 
 
 /**
- * Description : Cherche un unique caractère dans un fichier avec un délimiteur.
- * Renvoi :
- *      Succès : renvoie 1 et place le curseur après le caractère.
- *      Echec  :
- *          Fin de fichier:         renvoie -1 et ne bouge pas le curseur.
- *          Délimiteur atteint :    renvoie 0 et met le délimiteur après le délimiteur.
+ * Description : Lit un ligne dans un fihcier donnée et la renvoie dans la chaîne passée en argument.
+ *               `fgets` a pour défaut d'avoir un saut de ligne ('\n') en fin de chaîne.
+ *               `freadL` (la fonction ci-dessous) a pour unique but de palier à ce défaut.
  * Paramètres :
- *      FILE* sourceFile : pointeur de fichier du fichier concerné.
- *      char wantedChar  : caractère à rechercher dans le fichier.
- *      char delimiter   : caractère auquel arrêter la recherche
-*/
-int fSearchChar(FILE *sourceFile, char wantedChar, char delimiter) {
-    char test;
-	int initialCursor;
-	int size;
+ *      FILE* sourceFile : Pointeur du fichier concerné.
+ *      unsigned int sizeMax : nombre de caractères à lire.
+ *      char* destination : chaîne dans laquelle stockée la ligne lu.
+ * Retour :
+ *      Succès : renvoie 1
+ *      Echec  : renvoie 0
+ * Remarque : Pas de gestion de la position du pointeur.
+ */
+int freadL(FILE* sourceFile, unsigned int sizeMax, char* destination) {
+    int strLength;
+    char result[MAX];
 
-	size = fileSize(sourceFile)
-	initialCursor = ftell(sourceFile);
+    if(sourceFile != NULL) {
+        if(fgets(result, sizeMax, sourceFile) != NULL) {        // Lecture d'un ligne dans le fichier
+            strLength = strlen(result);
+            if(result[strLength-1] == '\n') {  // Si le dernier caractère avant le '\0' est un saut de ligne
+                result[strLength-1] = '\0';    // On le remplace par un '\0'
+                strcpy(destination, result);
+            }
+            return 1;
+        }
+    }
+    return 0;
+}
 
-	while(ftell(sourceFile) < size) {   // Tant que l'on n'est pas à la fin du fichier.
-        test = fgetc(fileSource);
-
-		/* Vérification de la chaîne lue */
-		if(test == wantedChar) {
-			return 1;   // Si identique
-		} else if(test == delimiter) {
-		    return 0;   // Si delimiteur atteint
-		} else {
-            fseek(sourceFile, prevCursor, SEEK_SET);    // Si non, on retourne où l'on était.
-            fseek(sourceFile, 1, SEEK_CUR);             // On avance d'un cran dans le fichier et on recommence.
-		}
-	}
-	fseek(sourceFile, initialCursor, SEEK_SET);         // Retour à la position initiale
-	return -1;
+/**
+ * Description : Vérifie que la ligne en question est bien à traiter.
+ * Paramètre(s) :
+ *      char* str : chaîne de caractères concerncée.
+ * Retour :
+ *      Succès : renvoie 1.
+ *      Échec  :
+ *          - Si la ligne est un commentaire ou une ligne vide, renvoie 0.
+ *          - Si la ligne est le symbole de fin de fichier, ou s'il y a eu une erreur de base, renvoie -1.
+ */
+int verifLine(char* str) {
+    // Le symbole de fin di fichier est "...". Il peut être suivit d'un saut de ligne ('\n'). Dans certains texte, le saut de ligne est en réalité "\r\n".
+    if(str == NULL || strcmp(str, "...") == 0 || strcmp(str, "...\n") == 0 || strcmp(str, "...\r\n") == 0)
+        return -1;
+    // Si la ligne lue est un commentaire ou une ligne vide. (Là encore, il peut y avoir '\r' avant un saut de ligne)
+    if(str[0] == '#' || str[0] == '\n' || str[0] == '\r')
+        return 0;
+    return 1;   // Si aucun des cas ci dessus, alors la ligne peut être traiter.
 }
 
 
-void getValue(FILE* fileSource, char* wantedElement, char* destination) {
-    if ( fSearchStr(fileSource, wantedElement) ) {      // Cherche l'élément voulu
-        if(fSearchChar(fileSource, ':', '\n')) {
-            if(fSearchChar(fileSource, '>', ':')) {
+/**
+ * Description : Vérifie que la ligne passée en argument contient bien une clef.
+ *               Pour ce faire, parcours le fichier à la recherche d'occurences.
+ *               Dès qu'une est trouvée, on vérifie qu'il n'y a rien avant et rien après hormis des espace ou des caractères autorisé ('-' et ':')
+ * Paramètres :
+ *      char* line : chaîne contenant la ligne lue.
+ *      char* wantedStr : chaîne recherchée
+ * Retour :
+ *      Succès : 1
+ *      Échec  : 0
+ */
+int isKey(char* line, char* wantedStr) {
+    int i;
+    int findStrIndex;
+    char* temp;
 
-            } else if(fSearchChar(fileSource, '|', ':')) {
-
-            } else if(fSearchChar(fileSource, '>', ':')) {
-
-            } else if(fSearchChar(fileSource, '-', ':')) {
-
-            } else {
-
+    if(line != NULL && wantedStr != NULL) {
+        if((temp = strstr(line, wantedStr))) {          // `strstr` renvoie un pointeur correspondant à la position (ou l'adresse) de la première occurence de la valeur cherchée dans la chaîne donnée.
+            findStrIndex = temp-line;                   // Par conséquent soustraire cette valeur à l'adresse de la chaîne dans laquelle on a cherché; cela nous donne l'index où se trouve l'occurence.
+            /* Vérification des caractère avant occurence */
+            for(i=0 ; i < findStrIndex ; i++) {         // Parcourt de la chaîne jusqu'à l'findStrIndex (jusqu'à l'occurence)
+                if(line[i] != ' ' && line[i] != '-') {  // Si l'un des caractère se trouvant avant l'occurence est incorrect
+                    return 0;                           // Pas une clef
+                }
+            }
+            /* Vérification des caractères après occurence */
+            if( (temp = strchr(line, ':')) ) {          // Une clef a forcément un ':' après elle. On vérifie qu'il y a ce caractère sur la même ligne.
+                /* Boucle jusqu'à ':' */
+                for(i=findStrIndex+strlen(wantedStr) ; i < temp-line ; i++) {  // `findStrIndex+strlen(wantedStr)` est l'index de la fin de l'occurence. `temp-line` correspond à l'index où se trouve le ':'
+                    if(line[i] != ' ') {                // Si l'un des caractères séparant l'occurence de ':' n'est pas un espace
+                        return 0;                       // Pas une clef
+                    }
+                }
+                return 1;   // Si aucun des cas ci-dessus, alors il s'agit d'une clef.
             }
         }
     }
+    return 0;
+}
 
+
+
+
+/**
+ * Description : Fonction prête à lire une valeur dans le fichier à partir d'un curseur. Appelée par fSearchKey uniquement.
+ * Paramètres :
+ *      FILE* sourceFile : pointeur de fichier du fichier concerné avec le curseur pré-positionner à l'endroit convenu (juste devant la valeur).
+ *      char* destination : chaîne de caractère dans laquelle sotcker la valeur lue.
+ * Retour :
+ *      Succès : 1
+ *      Échec  : 0
+ */
+int getValue(FILE* sourceFile, char* destination) {
+    int i;
+    int tempInt;
+    char tempChar;
+    char line[MAX];
+    char* tempCharPointer;
+
+    if(sourceFile != NULL) {
+        freadL(sourceFile, MAX, line);
+        switch(line[0]) {
+            case '|':   // Bloc litéral
+                break;
+            case '>':   // Bloc replié
+                break;
+            case '"':    // Text sur une ligne
+                break;
+            default:    // Valeur classique
+                strcpy(destination, line);
+                return 1;
+        }
+    }
+    return 0;
+}
+
+
+
+
+
+
+/**
+ * Description : Cherche un la première occurence d'un clef dans un fichier et renvoie sa valeur.
+ * Paramètres :
+ *      FILE* sourceFile : Pointeur de fichier du fichier concerné.
+ *      char* key : Chaîne de caractère à rechercher dans le fichier.
+ *      char* destination : Chaîne de caractère dans laquelle enregistrer la valeur trouvée.
+ * Retour :
+ *      Succès : met la valeur dans destination.
+ *      Echec  : assigne NULL dans destination.
+ * Remarque : Peut être améliorée ou dérivée en une fonction renvoyant les valeurs de chaque occurences.
+*/
+void getKeyValue(FILE *sourceFile, char *key, char* destination) {
+    int tempInt;
+	int fileSize;
+	int insideText;
+	int lastCorrectTab;
+	char line[MAX];
+
+    insideText     = 0;
+    lastCorrectTab = 0;
+	fileSize       = fSize(sourceFile);
+
+    while(ftell(sourceFile) < fileSize) {
+        if(freadL(sourceFile, MAX, line)) {
+            if(verifLine(line)) {
+                if(insideText) {
+                    if((tempInt = countTab(line)) < lastCorrectTab) {
+                        lastCorrectTab = tempInt;
+                        insideText = 0;
+                    }
+                } else {
+                    if(strchr(line, '>') || strchr(line, '|')) {
+                        lastCorrectTab = countTab(line);
+                        insideText = 1;
+                    } else if(isKey(line, key)) {
+                        tempInt = 0;
+                        while(line[tempInt] != ':') {
+                            tempInt++;
+                        }
+                        while(line[tempInt] == ' ') {
+                            tempInt++;
+                        }
+                        fseek(sourceFile, -strlen(line)+tempInt, SEEK_CUR);
+                        getValue(sourceFile, destination);
+                        break;
+                    }
+                }
+            }
+        }
+    }
 }

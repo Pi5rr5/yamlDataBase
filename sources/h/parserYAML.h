@@ -1,7 +1,11 @@
+#include <stdio.h>
+
 #ifndef PARSERYAML_H_INCLUDED
 #define PARSERYAML_H_INCLUDED
-
-    int fileSize(FILE*);
-    int fcheckS(FILE*, char*, char*, char*);
-
+    tableEntity* ll_addAtEnd(tableEntity*, char*);
+    int freadL(FILE*, unsigned int, char*);
+    int verifLine(char*);
+    int isKey(char*, char*);
+    int getValue(FILE*, char*);
+    int getKeyValue(FILE*, char*, char*);
 #endif // PARSERYAML_H_INCLUDED

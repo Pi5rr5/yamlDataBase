@@ -9,6 +9,15 @@
 
 db_infos locationdb;
 
+
+void verifFirstInit() {
+    FILE *fp;
+
+    if ((fp = fopen("donnees","r")) == NULL) {
+        printf("Impossible d'ouvrir le fichier en lecture\n");
+    }
+}
+
 void init() {
     verifFirstInit();
 
@@ -62,31 +71,51 @@ void changeDatabase(char *newDB) {
     locationdb.database = newDB;
 
 }
-void verifFirstInit() {
-    FILE *fp;
-
-    if ((fp = fopen("donnees","r")) == NULL)
-    {
-        printf("Impossible d'ouvrir le fichier en lecture\n");
-    }
 
 
-}
 
-/*
+/**
  * Description : Renvoie le nombre de caractères présents dans un fichiers.
  *               Sauvegarde la position du curseur avant le calcul pour pouvoir le remplacer à cet endroit à la fin de l'opération.
  * Paramètre(s) :
  *      FILE* file : Pointeur de fichier du fichier concerné.
  *
-*/
-int fileSize(FILE *file) {
+ */
+int fSize(FILE *file) {
 	int value;
-	int prevCursor;
+	int initialCursor;
 
-	prevCursor = ftell(file);           // Sauvegarde de la position du curseur actuelle
-	fseek(file, 0, SEEK_END);           // Déplacement vers la fin du fichier
-	value = ftell(file);                // Renvoi le nombre de charactères dans le fichier
-	fseek(file, prevCursor, SEEK_SET);  // Repositionnement du curseur à son emplacement initial.
+	initialCursor = ftell(file);           // Sauvegarde de la position du curseur actuelle
+	fseek(file, 0, SEEK_END);               // Déplacement vers la fin du fichier
+	value = ftell(file);                    // Renvoi le nombre de charactères dans le fichier
+	fseek(file, initialCursor, SEEK_SET);  // Repositionnement du curseur à son emplacement initial.
 	return value;
+}
+
+
+/**
+ * Description : Comptele nombre de tabulation au début de la chaîne donnée.
+ * Paramètre(s) :
+ *      char* str : chaîne de caractères concernée.
+ * Renvoi :
+ *      Succès : Le nombre de tabulations comptées.
+ *      Échec  : -1;
+ *
+ */
+int countTab(char* str) {
+    int i = -1;
+    int strLength;
+
+    if(str != NULL) {
+        strLength = strlen(str);
+        if(strLength > 0) {
+            for(i=0 ; i < strLength ; i++) {
+                if(str[i] != ' ') {
+                    break;
+                }
+            }
+            i /= 4;
+        }
+    }
+    return i;
 }

@@ -15,4 +15,8 @@
 
     void changeDatabase(char *);
 
+    int fSize(FILE*);
+
+    int countTab(char*);
+
 #endif //YAML_SOME_FUNCT_H
