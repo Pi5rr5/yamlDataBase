@@ -9,7 +9,7 @@
     #define MAX 255
 #endif  // MAX
 
-int main() {
+int main(int argc, char **argv) {
     FILE* fp;
     char test[MAX];
 
