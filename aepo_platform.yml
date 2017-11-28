@@ -1,15 +1,16 @@
+---
 # Ceci est un fichier test pour le projet de C yaml_DataBase.
 # La strcture des fichiers de tables sera comme suit.
 # nom_table
 -
     id : 1234
-    name : "nom1"
+    name : "id"
     comment : >
       Ceci est un commentaire sans retour à la ligne.
         Sauf si j'augmente l'identation.
         C'est pas du tout chiant.
 -
-    id : 5678
+    id_machin : 5678
     name : "Test de la prise en compte des guillemets : id (et des deux points)"
     note : on a les même id lol
     comment : |

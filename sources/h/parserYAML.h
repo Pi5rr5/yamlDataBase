@@ -7,5 +7,5 @@
     int verifLine(char*);
     int isKey(char*, char*);
     int getValue(FILE*, char*);
-    int getKeyValue(FILE*, char*, char*);
+    void getKeyValue(FILE*, char*, char*);
 #endif // PARSERYAML_H_INCLUDED
