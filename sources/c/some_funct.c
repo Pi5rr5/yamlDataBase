@@ -119,3 +119,35 @@ int countTab(char* str) {
     }
     return i;
 }
+
+/**
+ * Description : Déplace le curseur du fichier jusqu'au début de la ligne voulue.
+ * Paramètres :
+ *      FILE* sourceFile : pointeur de fichier du fichier concerné.
+ *      int line : numéro de ligne auquel se déplacer.
+ * Retour :
+ *      Succès : renvoie 1.
+ *      Échec : renvoie -1
+ * Remarque : En cas de dépassement du fichier, c'est-à-dire si le numéro de ligne demandé est supérieur
+ *            au nombre actuel de lignes dans le fichier, place le curseur en fin de fichier.
+ */
+int fGoToLine(FILE* sourceFile, int line) {
+    int i;
+    int fileSize;
+    char temp[MAX];
+
+    fileSize = fSize(sourceFile);
+    if(sourceFile != NULL) {
+        fseek(sourceFile, 0, SEEK_SET);
+        for(i=0 ; i < line-1 ; i++) {
+            if(ftell(sourceFile) < fileSize) {
+                fgets(temp, MAX, sourceFile);
+            } else {
+                return 0;
+            }
+        }
+        printf("%c", fgetc(sourceFile));
+        return 1;
+    }
+    return 0;
+}

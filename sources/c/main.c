@@ -11,14 +11,11 @@
 
 int main(int argc, char **argv) {
     FILE* fp;
-    char test[MAX];
+    ll_dataBlock* test;
 
     fp = fopen("aepo_platform.yml", "r");
     if(fp != NULL) {
-        getKeyValue(fp, "id", test);
-        if(test != NULL) {
-            printf("%s", test);
-        }
+        test = getKey(fp, "id_machin");
     } else {
         printf("\nEmpty file.");
     }

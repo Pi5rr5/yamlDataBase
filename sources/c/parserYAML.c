@@ -1,26 +1,27 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "../h/struct.h"
 #include "../h/some_funct.h"
 #include "../h/parserYAML.h"
 
 #ifndef MAX
-    #define MAX 255     // Taille maximum utilée pour les chaine de caractères non dynamiques.
+    #define MAX 255     // Taille maximum utilée pour les chaines de caractères non dynamiques.
 #endif // MAX
 
 /**
- * Description : Ajoute un élément à une liste chaînée de type `tableEntity`
+ * Description : Ajoute un élément à une liste chaînée de type `ll_dataBlock`
  * Paramètre(s) :
- *      tableEntity* list : pointeur du début de la liste chaînée.
+ *      ll_dataBlock* list : pointeur du début de la liste chaînée.
  *      value : valeur à ajouter dans le nouvel élément
  * Retour :
  *      Succès : pointeur vers la liste chaînée mise à jour.
  *      Échec  : en cas d'erreur d'allocation, renvoie la liste non mise à jour.
  *
  */
-tableEntity* ll_addAtEnd(tableEntity* list, char* value) {
-    tableEntity* new_element;
-    tableEntity* temp;
+ll_line* ll_addAtEnd(ll_line* list, char* value) {
+    ll_line* new_element;
+    ll_line* temp;
 
     new_element = malloc(sizeof(list));     // Allocation nécessaire pour le nouvel élément.
     if(new_element != NULL) {               // Si l'allocation s'est bien passée.
@@ -39,6 +40,59 @@ tableEntity* ll_addAtEnd(tableEntity* list, char* value) {
     }
     return list;                            // Si erreur d'allocation, on retourne liste actuelle.
 }
+
+
+
+
+/**
+ * Description : Affiche tous les éléments d'une liste chaînée de type ll_dataBlock.
+ *               Servira seulement pour du déboggage.
+ * Parmètre(s) :
+ *     ll_dataBlock* list : liste chaînée concernée.
+ * Retour : Aucun.
+ */
+void ll_display(ll_line* list) {
+    ll_line* temp;
+
+    if(list != NULL) {
+        temp = list;
+        while(temp->next != NULL) {
+            printf("%s | ", temp->line);
+            temp = temp->next;
+        }
+        printf("%s\n", temp->line);
+    } else {
+        fprintf(stderr, "Liste vide.");
+    }
+    printf("\n");
+}
+
+
+
+
+/**
+ * Description : libère tout l'espace mémoire pris par la liste chaînée.
+ * Paramtères :
+ *     ll_dataBlock list : liste chaînée concernée.
+ * Retour : Aucun.
+ */
+void ll_freeList(ll_dataBlock* list) {
+    ll_dataBlock* temp;
+    ll_dataBlock* temp2;
+
+    if(list != NULL) {
+        temp  = list;
+        temp2 = list;
+        while(temp->next != NULL) {
+            temp2 = temp;
+            temp = temp->next;
+            free(temp2);
+        }
+        free(temp);
+    }
+}
+
+
 
 
 /**
@@ -71,6 +125,9 @@ int freadL(FILE* sourceFile, unsigned int sizeMax, char* destination) {
     return 0;
 }
 
+
+
+
 /**
  * Description : Vérifie que la ligne en question est bien à traiter.
  * Paramètre(s) :
@@ -90,6 +147,8 @@ int verifLine(char* str) {
         return 0;
     return 1;   // Si aucun des cas ci-dessus, alors la ligne peut être traiter.
 }
+
+
 
 
 /**
@@ -145,11 +204,7 @@ int isKey(char* line, char* wantedStr) {
  *      Échec  : 0
  */
 int getValue(FILE* sourceFile, char* destination) {
-    int i;
-    int tempInt;
-    char tempChar;
     char line[MAX];
-    char* tempCharPointer;
 
     if(sourceFile != NULL) {
         freadL(sourceFile, MAX, line);
@@ -164,6 +219,7 @@ int getValue(FILE* sourceFile, char* destination) {
                 break;
             default:    // Valeur classique
                 strcpy(destination, line);
+                //ll_addAtEnd(linkedList, line);
                 return 1;
         }
     }
@@ -173,45 +229,83 @@ int getValue(FILE* sourceFile, char* destination) {
 
 
 
+/**
+ * Description : Lit l'ensemble des lignes d'une entité en enregistre le tout sous forme de liste chaînée.
+ * Paramètres :
+ *      FILE* sourceFile : pointeur de fichier du fichier concerné.
+ *      int lineNb : ligne où commence le bloc de données.
+ * Retour :
+ *      Succès : Renvoie une liste chaînée de bloc de données
+ *      Échec  : Renvoie NULL.
+ */
+ll_dataBlock* getDataBlock(FILE* sourceFile, int lineNb) {
+    int initTabCounter;
+    char line[MAX];
+    ll_dataBlock* temp;
+
+    if(sourceFile != NULL) {
+        fGoToLine(sourceFile, lineNb);
+        initTabCounter = countTab(line);
+        do {
+            if(freadL(sourceFile, MAX, line)) {
+                if(countTab(line) > initTabCounter) {
+                    printf("Ajout d'une ligne au bloc");
+                    temp = ll_addAtEnd(temp, line);
+                    continue;
+                }
+            } else if(temp != NULL) {
+                return temp;
+            }
+            break;
+        }while(1);
+    }
+    return NULL;
+}
 
 
 /**
- * Description : Cherche la première occurence d'une clef dans un fichier et renvoie sa valeur.
+ * Description : Cherche l'ensemble des occurence d'une clef dans le fichier.
  * Paramètres :
  *      FILE* sourceFile : Pointeur de fichier du fichier concerné.
  *      char* key : Chaîne de caractères à rechercher dans le fichier.
  *      char* destination : Chaîne de caractères dans laquelle enregistrer la valeur trouvée.
  * Retour :
- *      Succès : met la valeur dans destination.
- *      Echec  : assigne NULL dans destination.
+ *      Succès : Renvoie la liste chaînée de tous les blocs de données contenant la clef correspondante.
+ *      Échec : Renvoie NULL.
  * Remarque : Peut être améliorée ou dérivée en une fonction renvoyant les valeurs de chaque occurence.
  */
-void getKeyValue(FILE *sourceFile, char *key, char* destination) {
+ll_dataBlock* getKey(FILE *sourceFile, char *key) {
     int tempInt;
 	int fileSize;
 	int insideText;
-	int lastCorrectTab;
+	int lineCounter;
+	int lastCorrectTabValue;
+	int lastCorrectTabLineNb;
 	char line[MAX];
+	ll_dataBlock* entities;
 
-    insideText     = 0;
-    lastCorrectTab = 0;
 	fileSize       = fSize(sourceFile);
+    insideText     = 0;
+    lineCounter    = 0;
+    lastCorrectTabValue  = 0;
+    lastCorrectTabLineNb = 0;
 
     while(ftell(sourceFile) < fileSize) {       // Parcours du fichier
+        lineCounter++;
         if(freadL(sourceFile, MAX, line)) {     // Lecture d'une ligne du fichier
             if(verifLine(line)) {               // Si la ligne peut être traitée.
                 if(insideText) {                // insideText` est un booléen qui passe à `true` lorsqu'une syntaxe de valeur texte est détectée (cf. ligne 209).
-                    if((tempInt = countTab(line)) < lastCorrectTab) {   // Avant de rentrer dans une valeur texte, on enregistre la tabulation actuelle. A partir du moment où l'on revient à, ou que l'on souspasse, cette tabulatio, c'est qu'on sort de la valeur texte.
-                        lastCorrectTab = tempInt;                       // On met à jour la tabulation actuelle.
-                        insideText = 0;                                 // Le booléen repasse à `false`.
-                    } else {
-                        continue;                                       // On passe à la ligne suivante.
+                    if((tempInt = countTab(line)) >= lastCorrectTabValue) {     // Avant de rentrer dans une valeur texte, on enregistre la tabulation actuelle. A partir du moment où l'on revient à, ou que l'on souspasse, cette tabulatio, c'est qu'on sort de la valeur texte.
+                        continue;               // Le booléen repasse à `false`.
                     }
+                    lastCorrectTabValue  = tempInt;             // On met à jour la tabulation actuelle.
+                    lastCorrectTabLineNb = lineCounter;         // On mets à jour la dernière ligne avec une indentation correcte.
+                    insideText = 0;
                 }   // Si la ligne lue n'est pas une valeur texte
-                if(strchr(line, '>') || strchr(line, '|')) {            // /!\ ERREUR /!\ recherche un délimiteur de texte dans la ligne mais ne prend pas en compte le fait qu'il puisse être dans un valeur texte.
-                    lastCorrectTab = countTab(line);                    // On met à jour la tabulation actuelle.
-                    insideText = 1;                                     // Le booléen de texte passe à `true`.
-                } else if(isKey(line, key)) {           // Vérification si la ligne contient une clef (optionnel en soi, mais plus sécurisé).
+                if(strchr(line, '>') || strchr(line, '|')) {    // /!\ ERREUR /!\ recherche un délimiteur de texte dans la ligne mais ne prend pas en compte le fait qu'il puisse être dans un valeur texte.
+                    lastCorrectTabValue = countTab(line);       // On met à jour la tabulation actuelle.
+                    insideText = 1;
+                } else if(isKey(line, key)) {                   // Vérification si la ligne contient une clef (optionnel en soi, mais plus sécurisé).
                     /* On veut se mettre juste avant la valeur */
                     tempInt = 0;
                     while(line[tempInt] != ':') {       // Déplacement jusqu'au ':' de la clef /!\ WARNING /!\ si la clef comprend ':', la suite ne fonctionnera pas comme il faut.
@@ -220,11 +314,13 @@ void getKeyValue(FILE *sourceFile, char *key, char* destination) {
                     while(line[tempInt] == ' ') {       // Déplacement jusqu'au premier caractère de la valeur.
                         tempInt++;
                     }
-                    fseek(sourceFile, -strlen(line)+tempInt, SEEK_CUR);     // Déplacement du curseur juste avant la valeur.
-                    getValue(sourceFile, destination);                      // Récupération de la valeur.
-                    break;
+                    fseek(sourceFile, -strlen(line)+tempInt, SEEK_CUR);         // Déplacement du curseur juste avant la valeur.
+                    entities = getDataBlock(sourceFile, lastCorrectTabLineNb, entities);
                 }
             }
         }
     }
 }
+
+
+/* FONCTION DE GESTION DE LISTE CHAINEE DES BLOC DE DONNÉES */
