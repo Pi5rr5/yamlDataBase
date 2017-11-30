@@ -6,15 +6,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../h/some_funct.h"
-#include "../h/main.h"
+#include "../h/system_function.h"
 #include "../h/struct.h"
 
 //***********************************************
 void parse_use(char *buffer) {
     //  verifier qu'il reste un mot (un seul)
     buffer += 4;
-    changeDatabase(buffer);
-    showInfo();
+    useDB(buffer);
     requestSQL();
 }
 
@@ -37,13 +36,13 @@ void parserSQL(char *word, command_options *command) {
 
 void create_database(char *buffer) {
     buffer += 9;
-    printf("CREATE DATABASE : %s", buffer);
+    createDB(buffer);
     requestSQL();
 }
 
 void create_table(char *buffer) {
     buffer += 6;
-    printf("CREATE TABLE : %s", buffer);
+    createTable(buffer);
     requestSQL();
 }
 
@@ -66,13 +65,13 @@ void parse_create(char *buffer) {
 
 void drop_database(char *buffer) {
     buffer += 9;
-    printf("DROP DATABASE : %s", buffer);
+    dropDB(buffer);
     requestSQL();
 }
 
 void drop_table(char *buffer) {
     buffer += 6;
-    printf("DROP TABLE : %s", buffer);
+    dropTable(buffer);
     requestSQL();
 }
 
@@ -89,6 +88,7 @@ void parse_drop(char *buffer) {
     buffer += 5;
     parserSQL(buffer, cmdDrop);
 }
+
 void parse_exit(char *buffer) {
     printf("Goodbye ( ^_^)／");
 }

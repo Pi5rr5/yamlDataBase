@@ -13,6 +13,8 @@
 
     void showInfo();
 
+    char* getCurrentDB();
+
     void changeDatabase(char *);
 
 #endif //YAML_SOME_FUNCT_H

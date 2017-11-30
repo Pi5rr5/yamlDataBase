@@ -11,8 +11,7 @@ db_infos locationdb;
 
 void init() {
     verifFirstInit();
-
-    locationdb.database = "None (select one)";
+    locationdb.database = "NULL";
     showInfo();
 }
 
@@ -55,13 +54,18 @@ char *upWord(char *word) {
 }
 
 void showInfo() {
-printf("current database : %s\n", locationdb.database);
+    //if(strcmp(getCurrentDB(), "NULL") != 0)
+        printf("current database : %s\n", locationdb.database);
+}
+
+char* getCurrentDB() {
+    return locationdb.database;
 }
 
 void changeDatabase(char *newDB) {
     locationdb.database = newDB;
-
 }
+
 void verifFirstInit() {
     FILE *fp;
 
