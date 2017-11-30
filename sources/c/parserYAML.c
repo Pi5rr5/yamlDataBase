@@ -22,9 +22,9 @@ listOfLines* addLineToList(listOfLines* list, lineStruct line) {
     listOfLines* new_element;
     listOfLines* temp;
 
-    new_element = malloc(sizeof(list));     // Allocation nécessaire pour le nouvel élément.
+    new_element = malloc(sizeof(listOfLines));     // Allocation nécessaire pour le nouvel élément.
     if(new_element != NULL) {               // Si l'allocation s'est bien passée.
-        new_element->line = line;   // On affecte la valeur passée en argument à l'attribut du nouvel élement correspondant.
+        new_element->line = line;           // On affecte la valeur passée en argument à l'attribut du nouvel élement correspondant.
         new_element->next = NULL;           // On fait pointer le pointeur de structure `next` à NULL, le nouvel élément devenant le dernier de la liste
         if(list == NULL) {                  // Si la liste donnée est vide.
             return new_element;             // On retourne le nouvel élément.
@@ -63,7 +63,7 @@ void displayListOfLines(listOfLines* list) {
     } else {
         fprintf(stderr, "Liste vide.");
     }
-    printf("\n");
+    printf("\n\n");
 }
 
 
@@ -232,7 +232,7 @@ char* getValue(char* line) {
 
     while(line[tempInt++] != ':');      // Déplacement jusqu'au ':' de la clef /!\ WARNING /!\ si la clef comprend ':', la suite ne fonctionnera pas comme il faut.
     while(line[tempInt++] == ' ');      // Déplacement jusqu'au premier caractère de la valeur (inclu)
-
+    printf("%s.", line);
     switch(line[--tempInt]) {           // Recule d'un cran avant
         case 39:    // Texte sur une ligne simple quote (39 en ASCII)
             break;
@@ -241,7 +241,7 @@ char* getValue(char* line) {
         default:    // Valeur classique
             return line+tempInt;
     }
-    return NULL;
+    return "";
 }
 
 
@@ -259,7 +259,9 @@ lineStruct getLineStruct(char* str) {
     char temp[MAX];
 
     strcpy(line.key, getKey(str));
+    printf("Key ok.\n");
     strcpy(line.value, getValue(str));
+    printf("Value ok.\n");
     return line;
 }
 
@@ -281,6 +283,7 @@ listOfLines* getEntity(int startLine, FILE* sourceFile) {
     lineStruct line;
     listOfLines* resultList;
 
+    resultList = NULL;
     if(sourceFile != NULL) {
         fseek(sourceFile, 0, SEEK_SET);
         for(i=0 ; i < startLine ; i++) {
@@ -290,11 +293,11 @@ listOfLines* getEntity(int startLine, FILE* sourceFile) {
         }
         while(freadL(tempStr, MAX, sourceFile)) {
             line = getLineStruct(tempStr);
-            printf("getEntity : %s\n", line.key);
             resultList = addLineToList(resultList, line);
-            system("pause");
+            displayListOfLines(resultList);
         }
     }
+    freeListOfLines(resultList);
     return NULL;
 }
 
