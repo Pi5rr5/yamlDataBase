@@ -5,15 +5,10 @@
 -
     id : 1234
     name : "id"
-    comment : >
-      Ceci est un commentaire sans retour à la ligne.
-        Sauf si j'augmente l'identation.
-        C'est pas du tout chiant.
+    comment : Ceci est un commentaire
 -
     id_machin : 5678
     name : "Test de la prise en compte des guillemets : id (et des deux points)"
-    note : on a les même id lol
-    comment : |
-      Ceci est un commentaire avec retourn à la ligne.
-        Et si j'augmente l'identation, elle est conservée.
+    note : ""
+    comment :  Ceci est un commentaire.
 ...

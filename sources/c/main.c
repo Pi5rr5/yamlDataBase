@@ -11,11 +11,10 @@
 
 int main(int argc, char **argv) {
     FILE* fp;
-    ll_dataBlock* test;
 
     fp = fopen("aepo_platform.yml", "r");
     if(fp != NULL) {
-        test = getKey(fp, "id_machin");
+        getBlockWhere("id_machin", "1", fp);
     } else {
         printf("\nEmpty file.");
     }
