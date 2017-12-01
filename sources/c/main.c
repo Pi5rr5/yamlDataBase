@@ -9,12 +9,20 @@
     #define MAX 255
 #endif  // MAX
 
+/* ----- GLOBALS ----- */
+int fileLineCounter;
+
+/* ----- MAIN ----- */
 int main(int argc, char **argv) {
     FILE* fp;
 
-    fp = fopen("aepo_platform.yml", "r");
+    fp = fopen("test.yml", "r");
     if(fp != NULL) {
+        fileLineCounter = 0;
         getBlockWhere("id_machin", "1", fp);
+        if(fclose(fp) != 0) {
+            perror("\nError while closing file.\n");
+        }
     } else {
         printf("\nEmpty file.");
     }

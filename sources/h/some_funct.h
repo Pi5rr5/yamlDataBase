@@ -19,6 +19,6 @@
 
     int countTab(char*);
 
-    int fGoToLine(FILE*, int);
+    int fGoToLine(int, FILE*);
 
 #endif //YAML_SOME_FUNCT_H

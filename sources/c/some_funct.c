@@ -7,7 +7,9 @@
 #include <stdlib.h>
 #include "../h/struct.h"
 
+/* ----- GLOBALS ----- */
 db_infos locationdb;
+extern int fileLineCounter;
 
 
 void verifFirstInit() {
@@ -79,28 +81,26 @@ void changeDatabase(char *newDB) {
  *               Sauvegarde la position du curseur avant le calcul pour pouvoir le remplacer à cet endroit à la fin de l'opération.
  * Paramètre(s) :
  *      FILE* file : Pointeur de fichier du fichier concerné.
- *
  */
 int fSize(FILE *file) {
 	int value;
 	int initialCursor;
 
-	initialCursor = ftell(file);           // Sauvegarde de la position du curseur actuelle
+	initialCursor = ftell(file);            // Sauvegarde de la position du curseur actuelle
 	fseek(file, 0, SEEK_END);               // Déplacement vers la fin du fichier
 	value = ftell(file);                    // Renvoi le nombre de charactères dans le fichier
-	fseek(file, initialCursor, SEEK_SET);  // Repositionnement du curseur à son emplacement initial.
+	fseek(file, initialCursor, SEEK_SET);   // Repositionnement du curseur à son emplacement initial.
 	return value;
 }
 
 
 /**
- * Description : Comptele nombre de tabulation au début de la chaîne donnée.
+ * Description : Compte le nombre de tabulations au début de la chaîne donnée.
  * Paramètre(s) :
  *      char* str : chaîne de caractères concernée.
  * Renvoi :
  *      Succès : Le nombre de tabulations comptées.
- *      Échec  : -1;
- *
+ *      Échec  : Renvoie -1
  */
 int countTab(char* str) {
     int i = -1;
@@ -123,30 +123,32 @@ int countTab(char* str) {
 /**
  * Description : Déplace le curseur du fichier jusqu'au début de la ligne voulue.
  * Paramètres :
- *      FILE* sourceFile : pointeur de fichier du fichier concerné.
  *      int line : numéro de ligne auquel se déplacer.
+ *      FILE* sourceFile : pointeur de fichier du fichier concerné.
  * Retour :
  *      Succès : renvoie 1.
- *      Échec : renvoie -1
+ *      Échec  : renvoie -1
  * Remarque : En cas de dépassement du fichier, c'est-à-dire si le numéro de ligne demandé est supérieur
  *            au nombre actuel de lignes dans le fichier, place le curseur en fin de fichier.
  */
-int fGoToLine(FILE* sourceFile, int line) {
+int fGoToLine(int line, FILE* sourceFile) {
     int i;
     int fileSize;
     char temp[MAX];
 
     fileSize = fSize(sourceFile);
     if(sourceFile != NULL) {
-        fseek(sourceFile, 0, SEEK_SET);
-        for(i=0 ; i < line-1 ; i++) {
-            if(ftell(sourceFile) < fileSize) {
-                fgets(temp, MAX, sourceFile);
+        fseek(sourceFile, 0, SEEK_SET);                 // Déplacement au début du fichier
+        fileLineCounter = 0;
+        for(i=0 ; i < line-1 ; i++) {                   // Déplacement jusqu'à la ligne voulue
+            if(ftell(sourceFile) >= fileSize) {         // Si on dépasse la fin du fichier (ligne demandée plus grande que le nombre de lignes du fichier)
+                return 0;                               // Alors reotur d'erreur
+            } else if(fgets(temp, MAX, sourceFile)) {   // Sinon passage à la lign suivante
+                fileLineCounter++;
             } else {
                 return 0;
             }
         }
-        printf("%c", fgetc(sourceFile));
         return 1;
     }
     return 0;
