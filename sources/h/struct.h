@@ -46,7 +46,7 @@
      *      struct ll_dataBlock* *next : élément suivant de la liste chaînée.
      */
     typedef struct listOfEntities {
-        struct listOfEntities* block;
+        struct listOfLines* entity;
         struct listOfEntities* next;
     } listOfEntities;
 #endif // STRUCT_H_INCLUDED

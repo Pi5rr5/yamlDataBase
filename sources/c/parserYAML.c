@@ -366,7 +366,7 @@ listOfEntities* getBlockWhere(char* key, char* value, FILE* sourceFile) {
                     printf("Recovering entity : \n");
                     getEntity(startingLine+1, sourceFile);  // Récupération de l'entité
                     printf("Entity recovered.\n");
-                    system("pause >NULL");
+                    system("pause >nul");
                 }
             }
         }
