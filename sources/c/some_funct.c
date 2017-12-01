@@ -6,6 +6,7 @@
 
 #include "../h/some_funct.h"
 #include "../h/parser_SQL.h"
+#include "../h/struct.h"
 
 
 
