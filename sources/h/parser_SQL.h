@@ -3,27 +3,30 @@
 //
 
 #ifndef MY_PROJ_PARSER_H
-    #define MY_PROJ_PARSER_H
+#define MY_PROJ_PARSER_H
 
-    void parse_use(char *);
 
-    void parse_create(char *);
+typedef struct commandSQL {
+    char *name;
 
-    void parse_drop(char *);
+    void (*functionSQL)(char *);
+} commandSQL;
 
-    void parse_exit(char *);
+void parserSQL(char *);
 
-    void parse_error();
+void query_use(char *);
 
-    void parserSQL(char *, command_options *);
+void query_create_database(char *);
 
-    void create_database(char *);
+void query_create_table(char *);
 
-    void create_table(char *);
+void query_drop_database(char *);
 
-    void drop_database(char *);
+void query_drop_table(char *);
 
-    void drop_table(char *);
+void query_exit(char *);
+
+void query_error(char *);
 
 #endif /* MY_PROJ_PARSER_H */
 

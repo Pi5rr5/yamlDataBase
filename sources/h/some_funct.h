@@ -3,16 +3,11 @@
 //
 
 #ifndef YAML_SOME_FUNCT_H
-    #define YAML_SOME_FUNCT_H
+#define YAML_SOME_FUNCT_H
 
-    void init();
+void menu();
 
-    void verifFirstInit();
+char *upWord(char *);
+char *cleanQuery(char *);
 
-    char *upWord(char *);
-
-    void showInfo();
-
-    void changeDatabase(char *);
-
-#endif //YAML_SOME_FUNCT_H
+#endif /* YAML_SOME_FUNCT_H */

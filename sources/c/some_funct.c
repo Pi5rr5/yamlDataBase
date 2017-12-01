@@ -3,18 +3,14 @@
 //
 
 #include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include "../h/struct.h"
 
-db_infos locationdb;
+#include "../h/some_funct.h"
+#include "../h/parser_SQL.h"
 
-void init() {
-    verifFirstInit();
 
-    locationdb.database = "None (select one)";
-    showInfo();
-}
+
+//fonction de base menu, init (procédure initialisation), ouverture fichiers
+
 
 void requestSQL() {
     int counter;
@@ -37,38 +33,86 @@ void requestSQL() {
 }
 
 
+void menu() {
+    //  verifFirstInit();
+    //  showInfo();
+    printf("WELCOME\ntype exit or blanck query for exit");
 
-//a modifier pour up que le premier mot
-char *upWord(char *word) {
-    int len;
-    len = strlen(word);
-    int boucle;
-    char *upword = malloc(sizeof(char) * len);
-    for (boucle = 0; boucle < len; boucle++) {
-        if (word[boucle] >= 'a' && word[boucle] <= 'z') {
-            upword[boucle] = word[boucle] - 32;
-        } else {
-            upword[boucle] = word[boucle];
+    while (1) {
+        char requestsql[1024] = "";
+        char word[255] = "";
+        int counter;
+        counter = 1;
+        printf("\n%d>", counter);
+        //si ; en fin
+        while (scanf("%[^\n]%*c", word) == 1) {
+            if (!strcmp(&word[strlen(word) - 1], ";")) {
+                strcat(requestsql, word);
+                parserSQL(requestsql);
+                break;
+            } else if (strcmp(&word[strlen(word) - 1], " ")) {
+                strcat(word, " ");
+            }
+            strcat(requestsql, word);
+            printf("%d>", ++counter);
         }
+        if (strlen(word) == 0) {
+            query_exit("");
+            break;
+        }
+        if (!strcmp(upWord(word), "EXIT;")) {
+            break;
+        }
+
     }
+}
+
+
+char *upWord(char *word) {
+    size_t len;
+    int boucle;
+    len = strlen(word);
+    char *upword = malloc(sizeof(char) * (len + 1));
+    for (boucle = 0; boucle < len; boucle++) {
+        upword[boucle] = (char) ((word[boucle] >= 'a' && word[boucle] <= 'z') ? word[boucle] - 32 : word[boucle]);
+    }
+    upword[len] = '\0';
     return upword;
 }
 
-void showInfo() {
-printf("current database : %s\n", locationdb.database);
-}
-
-void changeDatabase(char *newDB) {
-    locationdb.database = newDB;
-
-}
-void verifFirstInit() {
-    FILE *fp;
-
-    if ((fp = fopen("donnees","r")) == NULL)
-    {
-        printf("Impossible d'ouvrir le fichier en lecture\n");
+char *cleanQuery(char *word) {
+    size_t len;
+    int boucle;
+    int showchar;
+    showchar = 1;
+    size_t cleanspace;
+    len = strlen(word);
+    cleanspace = len;
+    if (!strncmp(&word[0], " ", 1)) {
+        cleanspace = len - 1;
+        showchar = 0;
     }
-
-
+    for (boucle = 0; boucle < len - 1; boucle++) {
+        if (!strncmp(&word[boucle], " ", 1) && !strncmp(&word[boucle + 1], " ", 1)) {
+            cleanspace--;
+        }
+    }
+    char *cleanquery = malloc(sizeof(char) * (cleanspace + 1));
+    cleanquery[cleanspace - 1] = ';';
+    cleanquery[cleanspace] = '\0';
+    cleanspace = 0;
+    for (boucle = 0; boucle < len - 1; boucle++) {
+        if (!strncmp(&word[boucle], " ", 1) && !strncmp(&word[boucle + 1], " ", 1)) {
+            continue;
+        } else {
+            if (!showchar) {
+                showchar = 1;
+            } else {
+                cleanquery[cleanspace] = word[boucle];
+                cleanspace++;
+            }
+        }
+    }
+    return cleanquery;
 }
+

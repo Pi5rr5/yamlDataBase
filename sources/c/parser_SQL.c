@@ -1,107 +1,91 @@
 //
 // Created by Qut on 29/10/2017.
 //
-
+#include "../h/parser_SQL.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "../h/some_funct.h"
-#include "../h/main.h"
-#include "../h/struct.h"
 
-//***********************************************
-void parse_use(char *buffer) {
-    //  verifier qu'il reste un mot (un seul)
-    buffer += 4;
-    changeDatabase(buffer);
-    showInfo();
-    requestSQL();
-}
 
-void parserSQL(char *word, command_options *command) {
+
+// interpreteur SQL détection mot clé, récurcivité, renvoi fonction
+
+
+commandSQL cmdSQL[] = {
+        {"USE",             query_use},
+        {"CREATE DATABASE", query_create_database},
+        {"CREATE TABLE",    query_create_table},
+        {"DROP DATABASE",   query_drop_database},
+        {"DROP TABLE",      query_drop_table},
+        {"EXIT;",           query_exit},
+        {NULL, NULL}
+};
+
+void parserSQL(char *word) {
     int error;
-    error = 1;
     int loop;
+    char *cleanquery;
     char *upword;
-    upword = upWord(word);
-    for (loop = 0; command[loop].name; loop++) {
-        if (!strncmp(upword, command[loop].name, strlen(command[loop].name))) {
-            command[loop].f(word);
+    error = 1;
+    cleanquery = cleanQuery(word);
+    upword = upWord(cleanquery);
+    printf("%s\n", upword);
+    for (loop = 0; cmdSQL[loop].name; loop++) {
+        if (!strncmp(upword, cmdSQL[loop].name, strlen(cmdSQL[loop].name))) {
+            cmdSQL[loop].functionSQL(upword);
             error = 0;
             break;
         }
     }
-    error ? parse_error() : NULL;
+    error ? query_error(word) : NULL;
+    free(cleanquery);
     free(upword);
 }
 
-void create_database(char *buffer) {
-    buffer += 9;
-    printf("CREATE DATABASE : %s", buffer);
-    requestSQL();
+
+//***********************************************
+// parse command
+//***********************************************
+void query_use(char *buffer) {
+    // vérif à faire
+    printf("parse_use: %s", buffer);
 }
 
-void create_table(char *buffer) {
-    buffer += 6;
-    printf("CREATE TABLE : %s", buffer);
-    requestSQL();
-}
-
-command_options cmdCreate[] = {
-        {"DATABASE", create_database},
-        {"TABLE",    create_table},
-        {NULL, NULL}
-
-};
-
-void parse_create(char *buffer) {
-//verifier qu'il y a au moins un mot
-    // DATABASE avec 1 mot
-    // TABLE nom ( col type(xx),
-    // col2 type(xx)
-    // )
-    buffer += 7;
-    parserSQL(buffer, cmdCreate);
-}
-
-void drop_database(char *buffer) {
-    buffer += 9;
-    printf("DROP DATABASE : %s", buffer);
-    requestSQL();
-}
-
-void drop_table(char *buffer) {
-    buffer += 6;
-    printf("DROP TABLE : %s", buffer);
-    requestSQL();
-}
-
-command_options cmdDrop[] = {
-        {"DATABASE", drop_database},
-        {"TABLE",    drop_table},
-        {NULL, NULL}
-};
-
-void parse_drop(char *buffer) {
-    // verifier qu'il y a au moins un mot
-    // DATABASE 1 mot
-    // TABLE 1 mot
-    buffer += 5;
-    parserSQL(buffer, cmdDrop);
-}
-void parse_exit(char *buffer) {
+void query_exit(char *exit) {
+    // vérifier qu'il n'y a rien d'autre ensuite
     printf("Goodbye ( ^_^)／");
 }
 
-void parse_error() {
+void query_error(char *error) {
     printf("Error: Invalid Command (╯°□°）╯︵ ┻━┻");
-    requestSQL();
+}
+//***********************************************
+
+
+//***********************************************
+// Parse create
+//***********************************************
+void query_create_database(char *buffer) {
+    // verif à faire
+    printf("parse_create_database: %s", buffer);
 }
 
-command_options cmdRequest[] = {
-        {"USE",    parse_use},
-        {"CREATE", parse_create},
-        {"DROP",   parse_drop},
-        {"EXIT",   parse_exit},
-        {NULL, NULL}
-};
+void query_create_table(char *buffer) {
+    printf("parse_create_table: %s", buffer);
+}
+//***********************************************
+
+
+//***********************************************
+// Parse drop
+//***********************************************
+void query_drop_database(char *buffer) {
+    // vérif à faire
+    printf("parse_drop_database: %s", buffer);
+}
+
+void query_drop_table(char *buffer) {
+    printf("parse_drop_table: %s", buffer);
+}
+//***********************************************
