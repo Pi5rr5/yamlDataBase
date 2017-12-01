@@ -1,18 +1,36 @@
 //
 // Created by Qut on 29/10/2017.
 //
+
 #include <stdio.h>
+
 #include "../h/some_funct.h"
 #include "../h/parser_SQL.h"
-#include <string.h>
-#include <stdlib.h>
+
 
 
 //fonction de base menu, init (procédure initialisation), ouverture fichiers
 
 
+void requestSQL() {
+    int counter;
+    int len;
+    counter = 1;
+    char word[255];
+    printf("\n%d : ", counter);
+    while (scanf("%[^\n]%*c", word) == 1) {
+        if (strstr(word, ";") != NULL) {
+            len = strlen(word);
+            word[len - 1] = '\0';
+            parserSQL(word, cmdRequest);
 
+            break;
+        }
+        //traiter le multi-ligne
+        printf("%d : ", ++counter);
+    }
 
+}
 
 
 void menu() {
@@ -97,3 +115,4 @@ char *cleanQuery(char *word) {
     }
     return cleanquery;
 }
+
