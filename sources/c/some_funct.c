@@ -18,7 +18,7 @@
 void menu() {
     //  verifFirstInit();
     //  showInfo();
-    printf("WELCOME\nTYPE EXIT OR BLANK QUERY FOR EXIT");
+    printf("WELCOME\ntype exit or blanck query for exit");
 
     while (1) {
         char requestsql[1024] = "";
