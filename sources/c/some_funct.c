@@ -12,26 +12,6 @@
 //fonction de base menu, init (procédure initialisation), ouverture fichiers
 
 
-void requestSQL() {
-    int counter;
-    int len;
-    counter = 1;
-    char word[255];
-    printf("\n%d : ", counter);
-    while (scanf("%[^\n]%*c", word) == 1) {
-        if (strstr(word, ";") != NULL) {
-            len = strlen(word);
-            word[len - 1] = '\0';
-            parserSQL(word, cmdRequest);
-
-            break;
-        }
-        //traiter le multi-ligne
-        printf("%d : ", ++counter);
-    }
-
-}
-
 
 void menu() {
     //  verifFirstInit();
