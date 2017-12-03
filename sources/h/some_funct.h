@@ -21,4 +21,5 @@
 
     int fGoToLine(int, FILE*);
 
+    void error(char*);
 #endif //YAML_SOME_FUNCT_H

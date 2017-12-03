@@ -153,3 +153,21 @@ int fGoToLine(int line, FILE* sourceFile) {
     }
     return 0;
 }
+
+
+
+
+/**
+ * Description : Fonction de gestion d'erreur. Écrit dans l'outpout dédié au erreurs.
+ *
+ * @param char* message : message d'erreur.
+ *
+ * @return void.
+ *
+ * Remarque : peut être modifié en créant un répertoire d'erreur avec chaque erreur correspondant à un message précis.
+ */
+void error(char* message) {
+    if(message != NULL) {
+        fprintf(stderr, message);
+    }
+}
