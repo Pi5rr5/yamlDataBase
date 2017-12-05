@@ -14,6 +14,16 @@ git clone https://github.com/USER_NAME/yamlDataBase.git my-proj
 cd my-proj
 ```
 
-## Compiling
-
-Create locally a C project and import sources
+## Push modification
+Based on the fact that you've just cloned the repo :mailbox_with_mail:
+```
+git branch <your name/subject>
+git checkout <your branch>
+```
+Made some enhancement :hammer:
+```
+git add <modified files>
+git commit - m "brief message to explain what you've done"
+git push -u origin <your branch>
+```
+Then create a pull request :gift:

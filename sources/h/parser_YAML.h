@@ -1,0 +1,8 @@
+//
+// Created by Qut on 12/11/2017.
+//
+
+#ifndef YAMLDATABASE_PARSER_YAML_H
+#define YAMLDATABASE_PARSER_YAML_H
+
+#endif //YAMLDATABASE_PARSER_YAML_H
