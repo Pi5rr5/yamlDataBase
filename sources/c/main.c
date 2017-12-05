@@ -10,21 +10,25 @@
 #endif  // MAX
 
 /* ----- GLOBALS ----- */
-int fileLineCounter;
+int FILE_LINE_COUNTER;
 
 /* ----- MAIN ----- */
 int main(int argc, char **argv) {
     FILE* fp;
+    listOfEntities* test;
 
-    fp = fopen("test.yml", "r");
+    fp = fopen("resources/databases.yaml", "r");
     if(fp != NULL) {
-        fileLineCounter = 0;
-        getBlockWhere("id_machin", "1", fp);
+        FILE_LINE_COUNTER = 0;
+        if ( (test = getBlockWhere("name", "test1", fp)) != NULL)
+            displayListOfEntities(test);
+        freeListOfEntities(test);
+        displayListOfEntities(test);
         if(fclose(fp) != 0) {
             perror("\nError while closing file.\n");
         }
     } else {
-        printf("\nEmpty file.");
+        error("File not found.");
     }
     /*
     init();

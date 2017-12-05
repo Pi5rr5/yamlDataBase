@@ -6,11 +6,10 @@
 #include <string.h>
 #include <stdlib.h>
 #include "../h/struct.h"
-
 /* ----- GLOBALS ----- */
 db_infos locationdb;
-extern int fileLineCounter;
-
+extern int FILE_LINE_COUNTER;
+extern int DEBUG_PRINT;
 
 void verifFirstInit() {
     FILE *fp;
@@ -77,7 +76,7 @@ void changeDatabase(char *newDB) {
 
 
 /**
- * Description : Renvoie le nombre de caractères présents dans un fichiers.
+ * @breif Renvoie le nombre de caractères présents dans un fichiers.
  *               Sauvegarde la position du curseur avant le calcul pour pouvoir le remplacer à cet endroit à la fin de l'opération.
  * Paramètre(s) :
  *      FILE* file : Pointeur de fichier du fichier concerné.
@@ -95,7 +94,7 @@ int fSize(FILE *file) {
 
 
 /**
- * Description : Compte le nombre de tabulations au début de la chaîne donnée.
+ * @breif Compte le nombre de tabulations au début de la chaîne donnée.
  * Paramètre(s) :
  *      char* str : chaîne de caractères concernée.
  * Renvoi :
@@ -121,7 +120,7 @@ int countTab(char* str) {
 }
 
 /**
- * Description : Déplace le curseur du fichier jusqu'au début de la ligne voulue.
+ * @breif Déplace le curseur du fichier jusqu'au début de la ligne voulue.
  * Paramètres :
  *      int line : numéro de ligne auquel se déplacer.
  *      FILE* sourceFile : pointeur de fichier du fichier concerné.
@@ -139,12 +138,12 @@ int fGoToLine(int line, FILE* sourceFile) {
     fileSize = fSize(sourceFile);
     if(sourceFile != NULL) {
         fseek(sourceFile, 0, SEEK_SET);                 // Déplacement au début du fichier
-        fileLineCounter = 0;
+        FILE_LINE_COUNTER = 0;
         for(i=0 ; i < line-1 ; i++) {                   // Déplacement jusqu'à la ligne voulue
             if(ftell(sourceFile) >= fileSize) {         // Si on dépasse la fin du fichier (ligne demandée plus grande que le nombre de lignes du fichier)
                 return 0;                               // Alors reotur d'erreur
             } else if(fgets(temp, MAX, sourceFile)) {   // Sinon passage à la lign suivante
-                fileLineCounter++;
+                FILE_LINE_COUNTER++;
             } else {
                 return 0;
             }
@@ -158,7 +157,7 @@ int fGoToLine(int line, FILE* sourceFile) {
 
 
 /**
- * Description : Fonction de gestion d'erreur. Écrit dans l'outpout dédié au erreurs.
+ * @breif Fonction de gestion d'erreur. Écrit dans l'outpout dédié au erreurs.
  *
  * @param char* message : message d'erreur.
  *
@@ -166,8 +165,7 @@ int fGoToLine(int line, FILE* sourceFile) {
  *
  * Remarque : peut être modifié en créant un répertoire d'erreur avec chaque erreur correspondant à un message précis.
  */
-void error(char* message) {
-    if(message != NULL) {
+void error(const char* message) {
+    if(message != NULL)
         fprintf(stderr, message);
-    }
 }

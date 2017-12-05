@@ -14,7 +14,7 @@
 #endif // DEBUG_PRINT
 
 /* ----- GLOBALS ----- */
-extern int fileLineCounter;     // Extern est utlisé pour les globales uniquement.\
+extern int FILE_LINE_COUNTER;     // Extern est utlisé pour les globales uniquement.\
                                     Il permet au compilateur de signaler que cette variable a peut être déjà été déclarée qulquepart.\
                                     Il parcourt alors les fichiers (donc un peu coûteux en ressources)\
                                     et s'il trouve une autre déclaration qui a déjà été exécutée,\
@@ -22,11 +22,12 @@ extern int fileLineCounter;     // Extern est utlisé pour les globales uniquemen
 
 
 
-
 /* ----- FUNCTIONS ----- */
 
 /**
- * Description : Ajoute un élément à une liste chaînée de type `listOfLines`
+ * @name addLineToList
+ *
+ * @brief Ajoute un élément à une liste chaînée de type `listOfLines`
  *
  * @param listOfLines* list : pointeur du début de la liste chaînée.
  * @param value : valeur à ajouter dans le nouvel élément
@@ -40,8 +41,7 @@ listOfLines* addLineToList(listOfLines* list, lineStruct line) {
 
     new_element = malloc(sizeof(listOfLines));     // Allocation nécessaire pour le nouvel élément.
     if(new_element != NULL) {               // Si l'allocation s'est bien passée.
-        if(DEBUG_PRINT)
-            printf("\tAdding to list : '%s' as key and '%s' as value.\n", line.key, line.value);
+        if(DEBUG_PRINT) printf("Adding to list : '%s' as key and '%s' as value.\n", line.key, line.value);
         new_element->line = line;           // On affecte la valeur passée en argument à l'attribut du nouvel élement correspondant.
         new_element->next = NULL;           // On fait pointer le pointeur de structure `next` à NULL, le nouvel élément devenant le dernier de la liste
         if(list == NULL) {                  // Si la liste donnée est vide.
@@ -62,7 +62,9 @@ listOfLines* addLineToList(listOfLines* list, lineStruct line) {
 
 
 /**
- * Description : Ajoute un élément à une liste chaînée de type `listOfEntities`
+ * @name addEntityToList
+ *
+ * @brief Ajoute un élément à une liste chaînée de type `listOfEntities`
  *
  * @param listOfEntities* list : pointeur du début de la liste chaînée.
  * @param value : valeur à ajouter dans le nouvel élément
@@ -96,8 +98,10 @@ listOfEntities* addEntityToList(listOfEntities* list, listOfLines* entity) {
 
 
 /**
- * Description : Affiche tous les éléments d'une liste chaînée de type listOfLines.
- *               Servira seulement pour du déboggage.
+ * @name displayListOfLines
+ *
+ * @brief Affiche tous les éléments d'une liste chaînée de type listOfLines.
+ *          Servira seulement pour du déboggage.
  *
  * @param listOfLines* list : liste chaînée concernée.
  *
@@ -110,12 +114,12 @@ void displayListOfLines(listOfLines* list) {
     if(list != NULL) {
         temp = list;
         while(temp->next != NULL) {
-            printf("\t\tkey :\t%s\n\t\tvalue :\t%s\n", temp->line.key, temp->line.value);
+            printf("\t\tkey :%s\n\t\tvalue :%s\n", temp->line.key, temp->line.value);
             temp = temp->next;
         }
-        printf("\t\tkey :\t%s\n\t\tvalue :\t%s\n", temp->line.key, temp->line.value);
+        printf("\t\tkey :%s\n\t\tvalue :%s\n", temp->line.key, temp->line.value);
     } else {
-        error("Liste vide.");
+        error("\t\tListe vide.");
     }
     printf("\tEnd of list.\n\n");
 }
@@ -124,8 +128,10 @@ void displayListOfLines(listOfLines* list) {
 
 
 /**
- * Description : Affiche tous les éléments d'une liste chaînée de type listOfEntities.
- *               Servira seulement pour du déboggage.
+ * @name displayListOfEntities
+ *
+ * @brief Affiche tous les éléments d'une liste chaînée de type listOfEntities.
+ *          Servira seulement pour du déboggage.
  *
  * @param listOfEntities* list : liste chaînée concernée.
  *
@@ -134,7 +140,7 @@ void displayListOfLines(listOfLines* list) {
 void displayListOfEntities(listOfEntities* list) {
     listOfEntities* temp;
 
-    printf("\tList of entitites :\n");
+    printf("\nList of entitites :\n");
     if(list != NULL) {
         temp = list;
         while(temp->next != NULL) {
@@ -143,16 +149,18 @@ void displayListOfEntities(listOfEntities* list) {
         }
         displayListOfLines(temp->entity);
     } else {
-        error("Liste vide.");
+        error("\tListe vide.\n");
     }
-    printf("\tEnd of list.\n\n");
+    printf("End of list.\n\n");
 }
 
 
 
 
 /**
- * Description : libère tout l'espace mémoire pris par la liste chaînée.
+ * @name freeListOfLines
+ *
+ * @brief libère tout l'espace mémoire pris par la liste chaînée.
  *
  * @param listOfLines list : liste chaînée concernée.
  *
@@ -167,12 +175,12 @@ void freeListOfLines(listOfLines* list) {
         temp2 = list;
         while(temp->next != NULL) {
             temp2 = temp;
-            temp = temp->next;
-            if(temp2 != NULL) {
+            if(temp2 != NULL)
                 free(temp2);
-            }
+            temp = temp->next;
         }
-        free(temp);
+        if(temp != NULL)
+            free(temp);
     }
 }
 
@@ -180,27 +188,38 @@ void freeListOfLines(listOfLines* list) {
 
 
 /**
- * Description : Libère tout l'espace mémoire pris par la liste chaînée
+ * @name displayListOfEntities
+ *
+ * @brief Libère tout l'espace mémoire pris par la liste chaînée
  *
  * @param listOfEntities* list : list chaînée
  *
  * @return void.
  */
 void freeListOfEntities(listOfEntities* list) {
-    listOfEntities* temp;
-    listOfEntities* temp2;
+    listOfEntities* temp;       // Curseur ayant un cran d'avance (cf. paragraphe d'explication ci-dessous
+    listOfEntities* temp2;      // Curseur "libérateur de mémoire"
 
+    /*
+        Pour libérer l'espace mémoire d'une liste chaînée, deux curseurs sont nécessaire.
+        Un des curseur parcours la liste élément par élément en libérant leur espace mémoire les hein après les autres.
+        Seulement en libérant cet espace mémoire, on perd tout trace de l'élément suivant de la liste.
+        C'est pouruqoi on utilise un second curseur qui sera un cran en avant dans les élément, poru pouvoir continuer de libérer la chaîne.
+    */
     if(list != NULL) {
         temp  = list;
         temp2 = list;
         while(temp->next != NULL) {
             temp2 = temp;
-            temp = temp->next;
-            if(temp2 != NULL) {
-                freeListOfLines(temp2->entity);
+            if(temp2 != NULL) {                 // Simple sécurité, le cas contraire ne devrait jamais arriver
+                freeListOfLines(temp2->entity); // Libération mémoire de l'ensensemble de l'élément (lui même étant une liste chaînée d'un autre type)
+                free(temp2);
             }
+            temp = temp->next;
         }
-        free(temp);
+        freeListOfLines(temp->entity);
+        if(temp != NULL)
+            free(temp);
     }
 }
 
@@ -208,7 +227,9 @@ void freeListOfEntities(listOfEntities* list) {
 
 
 /**
- * Description : Lit une ligne dans un fihcier donnée et la renvoie dans la chaîne passée en argument.
+ * @name freadL
+ *
+ * @brief Lit une ligne dans un fihcier donnée et la renvoie dans la chaîne passée en argument.
  *               `fgets` a pour défaut d'avoir un saut de ligne ('\n') en fin de chaîne.
  *               `freadL` (la fonction ci-dessous) a pour unique but de palier à ce défaut.
  *
@@ -219,15 +240,15 @@ void freeListOfEntities(listOfEntities* list) {
  * @return (on success) 1
  * @return (on failure) 0
  *
- * Remarque : Pas de gestion de la position du pointeur.
+ * @remarks Pas de gestion de la position du pointeur.
  */
 int freadL(char* destination, unsigned int sizeMax, FILE* sourceFile) {
     int strLength;
     char result[MAX];
 
     if(sourceFile != NULL) {
-        if(fgets(result, sizeMax, sourceFile) != NULL) {        // Lecture d'un ligne dans le fichier
-            fileLineCounter++;
+        if(fgets(result, sizeMax, sourceFile) != NULL) {    // Lecture d'un ligne dans le fichier
+            FILE_LINE_COUNTER++;
             strLength = strlen(result);
             if(result[strLength-1] == '\n') {  // Si le dernier caractère avant le '\0' est un saut de ligne
                 result[strLength-1] = '\0';    // On le remplace par un '\0'
@@ -242,30 +263,47 @@ int freadL(char* destination, unsigned int sizeMax, FILE* sourceFile) {
 
 
 /**
- * Description : Vérifie que la ligne en question est bien à traiter.
+ * @name verifLine
+ *
+ * @brief Vérifie que la ligne en question est bien à traiter.
  *
  * @param char* str : chaîne de caractères concerncée.
  *
- * @return (on success) 1.
- * @return (on failure) :
- *      - Si la ligne est un commentaire ou une ligne vide, renvoie 0.
- *      - Si la ligne est le symbole de fin de fichier, ou s'il y a eu une erreur de base, renvoie -1.
+ * @return (on success) 1
+ * @return (on failure) 0
  */
 int verifLine(char* str) {
-    // Le symbole de fin di fichier est "...". Il peut être suivit d'un saut de ligne ('\n'). Dans certains texte, le saut de ligne est en réalité "\r\n".
-    if(str == NULL || strcmp(str, "...") == 0 || strcmp(str, "...\n") == 0 || strcmp(str, "...\r\n") == 0)
-        return -1;
-    // Si la ligne lue est un commentaire ou une ligne vide. (Là encore, il peut y avoir '\r' avant un saut de ligne)
+
+    // Empty string
+    if(str == NULL || strlen(str) == 0)
+        return 0;
+
+    // Début de fichier
+    if(strcmp(str, "---") == 0      // Le symbole de début de fichier est "---"
+    || strcmp(str, "---\n") == 0    // Il peut être suivit d'une saut de ligne
+    || strcmp(str, "---\r\n") == 0) // Autre écriture du saut de ligne possible.
+        return 0;
+
+    // Fin de fichier
+    if(strcmp(str, "...") == 0      // Le symbole de fin de fichier est "..."
+    || strcmp(str, "...\n") == 0    // Peut être suivit d'un saut de ligne.
+    || strcmp(str, "...\r\n") == 0) // Autre écriture du saut de ligne possible (dépend du fichier).
+        return 0;
+
+    // Commentaire ou ligne vide
     if(str[0] == '#' || str[0] == '\n' || str[0] == '\r')
         return 0;
-    return 1;   // Si aucun des cas ci-dessus, alors la ligne peut être traiter.
+
+    return 1;   // Si aucun des cas ci-dessus, alors la ligne peut être traitée.
 }
 
 
 
 
 /**
- * Description : Vérifie que la ligne passée en argument contient bien une clef donnée.
+ * @name hasKey
+ *
+ * @brief Vérifie que la ligne passée en argument contient bien une clef donnée.
  *               Pour ce faire, parcours le fichier à la recherche d'occurences.
  *               Dès qu'une est trouvée, on vérifie qu'il n'y a rien avant et rien après hormis des espaces ou des caractères autorisés ('-' et ':')
  *
@@ -308,12 +346,14 @@ int hasKey(char* line, char* key) {
 
 
 /**
- * Description : prend une ligne de données YAML en paramètre et retourne la clef qui s'y trouve.
+ * @name getKey
+ *
+ * @brief prend une ligne de données YAML en paramètre et retourne la clef qui s'y trouve.
  *
  * @param char* line : ligne YAML concernée.
  *
  * @return (on success) char* result : clef obtenue.
- * @return (on failure) NULL.
+ * @return (on failure) NULL
  */
 char* getKey(char* line) {
     int tempInt;
@@ -329,8 +369,7 @@ char* getKey(char* line) {
 
     strncpy(result, line+keyStart-1, tempInt-keyStart);     // copie juste la clef dans result
     result[tempInt-keyStart] = '\0';                        // strncpy ne prend pas en charge le '\0', on le rajoute à la fin de la chaîne
-    if(DEBUG_PRINT)
-        printf("\tKey recovered : %s\n", result);
+    if(DEBUG_PRINT) printf("Key recovered : %s\n", result);
     return result;
 }
 
@@ -338,7 +377,9 @@ char* getKey(char* line) {
 
 
 /**
- * Description : Prends une ligne de YAML en paramètre et renvoie la valeur qui s'y trouve.
+ * @name getValue
+ *
+ * @brief Prends une ligne de YAML en paramètre et renvoie la valeur qui s'y trouve.
  *
  * @param char* destination : chaîne de caractères dans laquelle sotcker la valeur.
  * @param char* line : ligne de YAML à traiter.
@@ -358,10 +399,10 @@ char* getValue(char* line) {
         case 34:    // Texte sur une ligne double quote (34 en ASCII)
             break;
         default:    // Valeur classique
-            if(DEBUG_PRINT)
-                printf("\tValue recovered : %s\n", line+tempInt);
+            if(DEBUG_PRINT) printf("Value recovered : %s\n", line+tempInt);
             return line+tempInt;
     }
+    if(DEBUG_PRINT) printf("Value recovered : \"\"\n");
     return "";
 }
 
@@ -369,13 +410,15 @@ char* getValue(char* line) {
 
 
 /**
- * Description : Prend une ligne de donnée YAML en paramètre et renvoie un objet `line` contenant sa clef et sa valeur.
+ * @name getLineStruct
+ *
+ * @brief Prend une ligne de donnée YAML en paramètre et renvoie un objet `line` contenant sa clef et sa valeur.
  *
  * @param char* str : chaîné de caractère de la ligne YAML concernée.
  *
  * @return (on success) lineStruct line : objet `line` contenant la clef et la valeur trouvées.
  *
- * Remarque : Cas d'échec non géré.
+ * @remarks Cas d'échec non géré.
  */
 lineStruct getLineStruct(char* str) {
     lineStruct line;
@@ -389,7 +432,9 @@ lineStruct getLineStruct(char* str) {
 
 
 /**
- * Description : Récupère l'intégralité d'une entité.
+ * @name getEntity
+ *
+ * @brief Récupère l'intégralité d'une entité.
  *
  * @param int startLine : Ligne où démarre l'ensemble des informations de l'entité.
  * @param FILE* sourceFile : pointeur de fichier du fichier concerné.
@@ -408,20 +453,25 @@ listOfLines* getEntity(int startLine, FILE* sourceFile) {
             while(freadL(tempStr, MAX, sourceFile) && verifLine(tempStr) && countTab(tempStr) != 0) {
                 line = getLineStruct(tempStr);
                 resultList = addLineToList(resultList, line);
-                displayListOfLines(resultList);
             }
             fseek(sourceFile, -strlen(tempStr)-2, SEEK_CUR);
-            fileLineCounter--;
+            FILE_LINE_COUNTER--;
+        } else {
+            if(DEBUG_PRINT) printf("Line change failed.\n");
         }
+    } else {
+        if(DEBUG_PRINT) printf("Source file not found.\n");
     }
-    return NULL;
+    return resultList;
 }
 
 
 
 
 /**
- * Description : Renvoie l'ensemble des entité ayant la clef passée en paramètre valant la valeur donnée.
+ * @name getBlockWhere
+ *
+ * @brief Renvoie l'ensemble des entité ayant la clef passée en paramètre valant la valeur donnée.
  *
  * @param char* key : Clef à rechercher
  * @param char* value : Valeur que la clef doit avoir.
@@ -443,58 +493,62 @@ listOfEntities* getBlockWhere(char* key, char* value, FILE* sourceFile) {
     entities = NULL;
 	fileSize = fSize(sourceFile);
     startingLine = 0;
-    fileLineCounter  = 0;
+    FILE_LINE_COUNTER  = 0;
 
     while(ftell(sourceFile) < fileSize) {                   // Parcours du fichier
         if(freadL(line, MAX, sourceFile)) {                 // Lecture d'une ligne du fichier
             if(verifLine(line)) {                           // Si la ligne peut être traitée.
                 tabulation = countTab(line);
                 if(tabulation == 0) {                       // Si début d'entité
-                    if(DEBUG_PRINT)
-                        printf("Start of entity found at line %d\n", fileLineCounter);
-                    startingLine = fileLineCounter;             // On enregistre la ligne de début de l'entité
+                    if(DEBUG_PRINT) printf("Start of entity found at line %d\n", FILE_LINE_COUNTER);
+                    startingLine = FILE_LINE_COUNTER;       // On enregistre la ligne de début de l'entité
                 } else {
                     if(strcpy(tempKey, getKey(line)) != NULL) {
                         if(strcpy(tempValue, getValue(line)) != NULL) {
                             if(strcmp(tempKey, key) == 0 && strcmp(tempValue, value) == 0) {
-                                printf("Recovering entity : \n");
+                                if(DEBUG_PRINT) printf("Recovering entity : \n");
                                 if((tempEntity = getEntity(startingLine+1, sourceFile)) != NULL) {
-                                    if(addEntityToList(entities, tempEntity) != NULL) {             // Récupération de l'entité
-                                        if(DEBUG_PRINT) {
-                                            printf("Entity recovered.\n");
-                                        }
-                                    } else {
+                                    if ( (entities = addEntityToList(entities, tempEntity)) == NULL) {             // Récupération de l'entité
                                         error("Error while adding entity from file.");
+                                        break;
+                                    } else {
+                                        if(DEBUG_PRINT) printf("Entity recovered.\n");
                                     }
                                 } else {
-                                    error("Error while recovering entity from file.");
+                                    error("Error while recovering entity.");
+                                    break;
                                 }
                             }
                         } else {
                             error("Error while recovering value.");
+                            break;
                         }
                     } else {
                         error("Error while recovering key.");
+                        break;
                     }
                 }
             }
         }
-        system("pause >nul");
     }
-    freeListOfEntities(entities);
-    return NULL;
+    if(DEBUG_PRINT) printf("\nEnd of process.\n");
+    return entities;
 }
 
 
 
 
 /**
- * Description : Récupère l'ensemble des entités présente dans une table.
+ * @name getAllFrom
+ *
+ * @brief Récupère l'ensemble des entités présente dans une table.
  *
  * @param FILE* sourceFile : pointeur de fichier du fichier concerné.
  *
  * @return (on success) listOfEntities* entities :
  * @return (on failure) NULL
+ *
+ * @remarks Pas finie.
  */
 listOfEntities* getAllFrom(FILE* sourceFile) {
     int fileSize;
@@ -510,16 +564,16 @@ listOfEntities* getAllFrom(FILE* sourceFile) {
 
     if(sourceFile != NULL) {
         fileSize = fSize(sourceFile);
-        fileLineCounter = 0;
+        FILE_LINE_COUNTER = 0;
         while(ftell(sourceFile) < fileSize) {
             if(freadL(tempStr, MAX, sourceFile)) {
-                fileLineCounter++;
+                FILE_LINE_COUNTER++;
                 if(verifLine(tempStr)) {
                     tabulation = countTab(tempStr);
                     if(tabulation == 0) {
                         if(DEBUG_PRINT)
-                            printf("Start of entity found at line %d\n", fileLineCounter);
-                        startOfEntity = fileLineCounter;             // On enregistre la ligne de début de l'entité
+                            printf("Start of entity found at line %d\n", FILE_LINE_COUNTER);
+                        startOfEntity = FILE_LINE_COUNTER;             // On enregistre la ligne de début de l'entité
                     } else {
                         if((tempEntity = getEntity(startOfEntity+1, sourceFile)) != NULL) {
                             if(addEntityToList(entities, tempEntity) != NULL) {
