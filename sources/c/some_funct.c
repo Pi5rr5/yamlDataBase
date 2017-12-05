@@ -11,7 +11,7 @@
 //fonction de base menu, init (procédure initialisation), ouverture fichiers
 
 
-
+extern int fileLineCounter;
 
 
 
@@ -97,3 +97,34 @@ char *cleanQuery(char *word) {
     }
     return cleanquery;
 }
+
+
+int isAlphaNum(char *word) {
+    size_t len;
+    int isOk;
+    isOk = 1;
+    len = strlen(word);
+    for(int boucle = 0; boucle < len; boucle++) {
+        if ((word[boucle] < 'a' || word[boucle] > 'z')) { isOk = 0; break; }
+    }
+    return isOk;
+}
+
+
+int countArgs(char* countChar, char delim) {
+    int count;
+    char* token = strtok(countChar, (const char *) delim);
+    while( token != NULL ) {
+        count++;
+        token = strtok(NULL, (const char *) delim);
+    }
+    return count;
+}
+
+//exemple
+/**
+ * Description : Renvoie le nombre de caractères présents dans un fichiers.
+ *               Sauvegarde la position du curseur avant le calcul pour pouvoir le remplacer à cet endroit à la fin de l'opération.
+ * Paramètre(s) :
+ *      FILE* file : Pointeur de fichier du fichier concerné.
+ */

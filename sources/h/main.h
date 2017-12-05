@@ -5,7 +5,7 @@
 #ifndef MY_PROJ_MAIN_H
 #define MY_PROJ_MAIN_H
 
-void requestSQL();
+
 
 
 

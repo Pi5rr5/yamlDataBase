@@ -14,15 +14,13 @@ typedef struct commandSQL {
 
 void parserSQL(char *);
 
-void query_use(char *);
 
-void query_create_database(char *);
+
 
 void query_create_table(char *);
 
-void query_drop_database(char *);
 
-void query_drop_table(char *);
+
 
 void query_exit(char *);
 

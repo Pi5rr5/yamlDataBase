@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../h/some_funct.h"
+#include "../h/Core.h"
 
 
 
@@ -25,67 +26,42 @@ commandSQL cmdSQL[] = {
 void parserSQL(char *word) {
     int error;
     int loop;
-    char *cleanquery;
-    char *upword;
+    int lenQuery;
+    int lenWord;
+    char *cleanQueryChar;
+    char *upWordChar;
+    char *querySent;
     error = 1;
-    cleanquery = cleanQuery(word);
-    upword = upWord(cleanquery);
-    printf("%s\n", upword);
+    cleanQueryChar = cleanQuery(word);
+    upWordChar = upWord(cleanQueryChar);
     for (loop = 0; cmdSQL[loop].name; loop++) {
-        if (!strncmp(upword, cmdSQL[loop].name, strlen(cmdSQL[loop].name))) {
-            cmdSQL[loop].functionSQL(upword);
+        if (!strncmp(upWordChar, cmdSQL[loop].name, strlen(cmdSQL[loop].name))) {
+            lenQuery = strlen(cleanQueryChar);
+            lenWord = strlen(cmdSQL[loop].name) +1;
+            querySent = malloc(sizeof(char) * (lenQuery - lenWord));
+            strncpy(querySent, cleanQueryChar + lenWord, lenQuery - lenWord - 1);
+            cmdSQL[loop].functionSQL(querySent);
+            free(querySent);
             error = 0;
             break;
         }
     }
     error ? query_error(word) : NULL;
-    free(cleanquery);
-    free(upword);
+    free(cleanQueryChar);
+    free(upWordChar);
 }
 
 
-//***********************************************
-// parse command
-//***********************************************
-void query_use(char *buffer) {
-    // vérif à faire
-    printf("parse_use: %s", buffer);
-}
 
 void query_exit(char *exit) {
-    // vérifier qu'il n'y a rien d'autre ensuite
     printf("Goodbye ( ^_^)／");
 }
 
 void query_error(char *error) {
     printf("Error: Invalid Command (╯°□°）╯︵ ┻━┻");
 }
-//***********************************************
 
-
-//***********************************************
-// Parse create
-//***********************************************
-void query_create_database(char *buffer) {
-    // verif à faire
-    printf("parse_create_database: %s", buffer);
-}
 
 void query_create_table(char *buffer) {
     printf("parse_create_table: %s", buffer);
 }
-//***********************************************
-
-
-//***********************************************
-// Parse drop
-//***********************************************
-void query_drop_database(char *buffer) {
-    // vérif à faire
-    printf("parse_drop_database: %s", buffer);
-}
-
-void query_drop_table(char *buffer) {
-    printf("parse_drop_table: %s", buffer);
-}
-//***********************************************
