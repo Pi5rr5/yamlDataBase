@@ -1,9 +1,11 @@
 #include "../h/some_funct.h"
 
 int main() {
+
     menu();
 
     return 0;
+
 }
 // a mettre dans un autre fichier et dans un while
 

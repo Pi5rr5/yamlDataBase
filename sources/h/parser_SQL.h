@@ -11,6 +11,8 @@ typedef struct commandSQL {
     void (*functionSQL)(char *);
 } commandSQL;
 
+char *extractDbName(char *);
+
 void parserSQL(char *);
 
 void query_use(char *);
