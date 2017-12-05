@@ -1,13 +1,30 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "../h/struct.h"
-#include "../h/parser_SQL.h"
 #include "../h/some_funct.h"
-#include "../h/system_function.h"
 
 int main() {
-    init();
-    requestSQL();
+    menu();
+
     return 0;
 }
+// a mettre dans un autre fichier et dans un while
+
+
+
+
+
+
+//test
+
+// base : dossier
+// table : dossier
+
+// yaml nom du champs, null, defaut, pk
+
+// utilisation structure
+
+
+// systeme gestion dossier/fichiers, saisie commande SQL, function print
+
+
+
+
+

@@ -12,4 +12,5 @@
     } command_options;
 
     extern command_options cmdRequest[];
+
 #endif // STRUCT_H_INCLUDED
