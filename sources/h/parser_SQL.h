@@ -5,12 +5,13 @@
 #ifndef MY_PROJ_PARSER_H
 #define MY_PROJ_PARSER_H
 
-
 typedef struct commandSQL {
     char *name;
 
     void (*functionSQL)(char *);
 } commandSQL;
+
+char *extractDbName(char *);
 
 void parserSQL(char *);
 

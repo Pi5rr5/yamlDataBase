@@ -1,16 +1,28 @@
 //
 // Created by Qut on 29/10/2017.
 //
-
 #include <stdio.h>
-
+#include <stdlib.h>
+#include <string.h>
+#include "../h/struct.h"
 #include "../h/some_funct.h"
 #include "../h/parser_SQL.h"
 
+// initiate current database
+db_infos locationdb;
+void initLocationDB() {
+    locationdb.database = "NULL";
+}
 
+char *getCurrentDB() {
+    return locationdb.database;
+}
+
+void changeDatabase(char *newDB) {
+    locationdb.database = newDB;
+}
 
 //fonction de base menu, init (procédure initialisation), ouverture fichiers
-
 
 void requestSQL() {
     int counter;
@@ -37,7 +49,7 @@ void menu() {
     //  verifFirstInit();
     //  showInfo();
     printf("WELCOME\ntype exit or blanck query for exit");
-
+    initLocationDB();
     while (1) {
         char requestsql[1024] = "";
         char word[255] = "";
