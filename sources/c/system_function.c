@@ -56,7 +56,7 @@ int createTable(char *tableName) {
     }
     char cmd[100];
     strcpy(cmd, "fsutil file createnew resources\\");
-    //strcat(cmd, getCurrentDB());
+    strcat(cmd, getCurrentDB());
     strcat(cmd, "\\");
     strcat(cmd, tableName);
     strcat(cmd, ".yaml 0 >nul 2>nul");
@@ -81,7 +81,7 @@ void dropTable(char *tableName){
     }
     char cmd[100];
     strcpy(cmd, "DEL /P resources\\");
-    //strcat(cmd, getCurrentDB());
+    strcat(cmd, getCurrentDB());
     strcat(cmd, "\\");
     strcat(cmd, tableName);
     strcat(cmd, ".yaml");
