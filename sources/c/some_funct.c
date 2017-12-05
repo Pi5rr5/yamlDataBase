@@ -22,8 +22,7 @@ void changeDatabase(char *newDB) {
     locationdb.database = newDB;
 }
 
-//fonction de base menu, init (procédure initialisation), ouverture fichiers
-
+//fonction de base menu, init (procÃ©dure initialisation), ouverture fichiers
 
 void requestSQL() {
     int counter;
