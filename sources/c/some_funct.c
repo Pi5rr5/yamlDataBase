@@ -22,7 +22,7 @@ void requestSQL() {
         if (strstr(word, ";") != NULL) {
             len = strlen(word);
             word[len - 1] = '\0';
-            parserSQL(word, cmdRequest);
+            parserSQL(word);
 
             break;
         }
