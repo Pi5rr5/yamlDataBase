@@ -13,4 +13,6 @@ void query_drop_database(char *);
 
 void query_drop_table(char *);
 
+void query_create_table(char *);
+
 #endif //YAMLDATABASE_CORE_H

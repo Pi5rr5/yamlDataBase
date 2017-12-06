@@ -11,9 +11,6 @@
 //fonction de base menu, init (procédure initialisation), ouverture fichiers
 
 
-extern int fileLineCounter;
-
-
 
 void menu() {
     //  verifFirstInit();
@@ -49,7 +46,13 @@ void menu() {
     }
 }
 
-
+/**
+ * Desc: up the string
+ *
+ * Param: Char * word : String to up
+ *
+ * Return: (char *) upper string
+ */
 char *upWord(char *word) {
     size_t len;
     int boucle;
@@ -62,6 +65,14 @@ char *upWord(char *word) {
     return upword;
 }
 
+
+/**
+ * Desc: delete multiple space
+ *
+ * Param: Char * word : String to clean of multiple space
+ *
+ * Return: (char *) clean string without multiple space
+ */
 char *cleanQuery(char *word) {
     size_t len;
     int boucle;
@@ -98,7 +109,13 @@ char *cleanQuery(char *word) {
     return cleanquery;
 }
 
-
+/**
+ * Desc: check if the string is alphanumeric
+ *
+ * Param: Char * word : String to check
+ *
+ * Return: 1 -> Alphanum ; 0 if not
+ */
 int isAlphaNum(char *word) {
     size_t len;
     int isOk;
@@ -110,16 +127,48 @@ int isAlphaNum(char *word) {
     return isOk;
 }
 
-
-int countArgs(char* countChar, char delim) {
+/**
+ * Desc: return number of terms split with the delim
+ *
+ * Param:
+ *      Char * countChar : String to split and count
+ *      char delim : Char delim
+ *
+ * Return: number of term (int)
+ */
+int countArgs(char* countChar, const char* delim) {
+    char * countrequest;
+    countrequest = malloc(sizeof(char) * (strlen(countChar) + 1));
+    strcpy(countrequest, countChar);
     int count;
-    char* token = strtok(countChar, (const char *) delim);
+    count = 0;
+    char* token = strtok(countrequest, delim);
     while( token != NULL ) {
         count++;
-        token = strtok(NULL, (const char *) delim);
+        token = strtok(NULL, delim);
     }
+    free(countrequest);
     return count;
 }
+
+
+char *splitWord(char *word, char *delim) {
+    int len;
+    int count;
+    char * firstWord;
+    len = strlen(word);
+    for(count = 0; count < len;count++) {
+        if (word[count] == delim[0]) {
+            firstWord = malloc(sizeof(char) * (count + 1));
+            strncpy(firstWord, word, count);
+            break;
+        }
+    }
+    return firstWord;
+}
+
+
+
 
 //exemple
 /**

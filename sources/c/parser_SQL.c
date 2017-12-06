@@ -62,6 +62,38 @@ void query_error(char *error) {
 }
 
 
-void query_create_table(char *buffer) {
-    printf("parse_create_table: %s", buffer);
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*int
+float
+char
+string*/
+
+
+/*CREATE TABLE MyGuests (
+        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        firstname VARCHAR(30) NOT NULL,
+lastname VARCHAR(30) NOT NULL,
+email VARCHAR(50),
+        reg_date TIMESTAMP
+)*/
+
+

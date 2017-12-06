@@ -5,13 +5,13 @@
 #include "../h/Core.h"
 #include <stdio.h>
 #include "../h/some_funct.h"
-
+#include <string.h>
+#include <stdlib.h>
 
 // CORE prgm appel parser, renvoi à interpreteur
 
 void query_use(char *use) {
-    //verifier nombre d'arg
-    if (countArgs(use, (char) " ") == 1) {
+/*    if (countArgs(use, (char) " ") == 1) {
         if (isAlphaNum(use)) {
             if (getBlockWhere("name", use, "databases.yaml") != NULL) {
                 if (useDB(use)) {
@@ -27,12 +27,12 @@ void query_use(char *use) {
         }
     } else {
         printf("Error : Query with too few args");
-    }
+    }*/
 }
 
 
 void query_create_database(char *buffer) {
-    if (countArgs(buffer, (char) " ") == 1) {
+/*    if (countArgs(buffer, (char) " ") == 1) {
         if (isAlphaNum(buffer)) {
             if (funcyaml(buffer)) {
                 if (funcsys(buffer)) {
@@ -48,12 +48,12 @@ void query_create_database(char *buffer) {
         }
     } else {
         printf("Error : Query with too few args");
-    }
+    }*/
 }
 
 
 void query_drop_database(char *buffer) {
-    if (countArgs(buffer, (char) " ") == 1) {
+/*    if (countArgs(buffer, (char) " ") == 1) {
         if (isAlphaNum(buffer)) {
             if (funcyaml(buffer)) {
                 if (funcsys(buffer)) {
@@ -69,12 +69,12 @@ void query_drop_database(char *buffer) {
         }
     } else {
         printf("Error : Query with too few args");
-    }
+    }*/
 }
 
 
 void query_drop_table(char *buffer) {
-    if (countArgs(buffer, (char) " ") == 1) {
+/*    if (countArgs(buffer, (char) " ") == 1) {
         if (isAlphaNum(buffer)) {
             if (funcyaml(buffer)) {
                 if (funcsys(buffer)) {
@@ -90,5 +90,31 @@ void query_drop_table(char *buffer) {
         }
     } else {
         printf("Error : Query with too few args");
+    }*/
+}
+
+void query_create_table(char *buffer) {
+    const char delim[2] = " ";
+    char *delim1 = " ";
+    int error;
+    error = 0;
+    if (countArgs(buffer, delim) > 1) {
+        char *table = splitWord(buffer, delim1);
+        if(isAlphaNum(table)) {
+            if(funcsys(table)) {
+
+            } else {
+                printf("Error : Can't create table on CMD");
+               error = 1;
+            }
+        } else {
+            printf("Error: Not an alpha-numeric argument");
+         error = 1;
+        }
+       free(table);
+        if(!error) {
+            //continue
+        }
     }
+
 }

@@ -12,7 +12,8 @@ void menu();
 char *upWord(char *);
 char *cleanQuery(char *);
 int isAlphaNum(char*);
-int countArgs(char*, char);
+int countArgs(char*, const char*);
+char *splitWord(char *, char*);
 
 
 #endif /* YAML_SOME_FUNCT_H */

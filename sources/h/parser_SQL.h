@@ -17,7 +17,7 @@ void parserSQL(char *);
 
 
 
-void query_create_table(char *);
+
 
 
 
