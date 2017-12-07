@@ -5,9 +5,9 @@
 
     int createTable(char *);
 
-    int useDB(char *);
+    int isExist(char *);
 
-    void dropTable(char *);
+    int createTable(char *,char *);
 
     int dropDB(char *);
 

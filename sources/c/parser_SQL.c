@@ -1,15 +1,16 @@
 //
 // Created by Qut on 29/10/2017.
 //
+#include "../h/parser_SQL.h"
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include "../h/parser_SQL.h"
 #include "../h/some_funct.h"
-#include "../h/system_function.h"
+
 
 
 // interpreteur SQL détection mot clé, récurcivité, renvoi fonction
+
 
 commandSQL cmdSQL[] = {
         {"USE",             query_use},
@@ -42,20 +43,13 @@ void parserSQL(char *word) {
     free(upword);
 }
 
-char *extractDbName(char *buffer){
-    char *dbName;
-    dbName = buffer;
-    dbName[strlen(dbName)-1] = 0;
-    dbName = strrchr(dbName, ' ') + 1;
-    return dbName;
-}
 
 //***********************************************
 // parse command
 //***********************************************
 void query_use(char *buffer) {
-    useDB(extractDbName(buffer));
-    //printf("parse_use: %s", buffer);
+    // vérif à faire
+    printf("parse_use: %s", buffer);
 }
 
 void query_exit(char *exit) {
@@ -73,13 +67,12 @@ void query_error(char *error) {
 // Parse create
 //***********************************************
 void query_create_database(char *buffer) {
-    createDB(extractDbName(buffer));
-    //printf("parse_create_database: %s", buffer);
+    // verif à faire
+    printf("parse_create_database: %s", buffer);
 }
 
 void query_create_table(char *buffer) {
-    createTable(extractDbName(buffer));
-    //printf("parse_create_table: %s", buffer);
+    printf("parse_create_table: %s", buffer);
 }
 //***********************************************
 
@@ -88,12 +81,11 @@ void query_create_table(char *buffer) {
 // Parse drop
 //***********************************************
 void query_drop_database(char *buffer) {
-    dropDB(extractDbName(buffer));
-    //printf("parse_drop_database: %s", buffer);
+    // vérif à faire
+    printf("parse_drop_database: %s", buffer);
 }
 
 void query_drop_table(char *buffer) {
-    dropTable(extractDbName(buffer));
-    //printf("parse_drop_table: %s", buffer);
+    printf("parse_drop_table: %s", buffer);
 }
 //***********************************************

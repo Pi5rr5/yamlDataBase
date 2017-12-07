@@ -6,9 +6,7 @@
 #define YAML_SOME_FUNCT_H
 
 void menu();
-void initLocationDB();
-char *getCurrentDB();
-void changeDatabase(char *);
+
 char *upWord(char *);
 char *cleanQuery(char *);
 
