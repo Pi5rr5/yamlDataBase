@@ -1,37 +1,38 @@
-#include <stdio.h>
-#include <string.h>
-#include "../h/struct.h"
-#include "../h/parser_SQL.h"
 #include "../h/some_funct.h"
 #include "../h/parserYAML.h"
 
-#ifndef MAX
-    #define MAX 255
-#endif  // MAX
 
 /* ----- GLOBALS ----- */
 int FILE_LINE_COUNTER;
 
 /* ----- MAIN ----- */
 int main(int argc, char **argv) {
-    FILE* fp;
-    listOfEntities* test;
 
-    fp = fopen("resources/databases.yaml", "r");
-    if(fp != NULL) {
-        FILE_LINE_COUNTER = 0;
-        if ( (test = getBlockWhere("name", "test1", fp)) != NULL)
-            displayListOfEntities(test);
-        freeListOfEntities(&test);
-        displayListOfEntities(test);
-        if(fclose(fp) != 0) {
-            perror("\nError while closing file.\n");
-        }
-    } else {
-        error("File not found.");
-    }
-    /*
-    init();
-    requestSQL();*/
+    menu();
+
     return 0;
+
 }
+// a mettre dans un autre fichier et dans un while
+
+
+
+
+
+
+//test
+
+// base : dossier
+// table : dossier
+
+// yaml nom du champs, null, defaut, pk
+
+// utilisation structure
+
+
+// systeme gestion dossier/fichiers, saisie commande SQL, function print
+
+
+
+
+
