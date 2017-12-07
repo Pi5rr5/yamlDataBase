@@ -1,6 +1,12 @@
 #include "../h/some_funct.h"
+#include "../h/parserYAML.h"
 
-int main() {
+
+/* ----- GLOBALS ----- */
+int FILE_LINE_COUNTER;
+
+/* ----- MAIN ----- */
+int main(int argc, char **argv) {
 
     menu();
 
