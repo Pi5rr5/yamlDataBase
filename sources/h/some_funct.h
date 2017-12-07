@@ -3,17 +3,13 @@
 //
 
 #ifndef YAML_SOME_FUNCT_H
-    #define YAML_SOME_FUNCT_H
+#define YAML_SOME_FUNCT_H
 
-    void init();
-
-    void verifFirstInit();
+    void menu();
 
     char *upWord(char *);
+    char *cleanQuery(char *);
 
-    void showInfo();
-
-    void changeDatabase(char *);
 
     int fSize(FILE*);
 
@@ -22,4 +18,4 @@
     int fGoToLine(int, FILE*);
 
     void error(const char*);
-#endif //YAML_SOME_FUNCT_H
+#endif /* YAML_SOME_FUNCT_H */

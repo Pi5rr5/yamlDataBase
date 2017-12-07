@@ -18,9 +18,9 @@
     extern command_options cmdRequest[];
 
     /**
-     * @brief Structure d'une ligne de donnée.
-     * @param char key[MAX] : chaîne de caractères correspondant à la clef de la donnée (ou nom de la colonne)
-     * @param char value[MAX] : chaîne de caractères correspondant à la valeur de la donnée.
+     * @brief Structure d'une ligne de donnï¿½e.
+     * @param char key[MAX] : chaï¿½ne de caractï¿½res correspondant ï¿½ la clef de la donnï¿½e (ou nom de la colonne)
+     * @param char value[MAX] : chaï¿½ne de caractï¿½res correspondant ï¿½ la valeur de la donnï¿½e.
      */
      typedef struct lineStruct {
         char key[MAX];
@@ -28,10 +28,10 @@
      } lineStruct;
 
     /**
-     * @brief Liste chaînée de lignes. Correspond à l'ensemble des données pour une entité.
+     * @brief Liste chaï¿½nï¿½e de lignes. Correspond ï¿½ l'ensemble des donnï¿½es pour une entitï¿½.
      *
-     * @param struct line element : ligne de donnée.
-     * @param struct listOfLines* next : pointeur vers l'élément de la liste suivant.
+     * @param struct line element : ligne de donnï¿½e.
+     * @param struct listOfLines* next : pointeur vers l'ï¿½lï¿½ment de la liste suivant.
      */
     typedef struct listOfLines {
         struct lineStruct line;
@@ -39,10 +39,10 @@
     } listOfLines;
 
     /**
-     * @brief Liste chaînée de blocs de données. C'est ce type de liste qui est renvoyé après une selection.
+     * @brief Liste chaï¿½nï¿½e de blocs de donnï¿½es. C'est ce type de liste qui est renvoyï¿½ aprï¿½s une selection.
      *
-     * @param struct ll_line block* block : liste chaînée de lignes de données (ou "Bloc de données").
-     * @param struct ll_dataBlock* *next : élément suivant de la liste chaînée.
+     * @param struct ll_line block* block : liste chaï¿½nï¿½e de lignes de donnï¿½es (ou "Bloc de donnï¿½es").
+     * @param struct ll_dataBlock* *next : ï¿½lï¿½ment suivant de la liste chaï¿½nï¿½e.
      */
     typedef struct listOfEntities {
         struct listOfLines* entity;
