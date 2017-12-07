@@ -1,0 +1,14 @@
+---
+# Ceci est un fichier test pour le projet de C yaml_DataBase.
+# La strcture des fichiers de tables sera comme suit.
+# nom_table
+-
+    id : 1234
+    name : "id"
+    comment : Ceci est un commentaire
+-
+    id_machin : 5678
+    name : "Test de la prise en compte des guillemets : id (et des deux points)"
+    note : ""
+    comment :  Ceci est un commentaire.
+...
