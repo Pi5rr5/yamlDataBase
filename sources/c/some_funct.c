@@ -88,7 +88,7 @@ char *upWord(char *word) {
 
 
 /**
- * @breif Renvoie le nombre de caractï¿½res prï¿½sents dans un fichiers.
+ * @brief Renvoie le nombre de caractï¿½res prï¿½sents dans un fichiers.
  *               Sauvegarde la position du curseur avant le calcul pour pouvoir le remplacer ï¿½ cet endroit ï¿½ la fin de l'opï¿½ration.
  * Paramï¿½tre(s) :
  *      FILE* file : Pointeur de fichier du fichier concernï¿½.
@@ -108,7 +108,7 @@ int fSize(FILE *file) {
 
 
 /**
- * @breif Compte le nombre de tabulations au dï¿½but de la chaï¿½ne donnï¿½e.
+ * @brief Compte le nombre de tabulations au dï¿½but de la chaï¿½ne donnï¿½e.
  * Paramï¿½tre(s) :
  *      char* str : chaï¿½ne de caractï¿½res concernï¿½e.
  * Renvoi :
@@ -134,7 +134,7 @@ int countTab(char* str) {
 }
 
 /**
- * @breif Dï¿½place le curseur du fichier jusqu'au dï¿½but de la ligne voulue.
+ * @brief Dï¿½place le curseur du fichier jusqu'au dï¿½but de la ligne voulue.
  * Paramï¿½tres :
  *      int line : numï¿½ro de ligne auquel se dï¿½placer.
  *      FILE* sourceFile : pointeur de fichier du fichier concernï¿½.
