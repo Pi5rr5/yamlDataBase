@@ -166,21 +166,14 @@ void displayListOfEntities(listOfEntities* list) {
  *
  * @return void.
  */
-void freeListOfLines(listOfLines* list) {
+void freeListOfLines(listOfLines** list) {
     listOfLines* temp;
-    listOfLines* temp2;
 
-    if(list != NULL) {
-        temp  = list;
-        temp2 = list;
-        while(temp->next != NULL) {
-            temp2 = temp;
-            if(temp2 != NULL)
-                free(temp2);
-            temp = temp->next;
+    if(*list != NULL) {
+        while( (temp = *list) != NULL ) {
+        	*list = (*list)->next;
+			free(temp);
         }
-        if(temp != NULL)
-            free(temp);
     }
 }
 
@@ -196,30 +189,15 @@ void freeListOfLines(listOfLines* list) {
  *
  * @return void.
  */
-void freeListOfEntities(listOfEntities* list) {
-    listOfEntities* temp;       // Curseur ayant un cran d'avance (cf. paragraphe d'explication ci-dessous
-    listOfEntities* temp2;      // Curseur "libérateur de mémoire"
+void freeListOfEntities(listOfEntities** list) {
+    listOfEntities* temp;       		// Curseur temporaire qui pointe vers la valeur à libérer
 
-    /*
-        Pour libérer l'espace mémoire d'une liste chaînée, deux curseurs sont nécessaire.
-        Un des curseur parcours la liste élément par élément en libérant leur espace mémoire les hein après les autres.
-        Seulement en libérant cet espace mémoire, on perd tout trace de l'élément suivant de la liste.
-        C'est pouruqoi on utilise un second curseur qui sera un cran en avant dans les élément, poru pouvoir continuer de libérer la chaîne.
-    */
-    if(list != NULL) {
-        temp  = list;
-        temp2 = list;
-        while(temp->next != NULL) {
-            temp2 = temp;
-            if(temp2 != NULL) {                 // Simple sécurité, le cas contraire ne devrait jamais arriver
-                freeListOfLines(temp2->entity); // Libération mémoire de l'ensensemble de l'élément (lui même étant une liste chaînée d'un autre type)
-                free(temp2);
-            }
-            temp = temp->next;
+    if(*list != NULL) {
+        while ( (temp = *list) != NULL ) {
+            *list = (*list)->next;
+			freeListOfLines(&temp->entity);		// Libération mémoire de l'ensensemble de l'élément (lui même étant une liste chaînée d'un autre type)
+			free(temp);
         }
-        freeListOfLines(temp->entity);
-        if(temp != NULL)
-            free(temp);
     }
 }
 
@@ -304,8 +282,8 @@ int verifLine(char* str) {
  * @name hasKey
  *
  * @brief Vérifie que la ligne passée en argument contient bien une clef donnée.
- *               Pour ce faire, parcours le fichier à la recherche d'occurences.
- *               Dès qu'une est trouvée, on vérifie qu'il n'y a rien avant et rien après hormis des espaces ou des caractères autorisés ('-' et ':')
+ *           Pour ce faire, parcours le fichier à la recherche d'occurences.
+ *           Dès qu'une est trouvée, on vérifie qu'il n'y a rien avant et rien après hormis des espaces ou des caractères autorisés ('-' et ':')
  *
  * @param char* line : chaîne contenant la ligne lue.
  * @param char* key : chaîne recherchée.
@@ -390,7 +368,7 @@ char* getKey(char* line) {
 char* getValue(char* line) {
     int tempInt = 0;
 
-    while(line[tempInt++] != ':');      // Déplacement jusqu'au ':' de la clef /!\ WARNING /!\ si la clef comprend ':', la suite ne fonctionnera pas comme il faut.
+    while(line[tempInt++] != ':');      // Déplacement jusqu'au ':' de la clef
     while(line[tempInt++] == ' ');      // Déplacement jusqu'au premier caractère de la valeur (inclu)
 
     switch(line[--tempInt]) {           // Recule d'un cran avant
@@ -423,8 +401,10 @@ char* getValue(char* line) {
 lineStruct getLineStruct(char* str) {
     lineStruct line;
 
+	if(DEBUG_PRINT) printf("Recovering line structure.\n");
     strcpy(line.key, getKey(str));      // Récupère la clef de la ligne
     strcpy(line.value, getValue(str));  // Récupère la valeur correspondante
+    if(DEBUG_PRINT) printf("End of recover.\n");
     return line;
 }
 
@@ -447,6 +427,7 @@ listOfLines* getEntity(int startLine, FILE* sourceFile) {
     lineStruct line;
     listOfLines* resultList;
 
+	if(DEBUG_PRINT) printf("Recovering entity.\n");
     resultList = NULL;
     if(sourceFile != NULL) {
         if(fGoToLine(startLine, sourceFile)) {
@@ -462,6 +443,7 @@ listOfLines* getEntity(int startLine, FILE* sourceFile) {
     } else {
         if(DEBUG_PRINT) printf("Source file not found.\n");
     }
+    if(DEBUG_PRINT) printf("End of recover.\n");
     return resultList;
 }
 
@@ -479,6 +461,9 @@ listOfLines* getEntity(int startLine, FILE* sourceFile) {
  *
  * @return (on success) listOfEntities* entities : liste chaînée d'entitées ayant la clef et la valeur correspondantes.
  * @return (on failure) NULL.
+ *
+ * @remarks si une erreur survient lors de la manipulation, renvoie tout de même les éléments trouvés.
+ *			Danger non estimé et passé outre, à réviser.
  */
 listOfEntities* getBlockWhere(char* key, char* value, FILE* sourceFile) {
 	int fileSize;
@@ -493,35 +478,33 @@ listOfEntities* getBlockWhere(char* key, char* value, FILE* sourceFile) {
     entities = NULL;
 	fileSize = fSize(sourceFile);
     startingLine = 0;
-    FILE_LINE_COUNTER  = 0;
+    FILE_LINE_COUNTER = 0;
 
     while(ftell(sourceFile) < fileSize) {                   // Parcours du fichier
         if(freadL(line, MAX, sourceFile)) {                 // Lecture d'une ligne du fichier
             if(verifLine(line)) {                           // Si la ligne peut être traitée.
                 tabulation = countTab(line);
                 if(tabulation == 0) {                       // Si début d'entité
-                    if(DEBUG_PRINT) printf("Start of entity found at line %d\n", FILE_LINE_COUNTER);
                     startingLine = FILE_LINE_COUNTER;       // On enregistre la ligne de début de l'entité
                 } else {
-                    if(strcpy(tempKey, getKey(line)) != NULL) {
-                        if(strcpy(tempValue, getValue(line)) != NULL) {
-                            if(strcmp(tempKey, key) == 0 && strcmp(tempValue, value) == 0) {
-                                if(DEBUG_PRINT) printf("Recovering entity : \n");
-                                if((tempEntity = getEntity(startingLine+1, sourceFile)) != NULL) {
-                                    if ( (entities = addEntityToList(entities, tempEntity)) == NULL) {             // Récupération de l'entité
-                                        error("Error while adding entity from file.");
-                                        break;
+                    if(strcpy(tempKey, getKey(line)) != NULL) {											// Récupération de la clef.
+                        if(strcmp(tempKey, key) == 0) {													// Vérification, s'il s'agit de la clef voulue.
+                            if(strcpy(tempValue, getValue(line)) != NULL) {								// Récupération de la valeur.
+                                if(strcmp(tempValue, value) == 0) {										// Vérification s'il s'agit de la valeur recherchée.
+                                    if((tempEntity = getEntity(startingLine+1, sourceFile)) != NULL) {	// Clef et valeur trouvées. Récupération de l'entité les contenant.
+                                        if ( (entities = addEntityToList(entities, tempEntity)) == NULL) {  // Ajout de l'entité à la liste des entités ayant "matché".
+                                            error("Error while adding entity from file.");				// Si erreur lors de la manipulation de la liste chaînée
+                                            break;														// Sortie de fonction
+                                        }
                                     } else {
-                                        if(DEBUG_PRINT) printf("Entity recovered.\n");
+                                        error("Error while recovering entity.");
+                                        break;
                                     }
-                                } else {
-                                    error("Error while recovering entity.");
-                                    break;
                                 }
+                            } else {
+                                error("Error while recovering value.");
+                                break;
                             }
-                        } else {
-                            error("Error while recovering value.");
-                            break;
                         }
                     } else {
                         error("Error while recovering key.");
@@ -531,7 +514,6 @@ listOfEntities* getBlockWhere(char* key, char* value, FILE* sourceFile) {
             }
         }
     }
-    if(DEBUG_PRINT) printf("\nEnd of process.\n");
     return entities;
 }
 
@@ -552,50 +534,38 @@ listOfEntities* getBlockWhere(char* key, char* value, FILE* sourceFile) {
  */
 listOfEntities* getAllFrom(FILE* sourceFile) {
     int fileSize;
-    int tabulation;
-    int startOfEntity;
-    char tempStr[MAX];
-    listOfLines* tempEntity;
-    listOfEntities* entities;
+	int tabulation;
+	int startingLine;
+	char line[MAX];
+	char tempKey[MAX];
+	char tempValue[MAX];
+	listOfLines* tempEntity;
+	listOfEntities* entities;
 
-    tabulation    = 0;
-    startOfEntity = 0;
-    tempEntity = NULL;
+    entities = NULL;
+	fileSize = fSize(sourceFile);
+    FILE_LINE_COUNTER = 0;
 
-    if(sourceFile != NULL) {
-        fileSize = fSize(sourceFile);
-        FILE_LINE_COUNTER = 0;
-        while(ftell(sourceFile) < fileSize) {
-            if(freadL(tempStr, MAX, sourceFile)) {
-                FILE_LINE_COUNTER++;
-                if(verifLine(tempStr)) {
-                    tabulation = countTab(tempStr);
-                    if(tabulation == 0) {
-                        if(DEBUG_PRINT)
-                            printf("Start of entity found at line %d\n", FILE_LINE_COUNTER);
-                        startOfEntity = FILE_LINE_COUNTER;             // On enregistre la ligne de début de l'entité
-                    } else {
-                        if((tempEntity = getEntity(startOfEntity+1, sourceFile)) != NULL) {
-                            if(addEntityToList(entities, tempEntity) != NULL) {
-                                if(DEBUG_PRINT) {
-                                    printf("Entity recovered.\n");
-                                }
-                            } else {
-                                error("Error while adding entity to list.\n");
-                            }
-                        } else {
-                            error("Error while recovering entity.\n");
-                        }
-                    }
-                }
-            }
-            system("pause >nul");
-        }
-    }
-    freeListOfEntities(entities);
-    return NULL;
+	if(sourceFile != NULL) {
+		fseek(sourceFile, 0, SEEK_SET);
+		while(ftell(sourceFile) < fileSize) {					// Parcours du fichier
+			if(freadL(line, MAX, sourceFile)) {					// Lecture d'une ligne du fichier
+				if(verifLine(line)) {							// Si la ligne peut être traitée.
+					if( (tabulation = countTab(line)) == 0) {	// Si début d'entité
+						if((tempEntity = getEntity(FILE_LINE_COUNTER+1, sourceFile)) != NULL) {		// Récupération de la prochaine entité.
+							if ( (entities = addEntityToList(entities, tempEntity)) == NULL) {		// Ajout de l'entité à la liste des entités ayant "matché".
+								error("Error while adding entity from file.");				// Si erreur lors de la manipulation de la liste chaînée
+								break;														// Sortie de fonction
+							}// Sinon, c'est que le block a correctement été récupéré.
+						} else {
+							error("Error while recovering entity.");
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+    return entities;
 }
 
-
-
-/* FONCTION DE GESTION DE LISTE CHAINÉE DES BLOC DE DONNÉES */

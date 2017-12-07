@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
         FILE_LINE_COUNTER = 0;
         if ( (test = getBlockWhere("name", "test1", fp)) != NULL)
             displayListOfEntities(test);
-        freeListOfEntities(test);
+        freeListOfEntities(&test);
         displayListOfEntities(test);
         if(fclose(fp) != 0) {
             perror("\nError while closing file.\n");

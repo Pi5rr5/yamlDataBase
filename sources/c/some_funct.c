@@ -157,7 +157,7 @@ int fGoToLine(int line, FILE* sourceFile) {
 
 
 /**
- * @breif Fonction de gestion d'erreur. Écrit dans l'outpout dédié au erreurs.
+ * @brief Fonction de gestion d'erreur. Écrit dans l'outpout dédié au erreurs.
  *
  * @param char* message : message d'erreur.
  *
