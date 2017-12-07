@@ -251,7 +251,7 @@ int freadL(char* destination, unsigned int sizeMax, FILE* sourceFile) {
  * @return (on failure) 0
  */
 int verifLine(char* str) {
-	char temp;
+	int tempInt = 0;
 
     // Empty string
     if(str == NULL || strlen(str) == 0)
@@ -270,8 +270,8 @@ int verifLine(char* str) {
         return 0;
 
     // Commentaire ou ligne vide
-    while(fgetc(temp) == ' ');
-    if(temp == '#' || temp == '\n' || temp == '\r')
+    while(str[tempInt++] == ' ');
+    if(str[tempInt] == '#' || str[tempInt] == '\n' || str[tempInt] == '\r')
         return 0;
 
     return 1;   // Si aucun des cas ci-dessus, alors la ligne peut être traitée.
