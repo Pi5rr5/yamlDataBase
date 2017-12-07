@@ -251,6 +251,7 @@ int freadL(char* destination, unsigned int sizeMax, FILE* sourceFile) {
  * @return (on failure) 0
  */
 int verifLine(char* str) {
+	char temp;
 
     // Empty string
     if(str == NULL || strlen(str) == 0)
@@ -269,56 +270,13 @@ int verifLine(char* str) {
         return 0;
 
     // Commentaire ou ligne vide
-    if(str[0] == '#' || str[0] == '\n' || str[0] == '\r')
+    while(fgetc(temp) == ' ');
+    if(temp == '#' || temp == '\n' || temp == '\r')
         return 0;
 
     return 1;   // Si aucun des cas ci-dessus, alors la ligne peut être traitée.
 }
 
-
-
-
-/**
- * @name hasKey
- *
- * @brief Vérifie que la ligne passée en argument contient bien une clef donnée.
- *           Pour ce faire, parcours le fichier à la recherche d'occurences.
- *           Dès qu'une est trouvée, on vérifie qu'il n'y a rien avant et rien après hormis des espaces ou des caractères autorisés ('-' et ':')
- *
- * @param char* line : chaîne contenant la ligne lue.
- * @param char* key : chaîne recherchée.
- *
- * @return (on success) 1
- * @return (on failure) 0
- */
-int hasKey(char* line, char* key) {
-    int i;
-    int findStrIndex;
-    char* temp;
-
-    if(line != NULL && key != NULL) {
-        if((temp = strstr(line, key))) {                // `strstr` renvoie un pointeur correspondant à la position (ou l'adresse) de la première occurence de la valeur cherchée dans la chaîne donnée.
-            findStrIndex = temp-line;                   // Par conséquent soustraire cette valeur à l'adresse de la chaîne dans laquelle on a cherché; cela nous donne l'index où se trouve l'occurence.
-            /* Vérification des caractère avant occurence */
-            for(i=0 ; i < findStrIndex ; i++) {         // Parcourt de la chaîne jusqu'à l'index (jusqu'à l'occurence)
-                if(line[i] != ' ' && line[i] != '-') {  // Si l'un des caractères se trouvant avant l'occurence est incorrect
-                    return 0;                           // Pas une clef
-                }
-            }
-            /* Vérification des caractères après occurence */
-            if( (temp = strchr(line, ':')) ) {          // Une clef a forcément un ':' après elle. On vérifie qu'il y a ce caractère sur la même ligne.
-                /* Boucle jusqu'à ':' */
-                for(i=findStrIndex+strlen(key) ; i < temp-line ; i++) {  // `findStrIndex+strlen(key)` est l'index de la fin de l'occurence. `temp-line` correspond à l'index où se trouve le ':'
-                    if(line[i] != ' ') {                // Si l'un des caractères séparant l'occurence de ':' n'est pas un espace
-                        return 0;                       // Pas une clef
-                    }
-                }
-                return 1;   // Si aucun des cas ci-dessus, alors il s'agit d'une clef.
-            }
-        }
-    }
-    return 0;
-}
 
 
 
@@ -371,14 +329,14 @@ char* getValue(char* line) {
     while(line[tempInt++] != ':');      // Déplacement jusqu'au ':' de la clef
     while(line[tempInt++] == ' ');      // Déplacement jusqu'au premier caractère de la valeur (inclu)
 
-    switch(line[--tempInt]) {           // Recule d'un cran avant
+    switch(line[tempInt]) {           // Recule d'un cran avant
         case 39:    // Texte sur une ligne simple quote (39 en ASCII)
             break;
         case 34:    // Texte sur une ligne double quote (34 en ASCII)
             break;
         default:    // Valeur classique
             if(DEBUG_PRINT) printf("Value recovered : %s\n", line+tempInt);
-            return line+tempInt;
+            return line+tempInt-1;
     }
     if(DEBUG_PRINT) printf("Value recovered : \"\"\n");
     return "";
@@ -401,10 +359,8 @@ char* getValue(char* line) {
 lineStruct getLineStruct(char* str) {
     lineStruct line;
 
-	if(DEBUG_PRINT) printf("Recovering line structure.\n");
     strcpy(line.key, getKey(str));      // Récupère la clef de la ligne
     strcpy(line.value, getValue(str));  // Récupère la valeur correspondante
-    if(DEBUG_PRINT) printf("End of recover.\n");
     return line;
 }
 
