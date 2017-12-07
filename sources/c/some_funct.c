@@ -23,7 +23,6 @@ void requestSQL() {
             len = strlen(word);
             word[len - 1] = '\0';
             parserSQL(word);
-
             break;
         }
         //traiter le multi-ligne
