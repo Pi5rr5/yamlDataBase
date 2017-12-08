@@ -111,6 +111,45 @@ int fSize(FILE *file) {
 }
 
 
+
+
+/**
+ * @name freadL
+ *
+ * @brief Reads a line from the current cursor position in a file and stores it in the string passed as argument.
+ *			`fgets` has as cons to recover the possible line break lying at the end of the line read.
+ *			`freadL` (the function below) has as only purpose to solve that behavior.
+ *
+ * @param char* destination : string in which one the result will be stored
+ * @param unsigned int sizeMax : characters number to read (large number like 255 recommended)
+ * @param FILE* sourceFile : file pointer of the concerned file.
+ *
+ * @return (on success) 1
+ * @return (on failure) 0
+ *
+ * @remarks Cursor position not handled.
+ */
+int freadL(char* destination, unsigned int sizeMax, FILE* sourceFile) {
+    int strLength;
+    char result[MAX];
+
+    if(sourceFile != NULL) {
+        if(fgets(result, sizeMax, sourceFile) != NULL) {    // Read a line in the file
+            FILE_LINE_COUNTER++;
+            strLength = strlen(result);
+            if(result[strLength-1] == '\n') {	// If the last character is a line break
+                result[strLength-1] = '\0';		// Then it is replace by '\0' (known as end of string character)
+                strcpy(destination, result);	// Copy the result in the passed argument
+            }
+            return 1;
+        }
+    }
+    return 0;
+}
+
+
+
+
 /**
  * @name countTab
  *
@@ -128,7 +167,7 @@ int countTab(char* str) {
     if(str != NULL) {
         strLength = strlen(str);
         if(strLength > 0) {
-            for(i=0 ; i < strLength && str[i] != ' '; i++);
+            for(i=0 ; i < strLength && str[i] == ' '; i++);
             i /= 4;
         }
     }

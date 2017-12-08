@@ -8,8 +8,8 @@
     void displayListOfEntities(listOfEntities*);
     void freeListOfLines(listOfLines**);
     void freeListOfEntities(listOfEntities**);
-    int freadL(char*, unsigned int, FILE*);
     int verifLine(char*);
     int hasKey(char*, char*);
     listOfEntities* getBlockWhere(char*, char*, FILE*);
+    listOfEntities* getAllFrom(FILE*);
 #endif // PARSERYAML_H_INCLUDED

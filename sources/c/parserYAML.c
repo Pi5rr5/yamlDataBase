@@ -18,7 +18,10 @@ extern int FILE_LINE_COUNTER;	/*  `extern` is exclusive to globals variables.
                                     It allows to specify to the compiler that the variable may have been already declared in another file.
                                     And if it has been, then it will be not redeclared */
 
-
+void debug(const char* msg) {
+	if(DEBUG_PRINT)
+		printf("%s\n", msg);
+}
 
 /* ----- FUNCTIONS ----- */
 
@@ -111,7 +114,7 @@ void displayListOfLines(listOfLines* list) {
     printf("\tList of lines :\n");
     if(list != NULL) {
         while ( (temp = list) != NULL) {
-            printf("\t\tkey :%s\n\t\tvalue :%s\n", list->line.key, list->line.value);
+            printf("\t\tkey : %s\t\tvalue : %s\n", list->line.key, list->line.value);
             list = list->next;
         }
     } else {
@@ -141,7 +144,7 @@ void displayListOfEntities(listOfEntities* list) {
     if(list != NULL) {
         while ( (temp = list) != NULL) {
             displayListOfLines(list->entity);
-            lsit = list->next;
+            list = list->next;
         }
     } else {
         error("\tEmpty list.\n");
@@ -167,6 +170,7 @@ void freeListOfLines(listOfLines** list) {
     if(*list != NULL) {
         while( (temp = *list) != NULL ) {	// Browsing the list
         	*list = (*list)->next;
+        	printf("releasing : %s\n", temp->line.value);
 			free(temp);
         }
     }
@@ -199,41 +203,6 @@ void freeListOfEntities(listOfEntities** list) {
 
 
 
-/**
- * @name freadL
- *
- * @brief Reads a line from the current cursor position in a file and stores it in the string passed as argument.
- *			`fgets` has as cons to recover the possible line break lying at the end of the line read.
- *			`freadL` (the funciton below) has as only purpose to solve that behavior.
- *
- * @param char* destination : string in which one the result will be stored
- * @param unsigned int sizeMax : characters number to read (large number like 255 recommended)
- * @param FILE* sourceFile : file pointer of the concerned file.
- *
- * @return (on success) 1
- * @return (on failure) 0
- *
- * @remarks Cursor position not handled.
- */
-int freadL(char* destination, unsigned int sizeMax, FILE* sourceFile) {
-    int strLength;
-    char result[MAX];
-
-    if(sourceFile != NULL) {
-        if(fgets(result, sizeMax, sourceFile) != NULL) {    // Read a line in the file
-            FILE_LINE_COUNTER++;
-            strLength = strlen(result);
-            if(result[strLength-1] == '\n') {	// If the last character is a line break
-                result[strLength-1] = '\0';		// Then it is replace by '\0' (known as end of string character)
-                strcpy(destination, result);	// Copy the result in the passed argument
-            }
-            return 1;
-        }
-    }
-    return 0;
-}
-
-
 
 /**
  * @name verifLine
@@ -253,15 +222,15 @@ int verifLine(char* str) {
         return 0;
 
     // Start of file case
-    if(strcmp(str, "---") == 0      // Le symbole de début de fichier est "---"
-    || strcmp(str, "---\n") == 0    // Il peut être suivit d'une saut de ligne
-    || strcmp(str, "---\r\n") == 0) // Autre écriture du saut de ligne possible.
+    if(strcmp(str, "---") == 0      // A YAML file starts with "---"
+    || strcmp(str, "---\n") == 0    // It can be followed by a line break
+    || strcmp(str, "---\r\n") == 0) // There can be a carriage return before the line break
         return 0;
 
     // End of file case
-    if(strcmp(str, "...") == 0      // Le symbole de fin de fichier est "..."
-    || strcmp(str, "...\n") == 0    // Peut être suivit d'un saut de ligne.
-    || strcmp(str, "...\r\n") == 0) // Autre écriture du saut de ligne possible (dépend du fichier).
+    if(strcmp(str, "...") == 0      // A YAML file ends with "..."
+    || strcmp(str, "...\n") == 0    // It can be followed by a line break
+    || strcmp(str, "...\r\n") == 0) // There can be a carriage return before the line break
         return 0;
 
     // Comment or empty line
@@ -305,8 +274,9 @@ char* getKey(char* line) {
 																		The size of a character is (in almost any case), 1.
 																		Therefore adding 1 to `line` is the same as starting this line one character further.
 																tempInt-keyStart+1 : number of character to copy (-1 because tempInt is one step too far). */
-    result[tempInt-keyStart] = '\0';                        // `strncpy` does not handle '\0'
-    strcpy(line, result);	// Straight return of result could be dangerous since it is a local variable. Therefore it is store in line.
+
+    result[tempInt-keyStart-1] = '\0';						// `strncpy` does not handle '\0' (-1 because tempInt is one step too far).
+    strcpy(line, result);	// Straight return of `result` might be dangerous since it's a local variable. Therefore it is stored in `line`.
     return line;
 }
 
@@ -326,7 +296,7 @@ char* getKey(char* line) {
 char* getValue(char* line) {
     int tempInt = 0;
 
-    while(line[tempInt++] != ':');      // Founds the index of the first occurence of ':'
+    while(line[tempInt++] != ':');      // Founds the index of the first occurrence of ':'
     while(line[tempInt++] == ' ');      // Founds the index of the next character that is not ' '
 
     switch(line[tempInt]) {
@@ -389,8 +359,8 @@ listOfLines* getEntity(int startLine, FILE* sourceFile) {
     if(sourceFile != NULL) {
         if(fGoToLine(startLine, sourceFile)) {		// Move the cursor the wanted line.
             while(freadL(tempStr, MAX, sourceFile) && countTab(tempStr) != 0 && verifLine(tempStr)) {	// Read a line, checks if it's still inside the block and if it has to be treated
-                line = getLineStruct(tempStr);					// Recover line object form the line.
-                resultList = addLineToList(resultList, line);	// Add that object to the list.
+            	line = getLineStruct(tempStr);					// Recover line object form the line.
+            	resultList = addLineToList(resultList, line);	// Add that object to the list.
             }
             fseek(sourceFile, -strlen(tempStr)-2, SEEK_CUR);	// Return to previous line
             FILE_LINE_COUNTER--;
@@ -500,7 +470,7 @@ listOfEntities* getAllFrom(FILE* sourceFile) {
 		while(ftell(sourceFile) < fileSize) {					// Browse the file
 			if(freadL(line, MAX, sourceFile)) {					// Read a line from the file.
 				if(verifLine(line)) {							// If the line can be treated.
-					if(countTab(line) == 0 && strcmp("-", line == 0)) {								// If start of entity
+					if(countTab(line) == 0 && strcmp("-", line) == 0) {								// If start of entity
 						if ( (tempEntity = getEntity(FILE_LINE_COUNTER+1, sourceFile)) != NULL) {	// Recover the entity
 							if ( (entities = addEntityToList(entities, tempEntity)) == NULL) {		// Add the entity to the list of entities
 								error("Error while adding entity from file.");							// If an error occurred during the previous manipulation,
