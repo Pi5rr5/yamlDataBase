@@ -13,7 +13,7 @@
     #define DEBUG_PRINT 1
 #endif // DEBUG_PRINT
 
-/* ----- GLOBALS ----- */
+/* ---------------- GLOBALS ---------------- */
 extern int FILE_LINE_COUNTER;	/*  `extern` is exclusive to globals variables.
                                     It allows to specify to the compiler that the variable may have been already declared in another file.
                                     And if it has been, then it will be not redeclared */
@@ -23,7 +23,22 @@ void debug(const char* msg) {
 		printf("%s\n", msg);
 }
 
-/* ----- FUNCTIONS ----- */
+
+
+
+
+
+
+
+
+/* ---------------- FUNCTIONS ---------------- */
+
+
+
+
+/* ----- LINKED LISTS  ----- */
+
+/* listOfLines */
 
 /**
  * @name addLineToList
@@ -58,8 +73,55 @@ listOfLines* addLineToList(listOfLines* list, lineStruct line) {
     return list;	// If allocation error, returns the passed list, unchanged.
 }
 
+/**
+ * @name displayListOfLines
+ *
+ * @brief Display each element of a linked list typed as `listOfLines`.
+ *
+ * @param listOfLines* list : concerned linked list.
+ *
+ * @return void
+ *
+ * @remarks Could be use as debugging tool as well as user interface. Fell free to personalize the displaying.
+ */
+void displayListOfLines(listOfLines* list) {
+    listOfLines* temp;
+
+    printf("\tList of lines :\n");
+    if(list != NULL) {
+        while ( (temp = list) != NULL) {
+            printf("\t\tkey : %s\t\tvalue : %s\n", list->line.key, list->line.value);
+            list = list->next;
+        }
+    } else {
+        error("\t\tEmpty list.");
+    }
+    printf("\tEnd of list.\n\n");
+}
+
+/**
+ * @name freeListOfLines
+ *
+ * @brief releasing of the memory used by a linked list typed as `listOfLines`.
+ *
+ * @param listOfLines** list : pointer of the concerned linked list.
+ *
+ * @return void
+ */
+void freeListOfLines(listOfLines** list) {
+    listOfLines* temp;
+
+    if(*list != NULL) {
+        while( (temp = *list) != NULL ) {	// Browsing the list
+        	*list = (*list)->next;
+        	printf("releasing : %s\n", temp->line.value);
+			free(temp);
+        }
+    }
+}
 
 
+/* listOfEntities */
 
 /**
  * @name addEntityToList
@@ -94,38 +156,6 @@ listOfEntities* addEntityToList(listOfEntities* list, listOfLines* entity) {
     return list;		// If allocation error, returns the passed list, unchanged.
 }
 
-
-
-
-/**
- * @name displayListOfLines
- *
- * @brief Display each element of a linked list typed as `listOfLines`.
- *
- * @param listOfLines* list : concerned linked list.
- *
- * @return void
- *
- * @remarks Could be use as debugging tool as well as user interface. Fell free to personalize the displaying.
- */
-void displayListOfLines(listOfLines* list) {
-    listOfLines* temp;
-
-    printf("\tList of lines :\n");
-    if(list != NULL) {
-        while ( (temp = list) != NULL) {
-            printf("\t\tkey : %s\t\tvalue : %s\n", list->line.key, list->line.value);
-            list = list->next;
-        }
-    } else {
-        error("\t\tEmpty list.");
-    }
-    printf("\tEnd of list.\n\n");
-}
-
-
-
-
 /**
  * @name displayListOfEntities
  *
@@ -152,35 +182,8 @@ void displayListOfEntities(listOfEntities* list) {
     printf("End of list.\n\n");
 }
 
-
-
-
 /**
- * @name freeListOfLines
- *
- * @brief releasing of the memory used by a linked list typed as `listOfLines`.
- *
- * @param listOfLines** list : pointer of the concerned linked list.
- *
- * @return void
- */
-void freeListOfLines(listOfLines** list) {
-    listOfLines* temp;
-
-    if(*list != NULL) {
-        while( (temp = *list) != NULL ) {	// Browsing the list
-        	*list = (*list)->next;
-        	printf("releasing : %s\n", temp->line.value);
-			free(temp);
-        }
-    }
-}
-
-
-
-
-/**
- * @name displayListOfEntities
+ * @name freeListOfEntities
  *
  * @brief Release the memory used by a linked list typed as `listOfEntities`
  *
@@ -201,8 +204,91 @@ void freeListOfEntities(listOfEntities** list) {
 }
 
 
+/* stringList */
+
+/**
+ * @name addStringToList
+ *
+ * @brief Add an element to a linked list typed as `listOfEntites`.
+ *
+ * @param stringList* list : pointer of the start of the linked list.
+ * @param value : value to put in the new element.
+ *
+ * @return (on success) : pointer to the updated linked list
+ * @return (on failure) : in case of allocation error, returns a null pointer
+ */
+stringList* addStringToList(stringList* list, char* str) {
+    stringList* new_element;
+    stringList* temp;
+
+    new_element = malloc(sizeof(stringList));	// Required memory allocation for the new element
+    if(new_element != NULL) {				// If the allocation went well
+        strcpy(new_element->str, str);		// We assign the value passed in argument to the corresponding attribute of the new element.
+        new_element->next = NULL;			// `next` pointer is set to NULL, the new element becoming the last node.
+        if(list == NULL) {					// If the given list is empty.
+            return new_element;				// Return of the new element only (because it's the only node).
+        } else {
+            temp = list;					// Otherwise, adding of the new element to the list.
+            while(temp->next != NULL) {		// Browse the list.
+                temp = temp->next;
+            }
+            temp->next = new_element;		// Make the current last node of the list points on the new element.
+            return list;					// Returning of the updated list.
+        }
+    }
+    return list;		// If allocation error, returns the passed list, unchanged.
+}
+
+/**
+ * @name displayStringList
+ *
+ * @brief Display each element of linked list typed as `stringList`
+ *
+ * @param stringList* list : concerned linked list.
+ *
+ * @return void
+ *
+ * @remarks Could be used as debugging tool as well as user interface.
+ */
+void displayStringList(stringList* list) {
+    stringList* temp;
+
+    printf("\nList of string :\n");
+    if(list != NULL) {
+        while ( (temp = list) != NULL) {
+			printf("\t\t%s\n", temp->str);
+            list = list->next;
+        }
+    } else {
+        error("\tEmpty list.\n");
+    }
+    printf("End of list.\n\n");
+}
+
+/**
+ * @name freeStringList
+ *
+ * @brief Release the memory used by a linked list typed as `stringList`
+ *
+ * @param stringList** list : pointer of the concerned linked list.
+ *
+ * @return void
+ */
+void freeStringList(stringList** list) {
+    stringList* temp;
+
+    if(*list != NULL) {
+        while ( (temp = *list) != NULL ) {		// Browsing the list
+            *list = (*list)->next;
+			free(temp);
+        }
+    }
+}
 
 
+
+
+/* ----- YAML PARSER FUNCTIONS ----- */
 
 /**
  * @name verifLine
@@ -241,10 +327,6 @@ int verifLine(char* str) {
     return 1;   // If none of above, then the line can be treated.
 }
 
-
-
-
-
 /**
  * @name getKey
  *
@@ -268,20 +350,15 @@ char* getKey(char* line) {
     while(line[tempInt++] != ' ' && line[tempInt] != ':');  // Founds the index of the next character that is neither a ' ' nor a ':'
 
     strncpy(result, line+keyStart, tempInt-keyStart-1);     /* Copy the key in result.
-																result : destination where to store the copy.
 																line+KeyStart : position to start the copy.
-																		line is the address of the string.
-																		The size of a character is (in almost any case), 1.
+																		line is the address of the string. The size of a `char` is, in almost any case, 1.
 																		Therefore adding 1 to `line` is the same as starting this line one character further.
-																tempInt-keyStart+1 : number of character to copy (-1 because tempInt is one step too far). */
+																tempInt-keyStart+1 : number of characters to copy (-1 because tempInt is one step too far). */
 
     result[tempInt-keyStart-1] = '\0';						// `strncpy` does not handle '\0' (-1 because tempInt is one step too far).
     strcpy(line, result);	// Straight return of `result` might be dangerous since it's a local variable. Therefore it is stored in `line`.
     return line;
 }
-
-
-
 
 /**
  * @name getValue
@@ -306,16 +383,12 @@ char* getValue(char* line) {
             break;
         default:    // Valeur classique
             return line+tempInt-1;	/* line+tempInt-1 : position to start the copy.
-										line is the address of the string.
-										The size of a character is (in almost any case), 1.
+										Line is the address of the string. The size of a `char` is, in almost any case, 1.
 										Therefore adding 1 to `line` is the same as starting this line one character further.
 										'-1' : `tempInt` is one step too far (since '++' in the previous loop is triggered even at the last lap).*/
     }
     return "";
 }
-
-
-
 
 /**
  * @name getLineStruct
@@ -335,9 +408,6 @@ lineStruct getLineStruct(char* str) {
     strcpy(line.value, getValue(str));  // Recover the value from the line.
     return line;
 }
-
-
-
 
 /**
  * @name getEntity
@@ -368,9 +438,6 @@ listOfLines* getEntity(int startLine, FILE* sourceFile) {
     }
     return resultList;
 }
-
-
-
 
 /**
  * @name getBlockWhere
@@ -440,9 +507,6 @@ listOfEntities* getBlockWhere(char* key, char* value, FILE* sourceFile) {
     return entities;
 }
 
-
-
-
 /**
  * @name getAllFrom
  *
@@ -488,3 +552,48 @@ listOfEntities* getAllFrom(FILE* sourceFile) {
     return entities;
 }
 
+/**
+ * @name selectKeys
+ *
+ * @brief Recover all the value of the wanted keys passed by argument.
+ *
+ * @param stringList* keys : array of strings which are the wanted keys.
+ * @param FILE* sourceFile : file pointer of the concerned file.
+ *
+ * @return stringList* keys : linked list half filled (keys only).
+ */
+stringList* selectKeys(stringList* keys, FILE* sourceFile) {
+	int fileSize;
+	char line[MAX];
+	char tempKey[MAX];
+	stringList* tempStringList;
+	listOfEntities* entities;
+
+    entities = NULL;
+	fileSize = fSize(sourceFile);
+    FILE_LINE_COUNTER = 0;
+
+	if(sourceFile != NULL) {
+		while ( (tempStringList = keys) != NULL) {
+			if(fseek(sourceFile, 0, SEEK_SET) == 0) {		// Set the cursor at the start of the file.
+				while(ftell(sourceFile) < fileSize) {					// Browse the file
+					if(freadL(line, MAX, sourceFile)) {					// Read a line from the file.
+						if(verifLine(line)) {							// If the line can be treated.
+							if(countTab(line) > 0) {					// If inside an entity.
+								if ( (tempKey = getKey(line)) != NULL) {
+									if(strcmp(tempKey, keys->str) == 0) {
+										// Get value and add it to the final List
+									}
+								}
+							}
+						}
+					}
+				}
+			} else {
+				error("Error while shifting inside the file.");
+			}
+			keys = keys->next;
+		}
+	}
+    return entities;
+}

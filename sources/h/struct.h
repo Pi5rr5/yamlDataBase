@@ -18,9 +18,13 @@
     extern command_options cmdRequest[];
 
     /**
-     * @brief Structure d'une ligne de donn�e.
-     * @param char key[MAX] : cha�ne de caract�res correspondant � la clef de la donn�e (ou nom de la colonne)
-     * @param char value[MAX] : cha�ne de caract�res correspondant � la valeur de la donn�e.
+     * @struct lineStruct
+     * @typedef lineStruct
+     *
+     * @brief Structure of a YAML data line.
+     *
+     * @param char key[MAX] : data key (i.e name of the column)
+     * @param char value[MAX] : data value
      */
      typedef struct lineStruct {
         char key[MAX];
@@ -28,10 +32,13 @@
      } lineStruct;
 
     /**
-     * @brief Liste cha�n�e de lignes. Correspond � l'ensemble des donn�es pour une entit�.
+     * @struct listOfLines
+     * @typedef listOfLines
      *
-     * @param struct line element : ligne de donn�e.
-     * @param struct listOfLines* next : pointeur vers l'�l�ment de la liste suivant.
+     * @brief Linked list of `linesStruct`. Corresponds to the entirety of an entity.
+     *
+     * @param struct line element : data line.
+     * @param struct listOfLines* next : next element of the linked list.
      */
     typedef struct listOfLines {
         struct lineStruct line;
@@ -39,13 +46,32 @@
     } listOfLines;
 
     /**
-     * @brief Liste cha�n�e de blocs de donn�es. C'est ce type de liste qui est renvoy� apr�s une selection.
+     * @struct listOfEntities
+     * @typedef listOfEntities
      *
-     * @param struct ll_line block* block : liste cha�n�e de lignes de donn�es (ou "Bloc de donn�es").
-     * @param struct ll_dataBlock* *next : �l�ment suivant de la liste cha�n�e.
+     * @brief Linked list of data blocks. This is the type that is return after any selection.
+     *
+     * @param struct ll_line block* block : linked list of data lines (also called "data block" or "entity")
+     * @param struct ll_dataBlock* *next : next element of the linked list.
      */
     typedef struct listOfEntities {
         struct listOfLines* entity;
         struct listOfEntities* next;
     } listOfEntities;
+
+    /**
+     * @struct stringList
+     * @typedef stringList
+     *
+     * @brief Linked list of string. Use for a lot of creation and few searches.
+     * 			Instead of a dynamic array of string which is use for a lot of searching and few creation.
+     *
+     * @param char[MAX] str : string element.
+     * @param struct stringList* next : next element of the linked list
+     */
+     typedef struct stringList {
+		char str[MAX];
+		struct stringList* next;
+     } stringList;
+
 #endif // STRUCT_H_INCLUDED

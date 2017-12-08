@@ -1,0 +1,20 @@
+---
+# struct.yaml
+# structure of a table
+
+-
+    name :
+    type :
+    null :
+    extra :
+    primary :
+    index :
+    
+-
+    name :
+    type :
+    null :
+    extra :
+    primary :
+    index :
+...
