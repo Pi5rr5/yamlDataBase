@@ -89,32 +89,37 @@ char *upWord(char *word) {
 
 
 /**
- * @brief Renvoie le nombre de caractï¿½res prï¿½sents dans un fichiers.
- *               Sauvegarde la position du curseur avant le calcul pour pouvoir le remplacer ï¿½ cet endroit ï¿½ la fin de l'opï¿½ration.
- * Paramï¿½tre(s) :
- *      FILE* file : Pointeur de fichier du fichier concernï¿½.
+ * @name fSize
+ *
+ * @brief Returns the number of characters present in the given file. In another meaning, the size of the file.
+ *
+ * @param FILE* file : file pointer of the concerned file.
+ *
+ * @remarks Reset the cursor at its initial position at the end of the process.
  */
 int fSize(FILE *file) {
 	int value = 0;
 	int initialCursor;
 
 	if(file != NULL) {
-		initialCursor = ftell(file);            // Sauvegarde de la position du curseur actuelle
-		fseek(file, 0, SEEK_END);               // Déplacement vers la fin du fichier
-		value = ftell(file);                    // Renvoi le nombre de charactères dans le fichier
-		fseek(file, initialCursor, SEEK_SET);   // Repositionnement du curseur à son emplacement initial.
+		initialCursor = ftell(file);            // Save the current cursor position.
+		fseek(file, 0, SEEK_END);               // Shifting to the end of the file.
+		value = ftell(file);                    // Recover the cursor position (i.e the number of characters)
+		fseek(file, initialCursor, SEEK_SET);   // Reset the cursor to its original position.
 	}
-	return value;
+	return value;	// Return result.
 }
 
 
 /**
- * @brief Compte le nombre de tabulations au dï¿½but de la chaï¿½ne donnï¿½e.
- * Paramï¿½tre(s) :
- *      char* str : chaï¿½ne de caractï¿½res concernï¿½e.
- * Renvoi :
- *      Succï¿½s : Le nombre de tabulations comptï¿½es.
- *      ï¿½chec  : Renvoie -1
+ * @name countTab
+ *
+ * @brief Counts the number of tabulation (one tabulation is 4 space characters)
+ *
+ * @param char* str : concerned string
+ *
+ * @return (on success) Counted tabulations.
+ * @return (on failure) -1;
  */
 int countTab(char* str) {
     int i = -1;
@@ -123,11 +128,7 @@ int countTab(char* str) {
     if(str != NULL) {
         strLength = strlen(str);
         if(strLength > 0) {
-            for(i=0 ; i < strLength ; i++) {
-                if(str[i] != ' ') {
-                    break;
-                }
-            }
+            for(i=0 ; i < strLength && str[i] != ' '; i++);
             i /= 4;
         }
     }
@@ -135,15 +136,16 @@ int countTab(char* str) {
 }
 
 /**
- * @brief Dï¿½place le curseur du fichier jusqu'au dï¿½but de la ligne voulue.
- * Paramï¿½tres :
- *      int line : numï¿½ro de ligne auquel se dï¿½placer.
- *      FILE* sourceFile : pointeur de fichier du fichier concernï¿½.
- * Retour :
- *      Succï¿½s : renvoie 1.
- *      ï¿½chec  : renvoie -1
- * Remarque : En cas de dï¿½passement du fichier, c'est-ï¿½-dire si le numï¿½ro de ligne demandï¿½ est supï¿½rieur
- *            au nombre actuel de lignes dans le fichier, place le curseur en fin de fichier.
+ * @brief Shift the file cursor at the start of the wanted line.
+ *
+ * @param int line : number of the line to shift to.
+ * @param FILE* sourceFile : file pointer of the concerned file.
+ *
+ * @return (on success) 1
+ * @return (on failure) 0
+ *
+ * @remarks If the end of line is exceed, i.e if the given number is superior of the line in the file,
+ *			then put the cursor at the end of the file.
  */
 int fGoToLine(int line, FILE* sourceFile) {
     int i;
@@ -152,12 +154,12 @@ int fGoToLine(int line, FILE* sourceFile) {
 
     fileSize = fSize(sourceFile);
     if(sourceFile != NULL) {
-        fseek(sourceFile, 0, SEEK_SET);                 // Dï¿½placement au dï¿½but du fichier
+        fseek(sourceFile, 0, SEEK_SET);					// Shifting to the start of the file.
         FILE_LINE_COUNTER = 0;
-        for(i=0 ; i < line-1 ; i++) {                   // Dï¿½placement jusqu'ï¿½ la ligne voulue
-            if(ftell(sourceFile) >= fileSize) {         // Si on dï¿½passe la fin du fichier (ligne demandï¿½e plus grande que le nombre de lignes du fichier)
-                return 0;                               // Alors reotur d'erreur
-            } else if(fgets(temp, MAX, sourceFile)) {   // Sinon passage ï¿½ la lign suivante
+        for(i=0 ; i < line-1 ; i++) {					// Loop up to the wanted line.
+            if(ftell(sourceFile) > fileSize) {			// If the file limit is exceed.
+                return 0;
+            } else if(fgets(temp, MAX, sourceFile)) {	// Next line.
                 FILE_LINE_COUNTER++;
             } else {
                 return 0;
@@ -172,13 +174,15 @@ int fGoToLine(int line, FILE* sourceFile) {
 
 
 /**
- * @brief Fonction de gestion d'erreur. ï¿½crit dans l'outpout dï¿½diï¿½ au erreurs.
+ * @name error
  *
- * @param char* message : message d'erreur.
+ * @brief Error displaying handler. Write in `stderr` (output dedicated to the errors).
  *
- * @return void.
+ * @param char* message : error message.
  *
- * @remarks : peut ï¿½tre modifiï¿½ en crï¿½ant un rï¿½pertoire d'erreur avec chaque erreur correspondant ï¿½ un message prï¿½cis.
+ * @return void
+ *
+ * @remarks Can be modify to have an index in which the function picks up the wanted error specify by in ID passed by argument.
  */
 void error(const char* message) {
     if(message != NULL)
