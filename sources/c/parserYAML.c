@@ -555,7 +555,7 @@ listOfEntities* getAllFrom(FILE* sourceFile) {
 /**
  * @name selectKeys
  *
- * @brief Recover all the value of the wanted keys passed by argument.
+ * @brief Recover all the values of the wanted keys passed by argument.
  *
  * @param stringList* keys : array of strings which are the wanted keys.
  * @param FILE* sourceFile : file pointer of the concerned file.
@@ -566,23 +566,25 @@ stringList* selectKeys(stringList* keys, FILE* sourceFile) {
 	int fileSize;
 	char line[MAX];
 	char tempKey[MAX];
-	stringList* tempStringList;
-	listOfEntities* entities;
+	char tempValue[MAX];
+	stringList* keyListCursor;
+	stringList* result;
 
-    entities = NULL;
 	fileSize = fSize(sourceFile);
     FILE_LINE_COUNTER = 0;
 
 	if(sourceFile != NULL) {
-		while ( (tempStringList = keys) != NULL) {
+		while ( (keyListCursor = keys) != NULL) {
 			if(fseek(sourceFile, 0, SEEK_SET) == 0) {		// Set the cursor at the start of the file.
 				while(ftell(sourceFile) < fileSize) {					// Browse the file
 					if(freadL(line, MAX, sourceFile)) {					// Read a line from the file.
 						if(verifLine(line)) {							// If the line can be treated.
 							if(countTab(line) > 0) {					// If inside an entity.
-								if ( (tempKey = getKey(line)) != NULL) {
-									if(strcmp(tempKey, keys->str) == 0) {
-										// Get value and add it to the final List
+								if ( (strcpy(tempKey, getKey(line))) != NULL) {				// Recovering the key
+									if (strcmp(tempKey, keys->str) == 0) {					// Checks if this is the wanted key
+										if ( (tempValue = getValue(line)) != NULL ) {		// Recover value
+											result = addStringToList(result, tempValue);
+										}
 									}
 								}
 							}

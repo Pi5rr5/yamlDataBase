@@ -6,7 +6,7 @@
     name :
     type :
     null :
-    extra :
+    auto_increment :
     primary :
     index :
     
@@ -14,7 +14,7 @@
     name :
     type :
     null :
-    extra :
+    auto_increment :
     primary :
     index :
 ...
