@@ -8,10 +8,6 @@
 #include <stdlib.h>
 
 
-//fonction de base menu, init (procédure initialisation), ouverture fichiers
-
-
-
 void menu() {
     //  verifFirstInit();
     //  showInfo();
@@ -122,7 +118,8 @@ int isAlphaNum(char *word) {
     isOk = 1;
     len = strlen(word);
     for(int boucle = 0; boucle < len; boucle++) {
-        if ((word[boucle] < 'a' || word[boucle] > 'z')) { isOk = 0; break; }
+
+        if (!((word[boucle] >= 'a' && word[boucle] <= 'z') || (word[boucle] >= 'A' && word[boucle] <= 'Z') || (word[boucle] >= '0' && word[boucle] <= '9'))) { isOk = 0; break; }
     }
     return isOk;
 }
@@ -152,6 +149,13 @@ int countArgs(char* countChar, const char* delim) {
 }
 
 
+/**
+ * Desc: return the first word of a string
+ *
+ * Param: Char * word : String to csplit
+ *
+ * Return: first word
+ */
 char *splitWord(char *word, char *delim) {
     int len;
     int count;
@@ -167,13 +171,13 @@ char *splitWord(char *word, char *delim) {
     return firstWord;
 }
 
-
-
-
-//exemple
 /**
- * Description : Renvoie le nombre de caractères présents dans un fichiers.
- *               Sauvegarde la position du curseur avant le calcul pour pouvoir le remplacer à cet endroit à la fin de l'opération.
- * Paramètre(s) :
- *      FILE* file : Pointeur de fichier du fichier concerné.
+ * Desc: check if the word is ban
+ *
+ * Param: Char * word : String to check
+ *
+ * Return: 1 -> not ban ; 0 -> ban
  */
+int correctWord(char *word) {
+    return 1;
+}

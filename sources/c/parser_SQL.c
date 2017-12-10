@@ -9,10 +9,10 @@
 #include "../h/Core.h"
 
 
-
-// interpreteur SQL détection mot clé, récurcivité, renvoi fonction
-
-
+/**
+ * Desc: List of command
+ *
+ */
 commandSQL cmdSQL[] = {
         {"USE",             query_use},
         {"CREATE DATABASE", query_create_database},
@@ -23,6 +23,12 @@ commandSQL cmdSQL[] = {
         {NULL, NULL}
 };
 
+/**
+ * Desc: parse the SQL query & call functions
+ *
+ * Param: Char * word : String to cut & check
+ *
+ */
 void parserSQL(char *word) {
     int error;
     int loop;
@@ -37,7 +43,7 @@ void parserSQL(char *word) {
     for (loop = 0; cmdSQL[loop].name; loop++) {
         if (!strncmp(upWordChar, cmdSQL[loop].name, strlen(cmdSQL[loop].name))) {
             lenQuery = strlen(cleanQueryChar);
-            lenWord = strlen(cmdSQL[loop].name) +1;
+            lenWord = strlen(cmdSQL[loop].name) + 1;
             querySent = malloc(sizeof(char) * (lenQuery - lenWord));
             strncpy(querySent, cleanQueryChar + lenWord, lenQuery - lenWord - 1);
             cmdSQL[loop].functionSQL(querySent);
@@ -52,7 +58,6 @@ void parserSQL(char *word) {
 }
 
 
-
 void query_exit(char *exit) {
     printf("Goodbye ( ^_^)／");
 }
@@ -60,40 +65,3 @@ void query_exit(char *exit) {
 void query_error(char *error) {
     printf("Error: Invalid Command (╯°□°）╯︵ ┻━┻");
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*int
-float
-char
-string*/
-
-
-/*CREATE TABLE MyGuests (
-        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        firstname VARCHAR(30) NOT NULL,
-lastname VARCHAR(30) NOT NULL,
-email VARCHAR(50),
-        reg_date TIMESTAMP
-)*/
-
-

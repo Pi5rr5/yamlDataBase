@@ -14,6 +14,6 @@ char *cleanQuery(char *);
 int isAlphaNum(char*);
 int countArgs(char*, const char*);
 char *splitWord(char *, char*);
-
+int correctWord(char *);
 
 #endif /* YAML_SOME_FUNCT_H */
