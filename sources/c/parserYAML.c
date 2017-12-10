@@ -223,7 +223,7 @@ stringList* addStringToList(stringList* list, char* str) {
 
     new_element = malloc(sizeof(stringList));	// Required memory allocation for the new element
     if(new_element != NULL) {				// If the allocation went well
-        strcpy(new_element->str, str);		// We assign the value passed in argument to the corresponding attribute of the new element.
+        strcpy(new_element->value, str);		// We assign the value passed in argument to the corresponding attribute of the new element.
         new_element->next = NULL;			// `next` pointer is set to NULL, the new element becoming the last node.
         if(list == NULL) {					// If the given list is empty.
             return new_element;				// Return of the new element only (because it's the only node).
@@ -256,7 +256,7 @@ void displayStringList(stringList* list) {
     printf("\nList of string :\n");
     if(list != NULL) {
         while ( (temp = list) != NULL) {
-			printf("\t\t%s\n", temp->str);
+			printf("\t\t%s\n", temp->value);
             list = list->next;
         }
     } else {
@@ -562,40 +562,20 @@ listOfEntities* getAllFrom(FILE* sourceFile) {
  *
  * @return stringList* keys : linked list half filled (keys only).
  */
-stringList* selectKeys(stringList* keys, FILE* sourceFile) {
-	int fileSize;
-	char line[MAX];
-	char tempKey[MAX];
-	char tempValue[MAX];
-	stringList* keyListCursor;
-	stringList* result;
+stringList* selectKeys(stringList* keys, listOfEntities* data) {
+	stringList* tempStringList;
+	listOfLines* tempListOfLines;
+	listOfEntities* tempListOfEntities;
 
-	fileSize = fSize(sourceFile);
-    FILE_LINE_COUNTER = 0;
+	if(data != NULL && keys != NULL) {
+		while ( (tempStringList = keys) != NULL) {
+			while ( (tempListOfEntities = data) != NULL) {
+				while ( (tempListOfLines = tempListOfEntities->entity) != NULL) {
+					if ( strcmp(tempListOfLines->line.key, tempStringList->value) == 0) {
 
-	if(sourceFile != NULL) {
-		while ( (keyListCursor = keys) != NULL) {
-			if(fseek(sourceFile, 0, SEEK_SET) == 0) {		// Set the cursor at the start of the file.
-				while(ftell(sourceFile) < fileSize) {					// Browse the file
-					if(freadL(line, MAX, sourceFile)) {					// Read a line from the file.
-						if(verifLine(line)) {							// If the line can be treated.
-							if(countTab(line) > 0) {					// If inside an entity.
-								if ( (strcpy(tempKey, getKey(line))) != NULL) {				// Recovering the key
-									if (strcmp(tempKey, keys->str) == 0) {					// Checks if this is the wanted key
-										if ( (tempValue = getValue(line)) != NULL ) {		// Recover value
-											result = addStringToList(result, tempValue);
-										}
-									}
-								}
-							}
-						}
 					}
 				}
-			} else {
-				error("Error while shifting inside the file.");
 			}
-			keys = keys->next;
 		}
 	}
-    return entities;
 }
