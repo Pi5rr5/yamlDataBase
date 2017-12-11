@@ -17,9 +17,9 @@ int main(int argc, char **argv) {
     gtk_init(&argc, &argv);
 
     builder = gtk_builder_new();
-    gtk_builder_add_from_file (builder, "file_Name.glade", NULL);
+    gtk_builder_add_from_file (builder, "../../test.glade", NULL); // path of the generate .glade file
 
-    window = GTK_WIDGET(gtk_builder_get_object(builder, "windows_Name"));
+    window = GTK_WIDGET(gtk_builder_get_object(builder, "yml db")); // windows id
     gtk_builder_connect_signals(builder, NULL);
 
     g_object_unref(builder);
