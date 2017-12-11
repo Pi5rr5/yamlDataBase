@@ -7,13 +7,13 @@
 #include "../h/some_funct.h"
 #include <string.h>
 #include <stdlib.h>
+#include "../h/system_function.h"
 
 // CORE prgm appel parser, renvoi à interpreteur
 
 
-
 void query_use(char *use) {
-/*    if (countArgs(use, (char) " ") == 1) {
+    if (countArgs(use, (char) " ") == 1) {
         if (isAlphaNum(use)) {
             if (getBlockWhere("name", use, "databases.yaml") != NULL) {
                 if (useDB(use)) {
@@ -29,12 +29,12 @@ void query_use(char *use) {
         }
     } else {
         printf("Error : Query with too few args");
-    }*/
+    }
 }
 
 
 void query_create_database(char *buffer) {
-/*    if (countArgs(buffer, (char) " ") == 1) {
+    if (countArgs(buffer, (char) " ") == 1) {
         if (isAlphaNum(buffer)) {
             if (funcyaml(buffer)) {
                 if (createDB(buffer)) {
@@ -50,12 +50,12 @@ void query_create_database(char *buffer) {
         }
     } else {
         printf("Error : Query with too few args");
-    }*/
+    }
 }
 
 
 void query_drop_database(char *buffer) {
-/*    if (countArgs(buffer, (char) " ") == 1) {
+    if (countArgs(buffer, (char) " ") == 1) {
         if (isAlphaNum(buffer)) {
             if (funcyaml(buffer)) {
                 if (dropDB(buffer)) {
@@ -71,12 +71,12 @@ void query_drop_database(char *buffer) {
         }
     } else {
         printf("Error : Query with too few args");
-    }*/
+    }
 }
 
 
 void query_drop_table(char *buffer) {
-/*    if (countArgs(buffer, (char) " ") == 1) {
+    if (countArgs(buffer, (char) " ") == 1) {
         if (isAlphaNum(buffer)) {
             if (funcyaml(buffer)) {
                 if (dropTable(buffer)) {
@@ -92,7 +92,7 @@ void query_drop_table(char *buffer) {
         }
     } else {
         printf("Error : Query with too few args");
-    }*/
+    }
 }
 
 void query_create_table(char *buffer) {
@@ -107,10 +107,10 @@ void query_create_table(char *buffer) {
         if (isAlphaNum(table)) {
             createQuery = malloc(sizeof(char) * (strlen(buffer) - strlen(table) + 1));
             strncpy(createQuery, buffer + strlen(table) + 1, strlen(buffer) - strlen(table));
-            /* if (!createTable(table)) {
+             if (!createTable(table)) {
                  printf("Error : Can't create table on CMD");
                  error = 1;
-             }*/
+             }
         } else {
             printf("Error: Not an alpha-numeric argument");
             error = 1;
@@ -134,14 +134,11 @@ void query_create_table(char *buffer) {
  */
 void splitCreateQuery(char *createQuery, const char *delim) {
     char *token;
-    token = strtok(createQuery, delim);
+    token = strtok1(createQuery, delim);
     while (token != NULL) {
-        printf("colonne:%s\n", token);
-        GoSplitCreateQuery(token, " ");
-        token = strtok(NULL, delim);
+        goSplitCreateQuery(token, " ");
+        token = strtok1(NULL, delim);
     }
-
-
 }
 
 /**
@@ -150,41 +147,117 @@ void splitCreateQuery(char *createQuery, const char *delim) {
  * Param: Char * word : String to check
  *
  */
-void GoSplitCreateQuery(char *createQuery, const char *delim) {
-    printf("%s\n", createQuery);
-    char *token;
+void goSplitCreateQuery(char *createQuery, const char *delim) {
+    char *token1;
     char *name;
     char *type;
-    char *null = "true";
-    char *auto_increment = "false";
-    char *primary = "false";
-    int count = 1;
+    char *checknull;
+    char *null;
+    char *checkauto;
+    char *auto_increment;
+    char *checkprimary;
+    char *primary;
+    int error = 0;
     if (countArgs(createQuery, " ") > 1) {
-        token = strtok(createQuery, delim);
-        while (token != NULL) {
-            if (count == 1) {
-                if (correctWord(token)) {
-                    printf("(-)%s\n", token);
-                    if (isAlphaNum(token)) {
-                        name = malloc(sizeof(char) * strlen(token));
-                        strcpy(name, token);
-                    } else {
-                        printf("Error: Not an alpha-numeric argument(blop)\n");
-                    }
-                } else {
-                    printf("Error: Use of a forbidden word");
-                }
-                count++;
-            } else {
-                // au dessus de 1
-                //vérifier les termes
+        char *name = splitWord(createQuery, " ");
+        if (correctWord(name)) {
+            if (!isAlphaNum(name)) {
+                printf("Error: Not an alpha-numeric argument(blop)\n");
+                error = 1;
             }
-            token = strtok(NULL, delim);
+        } else {
+            printf("Error: Use of a forbidden word");
+            error = 1;
         }
+        if (!error) {
+            type = malloc(sizeof(char) * 20);
+            type = strstr(upWord(createQuery), "INT");
+            if (!type) {
+                type = strstr(upWord(createQuery), "VARCHAR");
+                if (!type) {
+                    type = strstr(upWord(createQuery), "CHAR");
+                    if (!type) {
+                        type = strstr(upWord(createQuery), "FLOAT");
+                        if (!type) {
+                            error = 1;
+                        } else {
+                            type[5] = '\0';
+                        }
+                    } else { type[5] = '\0'; }
+                } else { type[8] = '\0'; }
+            } else { type[3] = '\0'; }
+            checknull = malloc(sizeof(char) * 20);
+            checknull = strstr(upWord(createQuery), "NOT NULL");
+            if (checknull) {
+                null = malloc(sizeof(char) * 4);
+                strcpy(null, "true");
+                null[4] = '\0';
+            } else {
+                null = malloc(sizeof(char) * 5);
+                strcpy(null, "false");
+                null[5] = '\0';
+            }
+            checkauto = malloc(sizeof(char) * 20);
+            checkauto = strstr(upWord(createQuery), "AUTO INCREMENT");
+            if (checkauto) {
+                auto_increment = malloc(sizeof(char) * 4);
+                strcpy(auto_increment, "true");
+                auto_increment[4] = '\0';
+            } else {
+                auto_increment = malloc(sizeof(char) * 5);
+                strcpy(auto_increment, "false");
+                auto_increment[5] = '\0';
+            }
+            checkprimary = malloc(sizeof(char) * 20);
+            checkprimary = strstr(upWord(createQuery), "PRIMARY KEY");
+            if (checkprimary) {
+                primary = malloc(sizeof(char) * 4);
+                strcpy(primary, "true");
+                primary[4] = '\0';
+            } else {
+                primary = malloc(sizeof(char) * 5);
+                strcpy(primary, "false");
+                primary[5] = '\0';
+            }
+
+        }
+        if(!error) {
+            printf("--type:%s--null:%s--auto:%s--primary:%s\n", type, null, auto_increment, primary);
+        } else {
+            printf("Error : No type selected");
+        }
+/*        createQuery += strlen(name);
+        token1 = strtok(createQuery, delim);
+
+        // recherche de param;
+        while (token1 != NULL) {
+            // recherche de mot ok;
+
+            token1 = strtok(NULL, delim);
+        }*/
     } else {
         printf("Error : Query with too few args");
     }
-    printf("------>%s\n", name);
+
+}
+
+
+// à expliquer
+char *strtok1(char *s, const char *delim) {
+    static char *lasts;
+    register int ch;
+
+    if (s == 0)
+        s = lasts;
+    do {
+        if ((ch = *s++) == '\0')
+            return 0;
+    } while (strchr(delim, ch));
+    --s;
+    lasts = s + strcspn(s, delim);
+    if (*lasts != 0)
+        *lasts++ = 0;
+    return s;
 }
 
 

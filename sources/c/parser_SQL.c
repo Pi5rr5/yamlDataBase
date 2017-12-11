@@ -19,7 +19,7 @@ commandSQL cmdSQL[] = {
         {"CREATE TABLE",    query_create_table},
         {"DROP DATABASE",   query_drop_database},
         {"DROP TABLE",      query_drop_table},
-        {"EXIT;",           query_exit},
+        {"EXIT",           query_exit},
         {NULL, NULL}
 };
 
@@ -44,8 +44,9 @@ void parserSQL(char *word) {
         if (!strncmp(upWordChar, cmdSQL[loop].name, strlen(cmdSQL[loop].name))) {
             lenQuery = strlen(cleanQueryChar);
             lenWord = strlen(cmdSQL[loop].name) + 1;
-            querySent = malloc(sizeof(char) * (lenQuery - lenWord));
-            strncpy(querySent, cleanQueryChar + lenWord, lenQuery - lenWord - 1);
+            querySent = malloc(sizeof(char) * (lenQuery - lenWord + 1));
+            strncpy(querySent, cleanQueryChar + lenWord, lenQuery - lenWord);
+            querySent[ lenQuery - lenWord - 1] = '\0';
             cmdSQL[loop].functionSQL(querySent);
             free(querySent);
             error = 0;
@@ -57,7 +58,7 @@ void parserSQL(char *word) {
     free(upWordChar);
 }
 
-
+// count & quit
 void query_exit(char *exit) {
     printf("Goodbye ( ^_^)／");
 }

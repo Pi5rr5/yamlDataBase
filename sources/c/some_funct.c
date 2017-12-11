@@ -117,9 +117,13 @@ int isAlphaNum(char *word) {
     int isOk;
     isOk = 1;
     len = strlen(word);
-    for(int boucle = 0; boucle < len; boucle++) {
+    for (int boucle = 0; boucle < len; boucle++) {
 
-        if (!((word[boucle] >= 'a' && word[boucle] <= 'z') || (word[boucle] >= 'A' && word[boucle] <= 'Z') || (word[boucle] >= '0' && word[boucle] <= '9'))) { isOk = 0; break; }
+        if (!((word[boucle] >= 'a' && word[boucle] <= 'z') || (word[boucle] >= 'A' && word[boucle] <= 'Z') ||
+              (word[boucle] >= '0' && word[boucle] <= '9'))) {
+            isOk = 0;
+            break;
+        }
     }
     return isOk;
 }
@@ -133,14 +137,14 @@ int isAlphaNum(char *word) {
  *
  * Return: number of term (int)
  */
-int countArgs(char* countChar, const char* delim) {
-    char * countrequest;
+int countArgs(char *countChar, const char *delim) {
+    char *countrequest;
     countrequest = malloc(sizeof(char) * (strlen(countChar) + 1));
     strcpy(countrequest, countChar);
     int count;
     count = 0;
-    char* token = strtok(countrequest, delim);
-    while( token != NULL ) {
+    char *token = strtok(countrequest, delim);
+    while (token != NULL) {
         count++;
         token = strtok(NULL, delim);
     }
@@ -159,12 +163,13 @@ int countArgs(char* countChar, const char* delim) {
 char *splitWord(char *word, char *delim) {
     int len;
     int count;
-    char * firstWord;
+    char *firstWord;
     len = strlen(word);
-    for(count = 0; count < len;count++) {
+    for (count = 0; count < len; count++) {
         if (word[count] == delim[0]) {
             firstWord = malloc(sizeof(char) * (count + 1));
             strncpy(firstWord, word, count);
+            firstWord[count] = '\0';
             break;
         }
     }
