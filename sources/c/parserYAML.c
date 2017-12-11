@@ -562,7 +562,7 @@ listOfEntities* getAllFrom(FILE* sourceFile) {
  *
  * @return stringList* keys : linked list half filled (keys only).
  */
-stringList* selectKeys(stringList* keys, listOfEntities* data) {
+stringList* selectKeys(stringList* keys, stringList* keyEquals, char* keyToUpdate, char* newValue, FILE* destinationFile) {
 	stringList* tempStringList;
 	listOfLines* tempListOfLines;
 	listOfEntities* tempListOfEntities;
@@ -581,12 +581,20 @@ stringList* selectKeys(stringList* keys, listOfEntities* data) {
 }
 
 /**
+ * @name updateValuesWhere
  *
+ * @brief update several values in following some conditions.
  *
+ * @param char** keys : list of keys having a condition to comply with.
+ * @param char* comparator : comparaison to do between `keys` and `keyEquals`.
+ * @param char** keyEquals : list of values that the `keys` are compare to (index by index).
+ * @param char** keysToUpdate : list of keys to update.
+ * @param char** newValues : values to set to the keys being updated.
+ * @param FILE* destinationFile : YAML file to which do the update.
  *
- *
- *
- *
- *
+ * @return (on success) 1
+ * @return (on failure) 0
  */
-int insert
+int updateValuesWhere(char** keys, char* comparator, char** keyEquals, char** keysToUpdate, char** newValues, FILE* destinationFile) {
+
+}
