@@ -6,86 +6,63 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../h/some_funct.h"
+#include "../h/Core.h"
 
 
-
-// interpreteur SQL détection mot clé, récurcivité, renvoi fonction
-
-
+/**
+ * Desc: List of command
+ *
+ */
 commandSQL cmdSQL[] = {
         {"USE",             query_use},
         {"CREATE DATABASE", query_create_database},
         {"CREATE TABLE",    query_create_table},
         {"DROP DATABASE",   query_drop_database},
         {"DROP TABLE",      query_drop_table},
-        {"EXIT;",           query_exit},
+        {"EXIT",           query_exit},
         {NULL, NULL}
 };
 
+/**
+ * Desc: parse the SQL query & call functions
+ *
+ * Param: Char * word : String to cut & check
+ *
+ */
 void parserSQL(char *word) {
     int error;
     int loop;
-    char *cleanquery;
-    char *upword;
+    int lenQuery;
+    int lenWord;
+    char *cleanQueryChar;
+    char *upWordChar;
+    char *querySent;
     error = 1;
-    cleanquery = cleanQuery(word);
-    upword = upWord(cleanquery);
-    printf("%s\n", upword);
+    cleanQueryChar = cleanQuery(word);
+    upWordChar = upWord(cleanQueryChar);
     for (loop = 0; cmdSQL[loop].name; loop++) {
-        if (!strncmp(upword, cmdSQL[loop].name, strlen(cmdSQL[loop].name))) {
-            cmdSQL[loop].functionSQL(upword);
+        if (!strncmp(upWordChar, cmdSQL[loop].name, strlen(cmdSQL[loop].name))) {
+            lenQuery = strlen(cleanQueryChar);
+            lenWord = strlen(cmdSQL[loop].name) + 1;
+            querySent = malloc(sizeof(char) * (lenQuery - lenWord + 1));
+            strncpy(querySent, cleanQueryChar + lenWord, lenQuery - lenWord);
+            querySent[ lenQuery - lenWord - 1] = '\0';
+            cmdSQL[loop].functionSQL(querySent);
+            free(querySent);
             error = 0;
             break;
         }
     }
     error ? query_error(word) : NULL;
-    free(cleanquery);
-    free(upword);
+    free(cleanQueryChar);
+    free(upWordChar);
 }
 
-
-//***********************************************
-// parse command
-//***********************************************
-void query_use(char *buffer) {
-    // vérif à faire
-    printf("parse_use: %s", buffer);
-}
-
+// count & quit
 void query_exit(char *exit) {
-    // vérifier qu'il n'y a rien d'autre ensuite
     printf("Goodbye ( ^_^)／");
 }
 
 void query_error(char *error) {
     printf("Error: Invalid Command (╯°□°）╯︵ ┻━┻");
 }
-//***********************************************
-
-
-//***********************************************
-// Parse create
-//***********************************************
-void query_create_database(char *buffer) {
-    // verif à faire
-    printf("parse_create_database: %s", buffer);
-}
-
-void query_create_table(char *buffer) {
-    printf("parse_create_table: %s", buffer);
-}
-//***********************************************
-
-
-//***********************************************
-// Parse drop
-//***********************************************
-void query_drop_database(char *buffer) {
-    // vérif à faire
-    printf("parse_drop_database: %s", buffer);
-}
-
-void query_drop_table(char *buffer) {
-    printf("parse_drop_table: %s", buffer);
-}
-//***********************************************
