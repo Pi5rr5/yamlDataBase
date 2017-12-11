@@ -579,3 +579,14 @@ stringList* selectKeys(stringList* keys, listOfEntities* data) {
 		}
 	}
 }
+
+/**
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ */
+int insert
