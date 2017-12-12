@@ -57,11 +57,11 @@ void menu() {
  */
 char *upWord(char *word) {
     size_t len;
-    int boucle;
+    int i;
     len = strlen(word);
     char *upword = malloc(sizeof(char) * (len + 1));
-    for (boucle = 0; boucle < len; boucle++) {
-        upword[boucle] = (char) ((word[boucle] >= 'a' && word[boucle] <= 'z') ? word[boucle] - 32 : word[boucle]);
+    for (i = 0; i < len; i++) {
+        upword[i] = (char) ((word[i] >= 'a' && word[i] <= 'z') ? word[i] - 32 : word[i]);
     }
     upword[len] = '\0';
     return upword;
@@ -175,7 +175,7 @@ void error(const char* message) {
  */
 char *cleanQuery(char *word) {
     size_t len;
-    int boucle;
+    int i;
     int showchar;
     showchar = 1;
     size_t cleanspace;
@@ -185,8 +185,8 @@ char *cleanQuery(char *word) {
         cleanspace = len - 1;
         showchar = 0;
     }
-    for (boucle = 0; boucle < len - 1; boucle++) {
-        if (!strncmp(&word[boucle], " ", 1) && !strncmp(&word[boucle + 1], " ", 1)) {
+    for (i = 0; i < len - 1; i++) {
+        if (!strncmp(&word[i], " ", 1) && !strncmp(&word[i + 1], " ", 1)) {
             cleanspace--;
         }
     }
@@ -194,14 +194,14 @@ char *cleanQuery(char *word) {
     cleanquery[cleanspace - 1] = ';';
     cleanquery[cleanspace] = '\0';
     cleanspace = 0;
-    for (boucle = 0; boucle < len - 1; boucle++) {
-        if (!strncmp(&word[boucle], " ", 1) && !strncmp(&word[boucle + 1], " ", 1)) {
+    for (i = 0; i < len - 1; i++) {
+        if (!strncmp(&word[i], " ", 1) && !strncmp(&word[i + 1], " ", 1)) {
             continue;
         } else {
             if (!showchar) {
                 showchar = 1;
             } else {
-                cleanquery[cleanspace] = word[boucle];
+                cleanquery[cleanspace] = word[i];
                 cleanspace++;
             }
         }
@@ -220,12 +220,15 @@ char *cleanQuery(char *word) {
 int isAlphaNum(char *word) {
     size_t len;
     int isOk;
+    int i;
+
     isOk = 1;
     len = strlen(word);
-    for (int boucle = 0; boucle < len; boucle++) {
-
-        if (!((word[boucle] >= 'a' && word[boucle] <= 'z') || (word[boucle] >= 'A' && word[boucle] <= 'Z') ||
-              (word[boucle] >= '0' && word[boucle] <= '9'))) {
+    for (i = 0; i < len; i++) {
+		if ( word[i] < '0'
+		|| (word[i] > '9' && word[i] < 'A')
+		|| (word[i] > 'Z' && word[i] < 'a')
+		|| (word[i] > 'z') ) {
             isOk = 0;
             break;
         }

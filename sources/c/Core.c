@@ -1,26 +1,28 @@
 //
 // Created by Qut on 12/11/2017.
 //
-
-#include "../h/Core.h"
 #include <stdio.h>
-#include "../h/some_funct.h"
 #include <string.h>
 #include <stdlib.h>
+#include "../h/Core.h"
+#include "../h/struct.h"
+#include "../h/some_funct.h"
+#include "../h/parserYAML.h"
 #include "../h/system_function.h"
 
 // CORE prgm appel parser, renvoi à interpreteur
 
 
 void query_use(char *use) {
-    if (countArgs(use, (char) " ") == 1) {
+	listOfEntities* tempList;
+
+    if (countArgs(use, " ") == 1) {
         if (isAlphaNum(use)) {
-            if (getBlockWhere("name", use, "databases.yaml") != NULL) {
-                if (useDB(use)) {
-                    changeDatabase(dbName);
-                } else {
+            if ( (tempList = getBlockWhere("name", use, "databases.yaml")) != NULL) {
+				freeListOfEntities(&tempList);
+                /*if (!useDB(use)) {
                     printf("Error: Problem for change db use (system cmd)");
-                }
+                }*/
             } else {
                 printf("Error: Base not exist");
             }
@@ -34,17 +36,17 @@ void query_use(char *use) {
 
 
 void query_create_database(char *buffer) {
-    if (countArgs(buffer, (char) " ") == 1) {
+    if (countArgs(buffer, " ") == 1) {
         if (isAlphaNum(buffer)) {
-            if (funcyaml(buffer)) {
+            //if (funcyaml(buffer)) {
                 if (createDB(buffer)) {
                     printf("Query : Database created");
                 } else {
                     printf("Error : Can't create database on CMD");
                 }
-            } else {
+            /*} else {
                 printf("Error : Can't create database on YAML");
-            }
+            }*/
         } else {
             printf("Error: Not an alpha-numeric argument");
         }
@@ -55,17 +57,17 @@ void query_create_database(char *buffer) {
 
 
 void query_drop_database(char *buffer) {
-    if (countArgs(buffer, (char) " ") == 1) {
+    if (countArgs(buffer, " ") == 1) {
         if (isAlphaNum(buffer)) {
-            if (funcyaml(buffer)) {
+            //if (funcyaml(buffer)) {
                 if (dropDB(buffer)) {
                     printf("Query : Database dropped");
                 } else {
                     printf("Error : Can't drop database on CMD");
                 }
-            } else {
+            /*} else {
                 printf("Error : Can't drop database on YAML");
-            }
+            }*/
         } else {
             printf("Error: Not an alpha-numeric argument");
         }
@@ -76,17 +78,17 @@ void query_drop_database(char *buffer) {
 
 
 void query_drop_table(char *buffer) {
-    if (countArgs(buffer, (char) " ") == 1) {
+    if (countArgs(buffer, " ") == 1) {
         if (isAlphaNum(buffer)) {
-            if (funcyaml(buffer)) {
-                if (dropTable(buffer)) {
+            //if (funcyaml(buffer)) {
+                if (dropTable(buffer, "nomtable")) {
                     printf("Query : Table dropped");
                 } else {
                     printf("Error : Can't drop table on CMD");
                 }
-            } else {
+            /*} else {
                 printf("Error : Can't drop table on YAML");
-            }
+            }*/
         } else {
             printf("Error: Not an alpha-numeric argument");
         }
@@ -107,7 +109,7 @@ void query_create_table(char *buffer) {
         if (isAlphaNum(table)) {
             createQuery = malloc(sizeof(char) * (strlen(buffer) - strlen(table) + 1));
             strncpy(createQuery, buffer + strlen(table) + 1, strlen(buffer) - strlen(table));
-             if (!createTable(table)) {
+             if (!createTable(table, "nomtable")) {
                  printf("Error : Can't create table on CMD");
                  error = 1;
              }

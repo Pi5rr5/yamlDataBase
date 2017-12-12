@@ -14,11 +14,11 @@
 #endif // DEBUG_PRINT
 
 /* ----- GLOBALS ----- */
-extern int FILE_LINE_COUNTER;     // Extern est utlisé pour les globales uniquement.\
-                                    Il permet au compilateur de signaler que cette variable a peut être déjà été déclarée qulquepart.\
-                                    Il parcourt alors les fichiers (donc un peu coûteux en ressources)\
-                                    et s'il trouve une autre déclaration qui a déjà été exécutée,\
-                                    alors il ne recrée pas la globale.
+extern int FILE_LINE_COUNTER;     /* Extern est utlisé pour les globales uniquement.
+                                    Il permet au compilateur de signaler que cette variable a peut être déjà été déclarée qulquepart.
+                                    Il parcourt alors les fichiers (donc un peu coûteux en ressources)
+                                    et s'il trouve une autre déclaration qui a déjà été exécutée,
+                                    alors il ne recrée pas la globale. */
 
 
 
@@ -251,30 +251,30 @@ int freadL(char* destination, unsigned int sizeMax, FILE* sourceFile) {
  * @return (on failure) 0
  */
 int verifLine(char* str) {
-	char temp;
+	int tempInt = 0;
 
-    // Empty string
+    // Empty string case
     if(str == NULL || strlen(str) == 0)
         return 0;
 
-    // Début de fichier
-    if(strcmp(str, "---") == 0      // Le symbole de début de fichier est "---"
-    || strcmp(str, "---\n") == 0    // Il peut être suivit d'une saut de ligne
-    || strcmp(str, "---\r\n") == 0) // Autre écriture du saut de ligne possible.
+    // Start of file case
+    if(strcmp(str, "---") == 0      // A YAML file starts with "---"
+    || strcmp(str, "---\n") == 0    // It can be followed by a line break
+    || strcmp(str, "---\r\n") == 0) // There can be a carriage return before the line break
         return 0;
 
-    // Fin de fichier
-    if(strcmp(str, "...") == 0      // Le symbole de fin de fichier est "..."
-    || strcmp(str, "...\n") == 0    // Peut être suivit d'un saut de ligne.
-    || strcmp(str, "...\r\n") == 0) // Autre écriture du saut de ligne possible (dépend du fichier).
+    // End of file case
+    if(strcmp(str, "...") == 0      // A YAML file ends with "..."
+    || strcmp(str, "...\n") == 0    // It can be followed by a line break
+    || strcmp(str, "...\r\n") == 0) // There can be a carriage return before the line break
         return 0;
 
-    // Commentaire ou ligne vide
-    while(fgetc(temp) == ' ');
-    if(temp == '#' || temp == '\n' || temp == '\r')
+    // Comment or empty line
+    while(str[tempInt++] == ' ');	// Ignore indentation
+    if(str[tempInt-1] == '#' || str[tempInt-1] == '\n' || str[tempInt-1] == '\r')	// If is a comment or line break (-1 because the tempInt++ in previous instruction is triggered one too much)
         return 0;
 
-    return 1;   // Si aucun des cas ci-dessus, alors la ligne peut être traitée.
+	return 1; // If none of above, then the line can be treated.
 }
 
 
@@ -284,12 +284,12 @@ int verifLine(char* str) {
 /**
  * @name getKey
  *
- * @brief prend une ligne de données YAML en paramètre et retourne la clef qui s'y trouve.
+ * @brief Takes a line of a YAML file as argument and return the key which is therein.
  *
- * @param char* line : ligne YAML concernée.
+ * @param char* line : concerned YAML line.
  *
- * @return (on success) char* result : clef obtenue.
- * @return (on failure) NULL
+ * @return (on success) char* result : obtained key.
+ * @return (on failure) null pointer.
  */
 char* getKey(char* line) {
     int tempInt;
@@ -299,14 +299,19 @@ char* getKey(char* line) {
     tempInt  = 0;
     keyStart = 0;
 
-    while(line[tempInt++] == ' ');                          // Trouve l'index du premier caractère n'étant pas un espace
-    keyStart = tempInt;
-    while(line[tempInt++] != ' ' && line[tempInt] != ':');  // Trouve l'index du premier caractère n'étant ni espace ni un ':'
+    while(line[tempInt++] == ' ');                          // Founds the index of the first character that is not ' '
+    keyStart = tempInt-1;									// `tempInt` is one step too far (since '++' in the previous loop is triggered even at the last lap).
+    while(line[tempInt++] != ' ' && line[tempInt] != ':');  // Founds the index of the next character that is neither a ' ' nor a ':'
 
-    strncpy(result, line+keyStart-1, tempInt-keyStart);     // copie juste la clef dans result
-    result[tempInt-keyStart] = '\0';                        // strncpy ne prend pas en charge le '\0', on le rajoute à la fin de la chaîne
-    if(DEBUG_PRINT) printf("Key recovered : %s\n", result);
-    return result;
+    strncpy(result, line+keyStart, tempInt-keyStart-1);     /* Copy the key in result.
+																line+KeyStart : position to start the copy.
+																		line is the address of the string. The size of a `char` is, in almost any case, 1.
+																		Therefore adding 1 to `line` is the same as starting this line one character further.
+																tempInt-keyStart+1 : number of characters to copy (-1 because tempInt is one step too far). */
+
+    result[tempInt-keyStart-1] = '\0';						// `strncpy` does not handle '\0' (-1 because tempInt is one step too far).
+    strcpy(line, result);	// Straight return of `result` might be dangerous since it's a local variable. Therefore it is stored in `line`.
+	return line;
 }
 
 

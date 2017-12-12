@@ -60,7 +60,7 @@ int createTable(char *tableName,char *dbName) {
 * @param  : tableName
 * TODO add return
 **/
-void dropTable(char *tableName,char *dbName){
+int dropTable(char *tableName, char *dbName){
     char cmd[100];
     strcpy(cmd, "DEL /P resources\\");
     strcat(cmd, dbName);
@@ -68,6 +68,7 @@ void dropTable(char *tableName,char *dbName){
     strcat(cmd, tableName);
     strcat(cmd, ".yaml");
     system(cmd);
+    return 1;
 }
 
 /**
