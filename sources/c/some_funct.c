@@ -264,3 +264,80 @@ char *cleanQuery(char *word) {
     return cleanquery;
 }
 
+/**
+ * @name strALen
+ *
+ * @brief Takes a 2 dimensional array of char as parameter, i.e an array of strings, returns the number of strings in it.
+ *
+ * @param char *array : pointer of the two dimensional array.
+ *
+ * @remarks Called as a single pointer because the function does not need to access the inner pointer.
+ */
+size_t strALen (char *array) {
+    size_t len = 0;
+
+	if(array != NULL)
+		while (*array++ != '\0')
+			len++;
+    return len/sizeof(char*);
+}
+
+/**
+ * @name strIsIn
+ *
+ * @brief Checks if a given string is in a list of string
+ *
+ * @param char* str : string to search for.
+ * @param char** strList : list of string to search in.
+ *
+ * @return (if found) the position of the occurrence in the list.
+ * @return (otherwise) -1
+ */
+int strIsIn(char* str, char strList[][MAX]) {
+	int i;
+	int listSize;
+
+	listSize = sizeof(strList)/sizeof(*strList);
+	printf("Size : %d/%d = %d\n", sizeof(strList), sizeof(*strList), listSize);
+	for(i=0 ; i < listSize ; i++) {
+		printf("In loop : %d\n", i);
+		if(strcmp(str, strList[i]) == 0) {
+			printf("Stop : %s\n", i);
+			return i;
+		}
+		printf("Next.\n");
+	}
+	return -1;
+}
+
+/**
+ * @name addColumn
+ *
+ * @brief Allocates a column to the given array typed as `char**`
+ *
+ * @param
+ *
+ *
+ *
+ */
+char** addColumn(char** stringArray, unsigned int currentSize, unsigned int dimToAdd, char value) {
+	int i;
+	char** temp;
+
+	if ( (temp = malloc(sizeof(char*)*currentSize + dimToAdd)) != NULL ) {
+		for(i=0 ; i < currentSize + dimToAdd ; i++) {
+			if ( (temp[i] = malloc(sizeof(char)*MAX)) == NULL ) {
+				while(i >= 0) {
+					free(temp[--i]);
+				}
+				free(temp);
+				return NULL;
+			} else if(i < currentSize) {
+				temp[i] = stringArray[i];
+			}
+		}
+		free(stringArray);
+		stringArray = temp;
+	}
+	return stringArray;
+}

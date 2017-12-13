@@ -10,11 +10,16 @@ int FILE_LINE_COUNTER;
 
 /* ----- MAIN ----- */
 int main(int argc, char **argv) {
+	int i;
 	FILE* fp;
-	listOfEntities* test = NULL;
+	char* comparators;
+	char** keysList;
+	char** valuesList;
 
-	if( (fp = fopen("resources/dataBases.yaml", "r")) != NULL) {
-		if( (test = getAllFrom(fp)) != NULL) {
+	listOfEntities* test = NULL;
+	printf("%d/%d = %d\n", sizeof(keysList), sizeof(*keysList), sizeof(keysList)/sizeof(*keysList));
+	if( (fp = fopen("resources/struct.yaml", "r")) != NULL) {
+		if( (test = getBlockWhere(keysList, comparators, valuesList, fp)) != NULL) {
 			displayListOfEntities(test);
 			freeListOfEntities(&test);
 		} else {

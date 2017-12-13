@@ -3,18 +3,18 @@
 # structure of a table
 
 -
-    name :
-    type :
-    null :
-    auto_increment :
-    primary :
-    index :
+    name : column1
+    type : VARCHAR
+    null : false
+    auto_increment : false
+    primary : false
+    length : 255
     
 -
-    name :
-    type :
-    null :
-    auto_increment :
-    primary :
-    index :
+    name : column2
+    type : int
+    null : false
+    auto_increment : true
+    primary : true
+    length : 4
 ...

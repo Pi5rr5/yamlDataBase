@@ -11,9 +11,8 @@
 
     typedef struct struct_command {
         char *name;
-
         void (*f)(char *);
-    } command_options;
+    } command_options, fctPtr;
 
     extern command_options cmdRequest[];
 
@@ -125,6 +124,5 @@
 	} queryResult;
 
 	/* ----- END OF "BY KEY" YAML SELECTION ----- */
-
 
 #endif // STRUCT_H_INCLUDED

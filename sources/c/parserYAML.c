@@ -54,7 +54,7 @@ void debug(const char* msg) {
 listOfLines* addLineToList(listOfLines* list, lineStruct line) {
     listOfLines* new_element;
     listOfLines* temp;
-
+	debug("Allocation.\n");
     new_element = malloc(sizeof(listOfLines));	// Required allocation for the new element.
     if(new_element != NULL) {				// If the allocation went well.
         new_element->line = line;			// We assign the value passed in argument to the corresponding attribute of the new element.
@@ -114,7 +114,6 @@ void freeListOfLines(listOfLines** list) {
     if(*list != NULL) {
         while( (temp = *list) != NULL ) {	// Browsing the list
         	*list = (*list)->next;
-        	printf("releasing : %s\n", temp->line.value);
 			free(temp);
         }
     }
@@ -137,7 +136,7 @@ void freeListOfLines(listOfLines** list) {
 listOfEntities* addEntityToList(listOfEntities* list, listOfLines* entity) {
     listOfEntities* new_element;
     listOfEntities* temp;
-
+	debug("Allocation.\n");
     new_element = malloc(sizeof(listOfEntities));	// Required memory allocation for the new element
     if(new_element != NULL) {				// If the allocation went well
         new_element->entity = entity;		// We assign the value passed in argument to the corresponding attribute of the new element.
@@ -220,7 +219,7 @@ void freeListOfEntities(listOfEntities** list) {
 stringList* addStringToList(stringList* list, char* str) {
     stringList* new_element;
     stringList* temp;
-
+	debug("Allocation.\n");
     new_element = malloc(sizeof(stringList));	// Required memory allocation for the new element
     if(new_element != NULL) {				// If the allocation went well
         strcpy(new_element->value, str);		// We assign the value passed in argument to the corresponding attribute of the new element.
@@ -444,8 +443,9 @@ listOfLines* getEntity(int startLine, FILE* sourceFile) {
  *
  * @brief Returns all the entities having the a matching the key and value passed as parameters.
  *
- * @param char* key : key to search
- * @param char* value : value that the key has to have
+ * @param char** keysList : list of keys to search which will be compare to `valuesList`
+ * @param char* comparators : list of comparators (treated as string)
+ * @param char** valuesList : list of values witch will be compare to `keysList`
  * @param FILE* sourceFile : file pointer of the concerned file.
  *
  * @return (on success) listOfEntities* entities : linked list of entities matching the request.
@@ -455,7 +455,8 @@ listOfLines* getEntity(int startLine, FILE* sourceFile) {
  *
  * @warning No estimation of the danger the previous remark could generates. A review may be required.
  */
-listOfEntities* getBlockWhere(char* key, char* value, FILE* sourceFile) {
+listOfEntities* getBlockWhere(char** keysList, char* comparators, char** valuesList, FILE* sourceFile) {
+	int tempInt;
 	int fileSize;
 	int tabulation;
 	int startingLine;
@@ -464,10 +465,10 @@ listOfEntities* getBlockWhere(char* key, char* value, FILE* sourceFile) {
 	char tempValue[MAX];
 	listOfLines* tempEntity;
 	listOfEntities* entities;
-
     entities = NULL;
     startingLine = 0;
     FILE_LINE_COUNTER = 0;
+	printf("%d/%d = %d\n", sizeof(keysList), sizeof(*keysList), sizeof(keysList)/sizeof(*keysList));
 
 	fileSize = fSize(sourceFile);
     while(ftell(sourceFile) < fileSize) {					// Browse the file.
@@ -478,13 +479,14 @@ listOfEntities* getBlockWhere(char* key, char* value, FILE* sourceFile) {
                     startingLine = FILE_LINE_COUNTER;				// Stores the current line number.
                 } else if(tabulation > 0) {																// Will be '-1' if an error occurred before.
                     if(strcpy(tempKey, getKey(line)) != NULL) {											// Recovers the key.
-                        if(strcmp(tempKey, key) == 0) {													// Checks if this key is the wanted one.
+						if( (tempInt = strIsIn(tempKey, keysList)) > 0) {							// Checks if this key is the wanted one.
+							system("pause >nul");
                             if(strcpy(tempValue, getValue(line)) != NULL) {								// Recovers the value.
-                                if(strcmp(tempValue, value) == 0) {										// Checks if this value is the wanted one.
-                                    if((tempEntity = getEntity(startingLine+1, sourceFile)) != NULL) {			// Recovers the entity containing those key and value.
-                                        if ( (entities = addEntityToList(entities, tempEntity)) == NULL) {  	// Add this entity to the list of entities.
-                                            error("Error while adding entity from file.");						// If an occurs during the previous manipulation,
-                                            break;																// Then stop the process.
+                                if( (strIsIn(tempValue, valuesList)) == tempInt) {						// Checks if this value is the wanted one.
+                                    if((tempEntity = getEntity(startingLine+1, sourceFile)) != NULL) {		// Recovers the entity containing those key and value.
+                                        if ( (entities = addEntityToList(entities, tempEntity)) == NULL) {  // Add this entity to the list of entities.
+                                            error("Error while adding entity from file.");					// If an occurs during the previous manipulation,
+                                            break;															// Then stop the process.
                                         }
                                     } else {
                                         error("Error while recovering entity.");
@@ -561,7 +563,7 @@ listOfEntities* getAllFrom(FILE* sourceFile) {
  * @param FILE* sourceFile : file pointer of the concerned file.
  *
  * @return stringList* keys : linked list half filled (keys only).
- */
+ *//*
 stringList* selectKeys(stringList* keys, stringList* keyEquals, char* keyToUpdate, char* newValue, FILE* destinationFile) {
 	stringList* tempStringList;
 	listOfLines* tempListOfLines;
@@ -578,16 +580,16 @@ stringList* selectKeys(stringList* keys, stringList* keyEquals, char* keyToUpdat
 			}
 		}
 	}
-}
+}*/
 
 /**
  * @name updateValuesWhere
  *
  * @brief update several values in following some conditions.
  *
- * @param char** keys : list of keys having a condition to comply with.
- * @param char* comparator : comparaison to do between `keys` and `keyEquals`.
- * @param char** keyEquals : list of values that the `keys` are compare to (index by index).
+ * @param char** keysList : list of keys having a condition to comply with.
+ * @param char* comparator : array of char listing comparator (has to finish by '\0' as a string)
+ * @param char** valuesList : list of values compare to `keysList` (bind by index).
  * @param char** keysToUpdate : list of keys to update.
  * @param char** newValues : values to set to the keys being updated.
  * @param FILE* destinationFile : YAML file to which do the update.
@@ -595,6 +597,21 @@ stringList* selectKeys(stringList* keys, stringList* keyEquals, char* keyToUpdat
  * @return (on success) 1
  * @return (on failure) 0
  */
-int updateValuesWhere(char** keys, char* comparator, char** keyEquals, char** keysToUpdate, char** newValues, FILE* destinationFile) {
+int updateValuesWhere(char** keysList, char* comparators, char** valuesList, char** keysToUpdate, char** newValues, FILE* destinationFile) {
+	int i;
+	int j;
+	size_t keysNb;
+	size_t keyEqualsNb;
+	size_t keysToUpdateNb;
+	size_t newValuesNb;
 
+	if ( destinationFile != NULL && keysToUpdate != NULL && newValues != NULL ) {
+        keysNb = strALen(keysList);
+		if ( keysNb == strALen(valuesList) && keysNb == strlen(comparators) ) {
+			for(i=0 ; i < keysNb ; i++) {
+
+			}
+		}
+	}
+	return 0;
 }
