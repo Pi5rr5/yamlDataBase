@@ -1,7 +1,5 @@
-#include <stdio.h>
-
 #ifndef PARSERYAML_H_INCLUDED
-#define PARSERYAML_H_INCLUDED
+	#define PARSERYAML_H_INCLUDED
     listOfLines* addLineToList(listOfLines*, lineStruct);
     listOfEntities* addEntityToList(listOfEntities*, listOfLines*);
     void displayListOfLines(listOfLines*);

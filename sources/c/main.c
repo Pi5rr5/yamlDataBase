@@ -10,21 +10,22 @@ int FILE_LINE_COUNTER;
 
 /* ----- MAIN ----- */
 int main(int argc, char **argv) {
-	int i;
 	FILE* fp;
 	char* comparators;
-	char** keysList;
-	char** valuesList;
+	arrayOfStrings keysList;
+	arrayOfStrings valuesList;
+
+	keysList = createArrayOfStrings((unsigned int)5);
+	valuesList = createArrayOfStrings((unsigned int)5);
 
 	listOfEntities* test = NULL;
-	printf("%d/%d = %d\n", sizeof(keysList), sizeof(*keysList), sizeof(keysList)/sizeof(*keysList));
 	if( (fp = fopen("resources/struct.yaml", "r")) != NULL) {
-		if( (test = getBlockWhere(keysList, comparators, valuesList, fp)) != NULL) {
-			displayListOfEntities(test);
-			freeListOfEntities(&test);
-		} else {
-			error("Error while recovering.\n");
-		}
+//		if( (test = getBlockWhere(keysList, comparators, valuesList, fp)) != NULL) {
+//			displayListOfEntities(test);
+//			freeListOfEntities(&test);
+//		} else {
+//			error("Error while recovering.\n");
+//		}
 	} else {
 		error("File not found.\n");
 	}

@@ -12,6 +12,8 @@
     int countTab(char*);
     int fGoToLine(int, FILE*);
     void error(const char*);
-    size_t strALen(char*);
 	int strIsIn(char*, char[][255]);
+	arrayOfStrings createArrayOfStrings(unsigned int);
+	arrayOfStrings updateArrayOfStrings(arrayOfStrings, unsigned int);
+	void freeArrayOfStrings(arrayOfStrings*);
 #endif /* YAML_SOME_FUNCT_H */

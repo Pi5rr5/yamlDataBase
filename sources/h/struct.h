@@ -16,6 +16,10 @@
 
     extern command_options cmdRequest[];
 
+	typedef struct arrayOfStrings {
+		char** array;
+		unsigned int stringsNb;
+	} arrayOfStrings;
 
 
     /* 		----- "BY ENTITY" YAML SELECTION -----

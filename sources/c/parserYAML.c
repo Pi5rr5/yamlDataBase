@@ -9,20 +9,19 @@
     #define MAX 255     // Maximum size for the non-dynamic strings.
 #endif // MAX
 
-#ifndef DEBUG_PRINT
-    #define DEBUG_PRINT 1
-#endif // DEBUG_PRINT
-
 /* ---------------- GLOBALS ---------------- */
-extern int FILE_LINE_COUNTER;	/*  `extern` is exclusive to globals variables.
-                                    It allows to specify to the compiler that the variable may have been already declared in another file.
-                                    And if it has been, then it will be not redeclared */
-
-void debug(const char* msg) {
-	if(DEBUG_PRINT)
-		printf("%s\n", msg);
-}
-
+/**
+ * @name FILE_LINE_COUNTER
+ *
+ * @brief global counting le current line number on which is the file cursor. Updated by few functions.
+ *
+ * @remarks `extern` is exclusive to globals variables.
+ *			It allows to specify to the compiler that the variable may have been already declared in another file.
+ *			And if it has been, then it will be not redeclared
+ *
+ * @see getEntity() getBlockWhere() getAllFrom() freadL()
+ */
+extern int FILE_LINE_COUNTER;
 
 
 
@@ -38,6 +37,7 @@ void debug(const char* msg) {
 
 /* ----- LINKED LISTS  ----- */
 
+
 /* listOfLines */
 
 /**
@@ -50,11 +50,13 @@ void debug(const char* msg) {
  *
  * @return (on success) : pointer to the updated linked list.
  * @return (on failure) : in case of an allocation error, returns a null pointer.
+ *
+ * @see listOfLines lineStruct
  */
 listOfLines* addLineToList(listOfLines* list, lineStruct line) {
     listOfLines* new_element;
     listOfLines* temp;
-	debug("Allocation.\n");
+
     new_element = malloc(sizeof(listOfLines));	// Required allocation for the new element.
     if(new_element != NULL) {				// If the allocation went well.
         new_element->line = line;			// We assign the value passed in argument to the corresponding attribute of the new element.
@@ -82,7 +84,9 @@ listOfLines* addLineToList(listOfLines* list, lineStruct line) {
  *
  * @return void
  *
- * @remarks Could be use as debugging tool as well as user interface. Fell free to personalize the displaying.
+ * @remarks Could be use as debugging tool as well as user interface. Feel free to personalize the displaying.
+ *
+ * @see listOflines lineStruct
  */
 void displayListOfLines(listOfLines* list) {
     listOfLines* temp;
@@ -107,6 +111,8 @@ void displayListOfLines(listOfLines* list) {
  * @param listOfLines** list : pointer of the concerned linked list.
  *
  * @return void
+ *
+ * @see listOfLines
  */
 void freeListOfLines(listOfLines** list) {
     listOfLines* temp;
@@ -132,11 +138,13 @@ void freeListOfLines(listOfLines** list) {
  *
  * @return (on success) : pointer to the updated linked list
  * @return (on failure) : in case of allocation error, returns a null pointer
+ *
+ * @see listOfEntities listOfLines addLineToList()
  */
 listOfEntities* addEntityToList(listOfEntities* list, listOfLines* entity) {
     listOfEntities* new_element;
     listOfEntities* temp;
-	debug("Allocation.\n");
+
     new_element = malloc(sizeof(listOfEntities));	// Required memory allocation for the new element
     if(new_element != NULL) {				// If the allocation went well
         new_element->entity = entity;		// We assign the value passed in argument to the corresponding attribute of the new element.
@@ -165,6 +173,8 @@ listOfEntities* addEntityToList(listOfEntities* list, listOfLines* entity) {
  * @return void
  *
  * @remarks Could be used as debugging tool as well as user interface.
+ *
+ * @see listOfEntities displayListOfLines()
  */
 void displayListOfEntities(listOfEntities* list) {
     listOfEntities* temp;
@@ -189,6 +199,8 @@ void displayListOfEntities(listOfEntities* list) {
  * @param listOfEntities** list : pointer of the concerned linked list.
  *
  * @return void
+ *
+ * @see listOfEntities freeListOfLines()
  */
 void freeListOfEntities(listOfEntities** list) {
     listOfEntities* temp;
@@ -219,7 +231,7 @@ void freeListOfEntities(listOfEntities** list) {
 stringList* addStringToList(stringList* list, char* str) {
     stringList* new_element;
     stringList* temp;
-	debug("Allocation.\n");
+
     new_element = malloc(sizeof(stringList));	// Required memory allocation for the new element
     if(new_element != NULL) {				// If the allocation went well
         strcpy(new_element->value, str);		// We assign the value passed in argument to the corresponding attribute of the new element.
@@ -288,6 +300,23 @@ void freeStringList(stringList** list) {
 
 
 /* ----- YAML PARSER FUNCTIONS ----- */
+
+/**
+ * @name isEOY (isEndOfYAML)
+ *
+ * @brief checks if the given string is corresponding of the indicator of end of YAML file (i.e "...").
+ *
+ * @param char* str : string to test.
+ *
+ * @return (on success) 1
+ * @return (on failure) 0
+ */
+int isEOY(char* str) {
+	if(str != NULL) {
+		return strcmp(str, "...") == 0 || strcmp(str, "...\n") == 0 || strcmp(str, "...\r\n") == 0;
+	}
+	return 0;
+}
 
 /**
  * @name verifLine
@@ -398,7 +427,9 @@ char* getValue(char* line) {
  *
  * @return (on success) lineStruct line : `lineStruct` object.
  *
- * @remarks Failure case is not handled.
+ * @remarks Failure case is not handled but should not appears.
+ *
+ * @see lineStruct getKey() getValue()
  */
 lineStruct getLineStruct(char* str) {
     lineStruct line;
@@ -418,6 +449,8 @@ lineStruct getLineStruct(char* str) {
  *
  * @return (on success) listOfLines* resultList : line linked list.
  * @return (on failure) null pointer.
+ *
+ * @see listOfLines lineStruct fGoToLine() freadL() countTab() verifLine() getLineStruct() addLineToList() FILE_LINE_COUNTER
  */
 listOfLines* getEntity(int startLine, FILE* sourceFile) {
     char tempStr[MAX];
@@ -445,7 +478,7 @@ listOfLines* getEntity(int startLine, FILE* sourceFile) {
  *
  * @param char** keysList : list of keys to search which will be compare to `valuesList`
  * @param char* comparators : list of comparators (treated as string)
- * @param char** valuesList : list of values witch will be compare to `keysList`
+ * @param char** valuesList : list of values which will be compare to `keysList`
  * @param FILE* sourceFile : file pointer of the concerned file.
  *
  * @return (on success) listOfEntities* entities : linked list of entities matching the request.
@@ -454,6 +487,8 @@ listOfLines* getEntity(int startLine, FILE* sourceFile) {
  * @remarks If an error occurs during the process, still returns the previous found elements.
  *
  * @warning No estimation of the danger the previous remark could generates. A review may be required.
+ *
+ * @see listOfEntities listOfLines FILE_LINE_COUNTER freadL() verifLine() countTab() getKey() getValue() getEntity() addEntityToList() error()
  */
 listOfEntities* getBlockWhere(char** keysList, char* comparators, char** valuesList, FILE* sourceFile) {
 	int tempInt;
@@ -520,6 +555,8 @@ listOfEntities* getBlockWhere(char** keysList, char* comparators, char** valuesL
  * @return (on failure) NULL
  *
  * @remarks Can be used for complex queries where the file manipulation will be too complicated compared to a linked list handling.
+ *
+ * @see listOfEntities listOfLines fSize() FILE_LINE_COUNTER freadL() countTab() getEntity() addEntityToList() error()
  */
 listOfEntities* getAllFrom(FILE* sourceFile) {
     int fileSize;
@@ -527,12 +564,14 @@ listOfEntities* getAllFrom(FILE* sourceFile) {
 	listOfLines* tempEntity;
 	listOfEntities* entities;
 
-    entities = NULL;
-	fileSize = fSize(sourceFile);
-    FILE_LINE_COUNTER = 0;
 
 	if(sourceFile != NULL) {
+
+		entities = NULL;
+		fileSize = fSize(sourceFile);
+		FILE_LINE_COUNTER = 0;
 		fseek(sourceFile, 0, SEEK_SET);
+
 		while(ftell(sourceFile) < fileSize) {					// Browse the file
 			if(freadL(line, MAX, sourceFile)) {					// Read a line from the file.
 				if(verifLine(line)) {							// If the line can be treated.
@@ -596,6 +635,8 @@ stringList* selectKeys(stringList* keys, stringList* keyEquals, char* keyToUpdat
  *
  * @return (on success) 1
  * @return (on failure) 0
+ *
+ * @see
  */
 int updateValuesWhere(char** keysList, char* comparators, char** valuesList, char** keysToUpdate, char** newValues, FILE* destinationFile) {
 	int i;
@@ -604,12 +645,101 @@ int updateValuesWhere(char** keysList, char* comparators, char** valuesList, cha
 	size_t keyEqualsNb;
 	size_t keysToUpdateNb;
 	size_t newValuesNb;
-
+/*
 	if ( destinationFile != NULL && keysToUpdate != NULL && newValues != NULL ) {
-        keysNb = strALen(keysList);
 		if ( keysNb == strALen(valuesList) && keysNb == strlen(comparators) ) {
 			for(i=0 ; i < keysNb ; i++) {
 
+			}
+		}
+	}*/
+	return 0;
+}
+
+/**
+ * @name insertLine
+ *
+ * @brief Insert a line in the given file at the current cursor position which is then set to a new empty line bellow the inserted one.
+ *
+ * @param lineStruct line : line to insert.
+ * @param FILE* destinationFile : file pointer to the concerned pointer.
+ *
+ * @return (on success) 1
+ * @return (on failure) 0
+ *
+ * @warning Better call this function through `insertEntity`.
+ *
+ * @see lineStruct insertEntity() insertEntity()
+ */
+int insertLine(lineStruct line, FILE* destinationFile) {
+	if(line.key != NULL && line.value != NULL && destinationFile != NULL) {
+		fprintf("    %s : %s\n", line.key, line.value);
+	}
+	return 0;
+}
+
+/**
+ * @name insertEntity
+ *
+ * @brief Insert an entity in the given file at the current cursor position.
+ *
+ * @param listOfLines* entity : entity to insert.
+ * @param FILE* destinationFile : file pointer to the concerned file.
+ *
+ * @return (on success) 1
+ * @return (on failure) 0
+ *
+ * @warning Shall be called by `insertListOfEntities` function only.
+ * 			The cursor has to be set before process the following function (which `insertListOfEntities` does)
+ *
+ * @see listOfLines insertLine() insertListOfEntities()
+ */
+int insertEntity(listOfLines* entity, FILE* destinationFile) {
+	listOfLines* tempEntity;
+
+	if(entity != NULL && destinationFile != NULL) {
+		while ( (tempEntity = entity) != NULL) {
+			insertLine(entity->line, destinationFile);
+			tempEntity = entity->next;
+		}
+	}
+}
+
+
+/**
+ * @name insertListOfEntities
+ *
+ * @brief Insert a list of entities in conformed YAML format at the end of the YAML file.
+ *
+ * @param listOfEntities* entities : list of entities to insert.
+ * @param FILE* destination : file pointer to the concerned file.
+ *
+ * @return (on success) 1
+ * @return (on failure) 0
+ *
+ * @see listOfEntities fSize() FILE_LINE_COUNTER freadL() insertEntity()
+ */
+int insertListOfEntities(listOfEntities* entities, FILE* destinationFile) {
+	int i;
+	int tempInt;
+	int fileSize;
+	char tempStr[MAX];
+	listOfEntities* tempEntity;
+
+	if(destinationFile != NULL) {
+		fileSize = fSize(destinationFile);
+		fseek(destinationFile, 0, SEEK_SET);
+		FILE_LINE_COUNTER = 0;
+
+		while( ftell(destinationFile) < fileSize ) {
+			if(freadL(tempStr, MAX, destinationFile)) {
+				if(isEOY(tempStr)) {
+					fprintf(destinationFile, "-\n");
+					while ( (tempEntity = entities) != NULL) {
+						insertEntity(entities->entity, destinationFile);
+						entities = entities->next;
+					}
+				}
 			}
 		}
 	}

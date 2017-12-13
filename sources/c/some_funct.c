@@ -7,8 +7,8 @@
 #include <stdlib.h>
 #include "../h/struct.h"
 #include "../h/some_funct.h"
+#include "../h/parserYAML.h"
 #include "../h/parser_SQL.h"
-#include "../h/struct.h"
 
 /* ----- GLOBALS ----- */
 extern int FILE_LINE_COUNTER;
@@ -265,24 +265,6 @@ char *cleanQuery(char *word) {
 }
 
 /**
- * @name strALen
- *
- * @brief Takes a 2 dimensional array of char as parameter, i.e an array of strings, returns the number of strings in it.
- *
- * @param char *array : pointer of the two dimensional array.
- *
- * @remarks Called as a single pointer because the function does not need to access the inner pointer.
- */
-size_t strALen (char *array) {
-    size_t len = 0;
-
-	if(array != NULL)
-		while (*array++ != '\0')
-			len++;
-    return len/sizeof(char*);
-}
-
-/**
  * @name strIsIn
  *
  * @brief Checks if a given string is in a list of string
@@ -311,33 +293,98 @@ int strIsIn(char* str, char strList[][MAX]) {
 }
 
 /**
- * @name addColumn
+ * @name createArrayOfStrings
  *
- * @brief Allocates a column to the given array typed as `char**`
+ * @brief Creates an "object" arrayOfStrings
  *
- * @param
+ * @param unsigned int nbOfStrings : number of strings possible in the array
  *
+ * @return (on success) new object
+ * @return (on failure)
  *
- *
+ * @see arrayOfStrings
  */
-char** addColumn(char** stringArray, unsigned int currentSize, unsigned int dimToAdd, char value) {
+arrayOfStrings createArrayOfStrings(unsigned int nbOfStrings) {
+	int i;
+	arrayOfStrings result;
+
+	if(nbOfStrings > 0) {
+		if ( (result.array = malloc(sizeof(char*) * nbOfStrings)) != NULL) {
+			for(i=0 ; i < nbOfStrings ; i++) {
+				if ( (result.array[i] = malloc(sizeof(char)*MAX)) == NULL) {
+					while(i >= 0) {
+						free(result.array[--i]);
+					}
+					free(result.array);
+				}
+			}
+		}
+	}
+	return result;
+}
+
+/**
+ * @name updateArrayOfStrings
+ *
+ * @brief Allocates columns to the given array typed as `char**`
+ *
+ * @param arrayOfStrings arrayToUpdate : concerned array
+ * @param unsigned int nbOfNewStrings : number of rows to add to the concerned array.
+ *
+ * @return (on success) updated array
+ * @return (on failure) non-updated array
+ *
+ * @see arrayOfStrings
+ */
+arrayOfStrings updateArrayOfStrings(arrayOfStrings arrayToUpdate, unsigned int nbOfNewStrings) {
 	int i;
 	char** temp;
 
-	if ( (temp = malloc(sizeof(char*)*currentSize + dimToAdd)) != NULL ) {
-		for(i=0 ; i < currentSize + dimToAdd ; i++) {
+	if ( (temp = malloc(sizeof(char*)*arrayToUpdate.stringsNb + nbOfNewStrings)) != NULL ) {
+		for(i=0 ; i < arrayToUpdate.stringsNb + nbOfNewStrings ; i++) {
 			if ( (temp[i] = malloc(sizeof(char)*MAX)) == NULL ) {
-				while(i >= 0) {
-					free(temp[--i]);
+				while(--i >= 0) {
+					if(temp[i] != NULL)
+						free(temp[i]);
 				}
-				free(temp);
-				return NULL;
-			} else if(i < currentSize) {
-				temp[i] = stringArray[i];
+				if(temp != NULL)
+					free(temp);
+				break;
+			} else if(i < arrayToUpdate.stringsNb) {
+				temp[i] = arrayToUpdate.array[i];
 			}
 		}
-		free(stringArray);
-		stringArray = temp;
+		free(arrayToUpdate.array);
+		arrayToUpdate.array = temp;
 	}
-	return stringArray;
+	return arrayToUpdate;
 }
+
+
+/**
+ * @name freeArrayOfStrings
+ *
+ * @brief free recursively the given array of strings.
+ *
+ * @param char** arrayOfStrings : pointer to the concerned array.
+ *
+ * @return void
+ *
+ * @see arrayOfStrings
+ */
+void freeArrayOfStrings(arrayOfStrings* arrayToFree) {
+	int i;
+	unsigned int tempUInt;
+
+	tempUInt = (*arrayToFree).stringsNb;
+
+	for(i=0 ; i < tempUInt ; i++)
+		if ( (*arrayToFree).array[i] != NULL) {
+			free( (*arrayToFree).array[i]);
+			(*arrayToFree).stringsNb--;
+		}
+	if ( (*arrayToFree).array != NULL)
+		free( (*arrayToFree).array);
+
+}
+

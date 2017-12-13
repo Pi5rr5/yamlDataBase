@@ -1,11 +1,13 @@
 //
 // Created by Qut on 29/10/2017.
 //
-#include "../h/parser_SQL.h"
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
+#include "../h/struct.h"
 #include "../h/some_funct.h"
+#include "../h/parserYAML.h"
+#include "../h/parser_SQL.h"
 
 
 
