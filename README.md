@@ -13,6 +13,8 @@ Clone this repo into new project folder (e.g., my-proj).
 git clone https://github.com/USER_NAME/yamlDataBase.git my-proj
 cd my-proj
 ```
+### GTK 2.X (windows & linux)
+Download and install gtk+ bundle, link for [gtk+ 2.24.10](http://ftp.gnome.org/pub/gnome/binaries/win32/gtk+/2.24/gtk+-bundle_2.24.10-20120208_win32.zip)
 
 ## Push modification
 Based on the fact that you've just cloned the repo :mailbox_with_mail:
