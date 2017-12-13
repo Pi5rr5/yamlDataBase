@@ -14,12 +14,12 @@
 
 
 void query_use(char *use) {
-	listOfEntities* tempList;
+    listOfEntities *tempList;
 
     if (countArgs(use, " ") == 1) {
         if (isAlphaNum(use)) {
-            if ( (tempList = getBlockWhere("name", use, "databases.yaml")) != NULL) {
-				freeListOfEntities(&tempList);
+            if ((tempList = getBlockWhere("name", use, "databases.yaml")) != NULL) {
+                freeListOfEntities(&tempList);
                 /*if (!useDB(use)) {
                     printf("Error: Problem for change db use (system cmd)");
                 }*/
@@ -39,11 +39,11 @@ void query_create_database(char *buffer) {
     if (countArgs(buffer, " ") == 1) {
         if (isAlphaNum(buffer)) {
             //if (funcyaml(buffer)) {
-                if (createDB(buffer)) {
-                    printf("Query : Database created");
-                } else {
-                    printf("Error : Can't create database on CMD");
-                }
+            if (createDB(buffer)) {
+                printf("Query : Database created");
+            } else {
+                printf("Error : Can't create database on CMD");
+            }
             /*} else {
                 printf("Error : Can't create database on YAML");
             }*/
@@ -60,11 +60,11 @@ void query_drop_database(char *buffer) {
     if (countArgs(buffer, " ") == 1) {
         if (isAlphaNum(buffer)) {
             //if (funcyaml(buffer)) {
-                if (dropDB(buffer)) {
-                    printf("Query : Database dropped");
-                } else {
-                    printf("Error : Can't drop database on CMD");
-                }
+            if (dropDB(buffer)) {
+                printf("Query : Database dropped");
+            } else {
+                printf("Error : Can't drop database on CMD");
+            }
             /*} else {
                 printf("Error : Can't drop database on YAML");
             }*/
@@ -81,11 +81,11 @@ void query_drop_table(char *buffer) {
     if (countArgs(buffer, " ") == 1) {
         if (isAlphaNum(buffer)) {
             //if (funcyaml(buffer)) {
-                if (dropTable(buffer, "nomtable")) {
-                    printf("Query : Table dropped");
-                } else {
-                    printf("Error : Can't drop table on CMD");
-                }
+            if (dropTable(buffer, "nomtable")) {
+                printf("Query : Table dropped");
+            } else {
+                printf("Error : Can't drop table on CMD");
+            }
             /*} else {
                 printf("Error : Can't drop table on YAML");
             }*/
@@ -98,29 +98,33 @@ void query_drop_table(char *buffer) {
 }
 
 void query_create_table(char *buffer) {
-    char *createQuery;
+    char createQuery[512] = "";
     const char delim[2] = " ";
-    char *delim1 = " ";
     int error;
     char *table;
     error = 0;
     if (countArgs(buffer, delim) > 1) {
-        table = splitWord(buffer, delim1);
+        table = splitWord(buffer, delim);
         if (isAlphaNum(table)) {
-            createQuery = malloc(sizeof(char) * (strlen(buffer) - strlen(table) + 1));
             strncpy(createQuery, buffer + strlen(table) + 1, strlen(buffer) - strlen(table));
-             if (!createTable(table, "nomtable")) {
-                 printf("Error : Can't create table on CMD");
-                 error = 1;
-             }
+/*            if (!createTable(table, "nomtable")) {
+                printf("Error : Can't create table on CMD");
+                error = 1;
+            }*/
         } else {
             printf("Error: Not an alpha-numeric argument");
             error = 1;
         }
-        free(table);
+        if(table != NULL) {
+            free(table);
+        }
         if (!error) {
-            splitCreateQuery(createQuery, ",");
-            free(createQuery);
+            if (createQuery[0] == 40 && createQuery[strlen(createQuery) - 1] == 41) {
+                 createQuery[strlen(createQuery) - 1] = '\0';
+                splitCreateQuery(createQuery+1, ",");
+            } else {
+                printf("Error : bad request");
+            }
         }
     } else {
         printf("Error : Not enough args");
@@ -146,22 +150,21 @@ void splitCreateQuery(char *createQuery, const char *delim) {
 /**
  * Desc: check & call function for insert into YAML files
  *
- * Param: Char * word : String to check
+ * Param: Char * word : String to check 
  *
  */
 void goSplitCreateQuery(char *createQuery, const char *delim) {
-    char *token1;
-    char *name;
-    char *type;
-    char *checknull;
-    char *null;
-    char *checkauto;
-    char *auto_increment;
-    char *checkprimary;
-    char *primary;
+    char name[255] = "";
+    char type[255] = "";
+    char null[6];
+    char auto_increment[6];
+    char primary[6];
     int error = 0;
+    strcpy(auto_increment, "");
+    strcpy(primary, "");
+    strcpy(null, "");
     if (countArgs(createQuery, " ") > 1) {
-        char *name = splitWord(createQuery, " ");
+        (createQuery[0] == 32) ? strcpy(name, splitWord(createQuery+1, delim)) :  strcpy(name, splitWord(createQuery, delim));
         if (correctWord(name)) {
             if (!isAlphaNum(name)) {
                 printf("Error: Not an alpha-numeric argument(blop)\n");
@@ -172,75 +175,20 @@ void goSplitCreateQuery(char *createQuery, const char *delim) {
             error = 1;
         }
         if (!error) {
-            type = malloc(sizeof(char) * 20);
-            type = strstr(upWord(createQuery), "INT");
-            if (!type) {
-                type = strstr(upWord(createQuery), "VARCHAR");
-                if (!type) {
-                    type = strstr(upWord(createQuery), "CHAR");
-                    if (!type) {
-                        type = strstr(upWord(createQuery), "FLOAT");
-                        if (!type) {
-                            error = 1;
-                        } else {
-                            type[5] = '\0';
-                        }
-                    } else { type[5] = '\0'; }
-                } else { type[8] = '\0'; }
-            } else { type[3] = '\0'; }
-            checknull = malloc(sizeof(char) * 20);
-            checknull = strstr(upWord(createQuery), "NOT NULL");
-            if (checknull) {
-                null = malloc(sizeof(char) * 4);
-                strcpy(null, "true");
-                null[4] = '\0';
-            } else {
-                null = malloc(sizeof(char) * 5);
-                strcpy(null, "false");
-                null[5] = '\0';
-            }
-            checkauto = malloc(sizeof(char) * 20);
-            checkauto = strstr(upWord(createQuery), "AUTO INCREMENT");
-            if (checkauto) {
-                auto_increment = malloc(sizeof(char) * 4);
-                strcpy(auto_increment, "true");
-                auto_increment[4] = '\0';
-            } else {
-                auto_increment = malloc(sizeof(char) * 5);
-                strcpy(auto_increment, "false");
-                auto_increment[5] = '\0';
-            }
-            checkprimary = malloc(sizeof(char) * 20);
-            checkprimary = strstr(upWord(createQuery), "PRIMARY KEY");
-            if (checkprimary) {
-                primary = malloc(sizeof(char) * 4);
-                strcpy(primary, "true");
-                primary[4] = '\0';
-            } else {
-                primary = malloc(sizeof(char) * 5);
-                strcpy(primary, "false");
-                primary[5] = '\0';
-            }
-
+            strcpy(null, checkExprSQL(createQuery, "NOT NULL"));
+            strcpy(auto_increment, checkExprSQL(createQuery, "AUTO INCREMENT"));
+            strcpy(primary, checkExprSQL(createQuery, "PRIMARY KEY"));
+            strcpy(type, checkTypeSQL(createQuery));
+            if (!type) { error = 1; }
         }
-        if(!error) {
+        if (!error) {
             printf("--type:%s--null:%s--auto:%s--primary:%s\n", type, null, auto_increment, primary);
         } else {
             printf("Error : No type selected");
         }
-/*        createQuery += strlen(name);
-        token1 = strtok(createQuery, delim);
-
-        // recherche de param;
-        while (token1 != NULL) {
-            // recherche de mot ok;
-
-            token1 = strtok(NULL, delim);
-        }*/
     } else {
-        printf("Error : Query with too few args");
+        printf("Error : Query with too few args !");
     }
-
 }
 
 

@@ -75,16 +75,16 @@ char *upWord(char *word) {
  *      FILE* file : Pointeur de fichier du fichier concernï¿½.
  */
 int fSize(FILE *file) {
-	int value = 0;
-	int initialCursor;
+    int value = 0;
+    int initialCursor;
 
-	if(file != NULL) {
-		initialCursor = ftell(file);            // Sauvegarde de la position du curseur actuelle
-		fseek(file, 0, SEEK_END);               // Déplacement vers la fin du fichier
-		value = ftell(file);                    // Renvoi le nombre de charactères dans le fichier
-		fseek(file, initialCursor, SEEK_SET);   // Repositionnement du curseur à son emplacement initial.
-	}
-	return value;
+    if (file != NULL) {
+        initialCursor = ftell(file);            // Sauvegarde de la position du curseur actuelle
+        fseek(file, 0, SEEK_END);               // Déplacement vers la fin du fichier
+        value = ftell(file);                    // Renvoi le nombre de charactères dans le fichier
+        fseek(file, initialCursor, SEEK_SET);   // Repositionnement du curseur à son emplacement initial.
+    }
+    return value;
 }
 
 
@@ -96,15 +96,15 @@ int fSize(FILE *file) {
  *      Succï¿½s : Le nombre de tabulations comptï¿½es.
  *      ï¿½chec  : Renvoie -1
  */
-int countTab(char* str) {
+int countTab(char *str) {
     int i = -1;
     int strLength;
 
-    if(str != NULL) {
+    if (str != NULL) {
         strLength = strlen(str);
-        if(strLength > 0) {
-            for(i=0 ; i < strLength ; i++) {
-                if(str[i] != ' ') {
+        if (strLength > 0) {
+            for (i = 0; i < strLength; i++) {
+                if (str[i] != ' ') {
                     break;
                 }
             }
@@ -125,19 +125,20 @@ int countTab(char* str) {
  * Remarque : En cas de dï¿½passement du fichier, c'est-ï¿½-dire si le numï¿½ro de ligne demandï¿½ est supï¿½rieur
  *            au nombre actuel de lignes dans le fichier, place le curseur en fin de fichier.
  */
-int fGoToLine(int line, FILE* sourceFile) {
+int fGoToLine(int line, FILE *sourceFile) {
     int i;
     int fileSize;
     char temp[MAX];
 
     fileSize = fSize(sourceFile);
-    if(sourceFile != NULL) {
+    if (sourceFile != NULL) {
         fseek(sourceFile, 0, SEEK_SET);                 // Dï¿½placement au dï¿½but du fichier
         FILE_LINE_COUNTER = 0;
-        for(i=0 ; i < line-1 ; i++) {                   // Dï¿½placement jusqu'ï¿½ la ligne voulue
-            if(ftell(sourceFile) >= fileSize) {         // Si on dï¿½passe la fin du fichier (ligne demandï¿½e plus grande que le nombre de lignes du fichier)
+        for (i = 0; i < line - 1; i++) {                   // Dï¿½placement jusqu'ï¿½ la ligne voulue
+            if (ftell(sourceFile) >=
+                fileSize) {         // Si on dï¿½passe la fin du fichier (ligne demandï¿½e plus grande que le nombre de lignes du fichier)
                 return 0;                               // Alors reotur d'erreur
-            } else if(fgets(temp, MAX, sourceFile)) {   // Sinon passage ï¿½ la lign suivante
+            } else if (fgets(temp, MAX, sourceFile)) {   // Sinon passage ï¿½ la lign suivante
                 FILE_LINE_COUNTER++;
             } else {
                 return 0;
@@ -149,8 +150,6 @@ int fGoToLine(int line, FILE* sourceFile) {
 }
 
 
-
-
 /**
  * @brief Fonction de gestion d'erreur. ï¿½crit dans l'outpout dï¿½diï¿½ au erreurs.
  *
@@ -160,8 +159,8 @@ int fGoToLine(int line, FILE* sourceFile) {
  *
  * @remarks : peut ï¿½tre modifiï¿½ en crï¿½ant un rï¿½pertoire d'erreur avec chaque erreur correspondant ï¿½ un message prï¿½cis.
  */
-void error(const char* message) {
-    if(message != NULL)
+void error(const char *message) {
+    if (message != NULL)
         fprintf(stderr, message);
 }
 
@@ -225,10 +224,10 @@ int isAlphaNum(char *word) {
     isOk = 1;
     len = strlen(word);
     for (i = 0; i < len; i++) {
-		if ( word[i] < '0'
-		|| (word[i] > '9' && word[i] < 'A')
-		|| (word[i] > 'Z' && word[i] < 'a')
-		|| (word[i] > 'z') ) {
+        if (word[i] < '0'
+            || (word[i] > '9' && word[i] < 'A')
+            || (word[i] > 'Z' && word[i] < 'a')
+            || (word[i] > 'z')) {
             isOk = 0;
             break;
         }
@@ -268,7 +267,7 @@ int countArgs(char *countChar, const char *delim) {
  *
  * Return: first word
  */
-char *splitWord(char *word, char *delim) {
+char *splitWord(char *word, const char *delim) {
     int len;
     int count;
     char *firstWord;
@@ -293,4 +292,48 @@ char *splitWord(char *word, char *delim) {
  */
 int correctWord(char *word) {
     return 1;
+}
+
+/**
+ * Desc: check if the expression is on SQL expr
+ *
+ * Param: Char * word : String to check
+ *
+ * Return: 1 -> good ; 0 -> not in expr list
+ */
+char *checkExprSQL(char *line, char *expr) {
+    char *checkline;
+    checkline = strstr(upWord(line), expr);
+    if (checkline) {
+        return "true";
+    } else {
+        return "false";
+    }
+
+}
+
+
+/**
+ * Desc: check & return the type for the column
+ *
+ * Param: Char * word : String to check
+ *
+ * Return: type of column
+ */
+char *checkTypeSQL(char *line) {
+    char *type;
+    type = strstr(upWord(line), "INT");
+    if (!type) {
+        type = strstr(upWord(line), "VARCHAR");
+        if (!type) {
+            type = strstr(upWord(line), "CHAR");
+            if (!type) {
+                type = strstr(upWord(line), "FLOAT");
+                if (type) {
+                    type[5] = '\0';
+                } else { type = "false"; }
+            } else { type[4] = '\0'; }
+        } else { type[7] = '\0'; }
+    } else { type[3] = '\0'; }
+    return type;
 }
