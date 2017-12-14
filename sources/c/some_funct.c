@@ -117,6 +117,8 @@ int fSize(FILE *file) {
  * @return (on failure) 0
  *
  * @remarks Cursor position not handled.
+ *
+ * @see FILE_LINE_COUNTER
  */
 int freadL(char* destination, unsigned int sizeMax, FILE* sourceFile) {
     int strLength;
@@ -171,6 +173,8 @@ int countTab(char* str) {
  *
  * @remarks If the end of line is exceed, i.e if the given number is superior of the line in the file,
  *			then put the cursor at the end of the file.
+ *
+ * @see FILE_LINE_COUNTER
  */
 int fGoToLine(int line, FILE* sourceFile) {
     int i;
@@ -265,7 +269,6 @@ int strSearchInArray(char* str, arrayOfStrings array) {
 		if(strcmp(str, array.array[i]) == 0) {
 			return i;
 		}
-		printf("Next.\n");
 	}
 	return -1;
 }
@@ -278,7 +281,7 @@ int strSearchInArray(char* str, arrayOfStrings array) {
  * @param unsigned int nbOfStrings : number of strings possible in the array
  *
  * @return (on success) new object
- * @return (on failure)
+ * @return (on failure) unknown
  *
  * @see arrayOfStrings
  */
@@ -288,13 +291,16 @@ arrayOfStrings createArrayOfStrings(unsigned int nbOfStrings) {
 
 	if(nbOfStrings > 0) {
 		if ( (result.array = malloc(sizeof(char*) * nbOfStrings)) != NULL) {
+			result.stringsNb = -1;
 			for(i=0 ; i < nbOfStrings ; i++) {
 				if ( (result.array[i] = malloc(sizeof(char)*MAX)) == NULL) {
 					while(i >= 0) {
 						free(result.array[--i]);
+						result.stringsNb--;
 					}
 					free(result.array);
 				}
+				result.stringsNb++;
 			}
 		}
 	}
@@ -374,9 +380,28 @@ void freeArrayOfStrings(arrayOfStrings* arrayToFree) {
  * @param char* comparator : string containing the comparator. Will call a pointer of function depending on the string.
  * @param char* str2 : second value.
  *
- * @return (if true)  1
- * @return (if false) 0
+ * @return (if true) 1
+ * @return (if false or error) 0
  */
 int compare(char* str1, char* comparator, char* str2) {
+	if(str1 != NULL && comparator != NULL && str2 != NULL) {
+		if(strcmp(comparator, "=") == 0)
+			return strcmp(str1, str2) == 0;
 
+		if(strcmp(comparator, ">") == 0)
+			return atof(str1)  > atof(str2);
+
+		if(strcmp(comparator, "<") == 0)
+			return atof(str1)  < atof(str2);
+
+		if(strcmp(comparator, "!=") == 0)
+			return strcmp(str1, str2) != 0;
+
+		if(strcmp(comparator,">=") == 0)
+			return atof(str1) >= atof(str2);
+
+		if(strcmp(comparator,"<=") == 0)
+			return atof(str1) <= atof(str2);
+	}
+	return 0;
 }

@@ -94,7 +94,7 @@ void displayListOfLines(listOfLines* list) {
     printf("\tList of lines :\n");
     if(list != NULL) {
         while ( (temp = list) != NULL) {
-            printf("\t\tkey : %s\t\tvalue : %s\n", list->line.key, list->line.value);
+            printf("\t\tkey : %s\n\t\tvalue : %s\n\n", list->line.key, list->line.value);
             list = list->next;
         }
     } else {
@@ -411,35 +411,38 @@ listOfLines* getEntity(int startLine, FILE* sourceFile) {
  * @see listOfEntities listOfLines FILE_LINE_COUNTER freadL() verifLine() countTab() getKey() getValue() getEntity() addEntityToList() error()
  */
 listOfEntities* getBlockWhere(arrayOfStrings keysList, arrayOfStrings comparators, arrayOfStrings valuesList, FILE* sourceFile) {
+	char line[MAX];
+	char tempKey[MAX];
+	char tempValue[MAX];
 	int tempInt;
 	int fileSize;
 	int tabulation;
 	int startingLine;
-	char line[MAX];
-	char tempKey[MAX];
-	char tempValue[MAX];
 	listOfLines* tempEntity;
 	listOfEntities* entities;
-    entities = NULL;
+
     startingLine = 0;
     FILE_LINE_COUNTER = 0;
+    entities   = NULL;
+    tempEntity = NULL;
+	fileSize   = fSize(sourceFile);
+	fseek(sourceFile, 0, SEEK_SET);
 
-	fileSize = fSize(sourceFile);
     while(ftell(sourceFile) < fileSize) {					// Browse the file.
-        if(freadL(line, MAX, sourceFile)) {					// Read a line from the file.
-            if(verifLine(line)) {							// If the read line can be treated.
-                tabulation = countTab(line);
+		if(freadL(line, MAX, sourceFile)) {					// Read a line from the file.
+        	if(verifLine(line)) {							// If the read line can be treated.
+            	tabulation = countTab(line);
                 if(tabulation == 0 && strcmp("-", line) == 0) {		// If start of entity
                     startingLine = FILE_LINE_COUNTER;				// Stores the current line number.
                 } else if(tabulation > 0) {																// Will be '-1' if an error occurred before.
                     if(strcpy(tempKey, getKey(line)) != NULL) {											// Recovers the key.
-						if( (tempInt = strSearchInArray(tempKey, keysList)) > 0) {							// Checks if this key is the wanted one.
+						if( (tempInt = strSearchInArray(tempKey, keysList)) >= 0) {							// Checks if this key is the wanted one.
 							if(strcpy(tempValue, getValue(line)) != NULL) {									// Recovers the value.
-                                if( compare(tempKey, comparators.array[tempInt], tempValue) ) {					// Checks if this value matches the wanted comparison.
-									if((tempEntity = getEntity(startingLine+1, sourceFile)) != NULL) {			// Recovers the entity containing those key and value.
-                                        if ( (entities = addEntityToList(entities, tempEntity)) == NULL) {  	// Add this entity to the list of entities.
-                                            error("Error while adding entity from file.");						// If an occurs during the previous manipulation,
-                                            break;																// Then stop the process.
+								if( compare(tempValue, comparators.array[tempInt], valuesList.array[tempInt]) ) {	// Checks if this value matches the wanted comparison.
+									if((tempEntity = getEntity(startingLine+1, sourceFile)) != NULL) {				// Recovers the entity containing those key and value.
+                                        if ( (entities = addEntityToList(entities, tempEntity)) == NULL) {			// Add this entity to the list of entities.
+                                            error("Error while adding entity from file.");							// If an occurs during the previous manipulation,
+                                            break;																	// Then stop the process.
                                         }
                                     } else {
                                         error("Error while recovering entity.");
