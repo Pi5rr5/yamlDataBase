@@ -12,8 +12,9 @@
     int countTab(char*);
     int fGoToLine(int, FILE*);
     void error(const char*);
-	int strIsIn(char*, char[][255]);
+	int strSearchInArray(char*, arrayOfStrings);
 	arrayOfStrings createArrayOfStrings(unsigned int);
 	arrayOfStrings updateArrayOfStrings(arrayOfStrings, unsigned int);
 	void freeArrayOfStrings(arrayOfStrings*);
+	int compare(char*, char*, char*);
 #endif /* YAML_SOME_FUNCT_H */

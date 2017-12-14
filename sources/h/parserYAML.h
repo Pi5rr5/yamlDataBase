@@ -8,6 +8,6 @@
     void freeListOfEntities(listOfEntities**);
     int verifLine(char*);
     int hasKey(char*, char*);
-	listOfEntities* getBlockWhere(char**, char*, char**, FILE*);
+	listOfEntities* getBlockWhere(arrayOfStrings, arrayOfStrings, arrayOfStrings, FILE*);
     listOfEntities* getAllFrom(FILE*);
 #endif // PARSERYAML_H_INCLUDED

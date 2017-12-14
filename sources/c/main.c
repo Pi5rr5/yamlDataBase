@@ -9,23 +9,22 @@
 int FILE_LINE_COUNTER;
 
 /* ----- MAIN ----- */
-int main(int argc, char **argv) {
-	FILE* fp;
-	char* comparators;
+int main(int argc, char **argv) {FILE* fp;
 	arrayOfStrings keysList;
 	arrayOfStrings valuesList;
+	arrayOfStrings comparators;
 
 	keysList = createArrayOfStrings((unsigned int)5);
 	valuesList = createArrayOfStrings((unsigned int)5);
 
 	listOfEntities* test = NULL;
 	if( (fp = fopen("resources/struct.yaml", "r")) != NULL) {
-//		if( (test = getBlockWhere(keysList, comparators, valuesList, fp)) != NULL) {
-//			displayListOfEntities(test);
-//			freeListOfEntities(&test);
-//		} else {
-//			error("Error while recovering.\n");
-//		}
+		if( (test = getBlockWhere(keysList, comparators, valuesList, fp)) != NULL) {
+			displayListOfEntities(test);
+			freeListOfEntities(&test);
+		} else {
+			error("Error while recovering.\n");
+		}
 	} else {
 		error("File not found.\n");
 	}

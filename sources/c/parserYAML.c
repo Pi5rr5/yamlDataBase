@@ -215,88 +215,6 @@ void freeListOfEntities(listOfEntities** list) {
 }
 
 
-/* stringList */
-
-/**
- * @name addStringToList
- *
- * @brief Add an element to a linked list typed as `listOfEntites`.
- *
- * @param stringList* list : pointer of the start of the linked list.
- * @param value : value to put in the new element.
- *
- * @return (on success) : pointer to the updated linked list
- * @return (on failure) : in case of allocation error, returns a null pointer
- */
-stringList* addStringToList(stringList* list, char* str) {
-    stringList* new_element;
-    stringList* temp;
-
-    new_element = malloc(sizeof(stringList));	// Required memory allocation for the new element
-    if(new_element != NULL) {				// If the allocation went well
-        strcpy(new_element->value, str);		// We assign the value passed in argument to the corresponding attribute of the new element.
-        new_element->next = NULL;			// `next` pointer is set to NULL, the new element becoming the last node.
-        if(list == NULL) {					// If the given list is empty.
-            return new_element;				// Return of the new element only (because it's the only node).
-        } else {
-            temp = list;					// Otherwise, adding of the new element to the list.
-            while(temp->next != NULL) {		// Browse the list.
-                temp = temp->next;
-            }
-            temp->next = new_element;		// Make the current last node of the list points on the new element.
-            return list;					// Returning of the updated list.
-        }
-    }
-    return list;		// If allocation error, returns the passed list, unchanged.
-}
-
-/**
- * @name displayStringList
- *
- * @brief Display each element of linked list typed as `stringList`
- *
- * @param stringList* list : concerned linked list.
- *
- * @return void
- *
- * @remarks Could be used as debugging tool as well as user interface.
- */
-void displayStringList(stringList* list) {
-    stringList* temp;
-
-    printf("\nList of string :\n");
-    if(list != NULL) {
-        while ( (temp = list) != NULL) {
-			printf("\t\t%s\n", temp->value);
-            list = list->next;
-        }
-    } else {
-        error("\tEmpty list.\n");
-    }
-    printf("End of list.\n\n");
-}
-
-/**
- * @name freeStringList
- *
- * @brief Release the memory used by a linked list typed as `stringList`
- *
- * @param stringList** list : pointer of the concerned linked list.
- *
- * @return void
- */
-void freeStringList(stringList** list) {
-    stringList* temp;
-
-    if(*list != NULL) {
-        while ( (temp = *list) != NULL ) {		// Browsing the list
-            *list = (*list)->next;
-			free(temp);
-        }
-    }
-}
-
-
 
 
 /* ----- YAML PARSER FUNCTIONS ----- */
@@ -312,10 +230,7 @@ void freeStringList(stringList** list) {
  * @return (on failure) 0
  */
 int isEOY(char* str) {
-	if(str != NULL) {
-		return strcmp(str, "...") == 0 || strcmp(str, "...\n") == 0 || strcmp(str, "...\r\n") == 0;
-	}
-	return 0;
+	return str != NULL && ( strcmp(str, "...") == 0 || strcmp(str, "...\n") == 0 || strcmp(str, "...\r\n") == 0 );
 }
 
 /**
@@ -471,6 +386,11 @@ listOfLines* getEntity(int startLine, FILE* sourceFile) {
     return resultList;
 }
 
+
+
+
+/* ----- YAML QUERY FUNCTIONS ----- */
+
 /**
  * @name getBlockWhere
  *
@@ -490,7 +410,7 @@ listOfLines* getEntity(int startLine, FILE* sourceFile) {
  *
  * @see listOfEntities listOfLines FILE_LINE_COUNTER freadL() verifLine() countTab() getKey() getValue() getEntity() addEntityToList() error()
  */
-listOfEntities* getBlockWhere(char** keysList, char* comparators, char** valuesList, FILE* sourceFile) {
+listOfEntities* getBlockWhere(arrayOfStrings keysList, arrayOfStrings comparators, arrayOfStrings valuesList, FILE* sourceFile) {
 	int tempInt;
 	int fileSize;
 	int tabulation;
@@ -503,25 +423,23 @@ listOfEntities* getBlockWhere(char** keysList, char* comparators, char** valuesL
     entities = NULL;
     startingLine = 0;
     FILE_LINE_COUNTER = 0;
-	printf("%d/%d = %d\n", sizeof(keysList), sizeof(*keysList), sizeof(keysList)/sizeof(*keysList));
 
 	fileSize = fSize(sourceFile);
     while(ftell(sourceFile) < fileSize) {					// Browse the file.
         if(freadL(line, MAX, sourceFile)) {					// Read a line from the file.
-            if(verifLine(line)) {							// if the read line can be treated.
+            if(verifLine(line)) {							// If the read line can be treated.
                 tabulation = countTab(line);
                 if(tabulation == 0 && strcmp("-", line) == 0) {		// If start of entity
                     startingLine = FILE_LINE_COUNTER;				// Stores the current line number.
                 } else if(tabulation > 0) {																// Will be '-1' if an error occurred before.
                     if(strcpy(tempKey, getKey(line)) != NULL) {											// Recovers the key.
-						if( (tempInt = strIsIn(tempKey, keysList)) > 0) {							// Checks if this key is the wanted one.
-							system("pause >nul");
-                            if(strcpy(tempValue, getValue(line)) != NULL) {								// Recovers the value.
-                                if( (strIsIn(tempValue, valuesList)) == tempInt) {						// Checks if this value is the wanted one.
-                                    if((tempEntity = getEntity(startingLine+1, sourceFile)) != NULL) {		// Recovers the entity containing those key and value.
-                                        if ( (entities = addEntityToList(entities, tempEntity)) == NULL) {  // Add this entity to the list of entities.
-                                            error("Error while adding entity from file.");					// If an occurs during the previous manipulation,
-                                            break;															// Then stop the process.
+						if( (tempInt = strSearchInArray(tempKey, keysList)) > 0) {							// Checks if this key is the wanted one.
+							if(strcpy(tempValue, getValue(line)) != NULL) {									// Recovers the value.
+                                if( compare(tempKey, comparators.array[tempInt], tempValue) ) {					// Checks if this value matches the wanted comparison.
+									if((tempEntity = getEntity(startingLine+1, sourceFile)) != NULL) {			// Recovers the entity containing those key and value.
+                                        if ( (entities = addEntityToList(entities, tempEntity)) == NULL) {  	// Add this entity to the list of entities.
+                                            error("Error while adding entity from file.");						// If an occurs during the previous manipulation,
+                                            break;																// Then stop the process.
                                         }
                                     } else {
                                         error("Error while recovering entity.");
@@ -564,13 +482,13 @@ listOfEntities* getAllFrom(FILE* sourceFile) {
 	listOfLines* tempEntity;
 	listOfEntities* entities;
 
-
 	if(sourceFile != NULL) {
-
+		/* Initialization */
 		entities = NULL;
 		fileSize = fSize(sourceFile);
 		FILE_LINE_COUNTER = 0;
 		fseek(sourceFile, 0, SEEK_SET);
+		/* End of initialization */
 
 		while(ftell(sourceFile) < fileSize) {					// Browse the file
 			if(freadL(line, MAX, sourceFile)) {					// Read a line from the file.
@@ -593,35 +511,8 @@ listOfEntities* getAllFrom(FILE* sourceFile) {
     return entities;
 }
 
-/**
- * @name selectKeys
- *
- * @brief Recover all the values of the wanted keys passed by argument.
- *
- * @param stringList* keys : array of strings which are the wanted keys.
- * @param FILE* sourceFile : file pointer of the concerned file.
- *
- * @return stringList* keys : linked list half filled (keys only).
- *//*
-stringList* selectKeys(stringList* keys, stringList* keyEquals, char* keyToUpdate, char* newValue, FILE* destinationFile) {
-	stringList* tempStringList;
-	listOfLines* tempListOfLines;
-	listOfEntities* tempListOfEntities;
-
-	if(data != NULL && keys != NULL) {
-		while ( (tempStringList = keys) != NULL) {
-			while ( (tempListOfEntities = data) != NULL) {
-				while ( (tempListOfLines = tempListOfEntities->entity) != NULL) {
-					if ( strcmp(tempListOfLines->line.key, tempStringList->value) == 0) {
-
-					}
-				}
-			}
-		}
-	}
-}*/
-
-/**
+/*
+/\**
  * @name updateValuesWhere
  *
  * @brief update several values in following some conditions.
@@ -637,7 +528,7 @@ stringList* selectKeys(stringList* keys, stringList* keyEquals, char* keyToUpdat
  * @return (on failure) 0
  *
  * @see
- */
+ *\/
 int updateValuesWhere(char** keysList, char* comparators, char** valuesList, char** keysToUpdate, char** newValues, FILE* destinationFile) {
 	int i;
 	int j;
@@ -645,16 +536,16 @@ int updateValuesWhere(char** keysList, char* comparators, char** valuesList, cha
 	size_t keyEqualsNb;
 	size_t keysToUpdateNb;
 	size_t newValuesNb;
-/*
+
 	if ( destinationFile != NULL && keysToUpdate != NULL && newValues != NULL ) {
 		if ( keysNb == strALen(valuesList) && keysNb == strlen(comparators) ) {
 			for(i=0 ; i < keysNb ; i++) {
 
 			}
 		}
-	}*/
+	}
 	return 0;
-}
+}*/
 
 /**
  * @name insertLine
@@ -673,7 +564,7 @@ int updateValuesWhere(char** keysList, char* comparators, char** valuesList, cha
  */
 int insertLine(lineStruct line, FILE* destinationFile) {
 	if(line.key != NULL && line.value != NULL && destinationFile != NULL) {
-		fprintf("    %s : %s\n", line.key, line.value);
+		return fprintf("    %s : %s\n", line.key, line.value) > 0;
 	}
 	return 0;
 }
@@ -699,10 +590,14 @@ int insertEntity(listOfLines* entity, FILE* destinationFile) {
 
 	if(entity != NULL && destinationFile != NULL) {
 		while ( (tempEntity = entity) != NULL) {
-			insertLine(entity->line, destinationFile);
+			if(!insertLine(entity->line, destinationFile)) {
+				return 0;
+			}
 			tempEntity = entity->next;
 		}
+		return 1;
 	}
+	return 0;
 }
 
 
@@ -720,8 +615,6 @@ int insertEntity(listOfLines* entity, FILE* destinationFile) {
  * @see listOfEntities fSize() FILE_LINE_COUNTER freadL() insertEntity()
  */
 int insertListOfEntities(listOfEntities* entities, FILE* destinationFile) {
-	int i;
-	int tempInt;
 	int fileSize;
 	char tempStr[MAX];
 	listOfEntities* tempEntity;

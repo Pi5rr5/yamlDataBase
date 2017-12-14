@@ -13,10 +13,7 @@
 /* ----- GLOBALS ----- */
 extern int FILE_LINE_COUNTER;
 
-
-
 //fonction de base menu, init (procÃ©dure initialisation), ouverture fichiers
-
 
 void requestSQL() {
     int counter;
@@ -36,7 +33,6 @@ void requestSQL() {
     }
 
 }
-
 
 void menu() {
     //  verifFirstInit();
@@ -72,7 +68,6 @@ void menu() {
     }
 }
 
-
 char *upWord(char *word) {
     size_t len;
     int boucle;
@@ -84,9 +79,6 @@ char *upWord(char *word) {
     upword[len] = '\0';
     return upword;
 }
-
-
-
 
 /**
  * @name fSize
@@ -109,9 +101,6 @@ int fSize(FILE *file) {
 	}
 	return value;	// Return result.
 }
-
-
-
 
 /**
  * @name freadL
@@ -146,9 +135,6 @@ int freadL(char* destination, unsigned int sizeMax, FILE* sourceFile) {
     }
     return 0;
 }
-
-
-
 
 /**
  * @name countTab
@@ -209,9 +195,6 @@ int fGoToLine(int line, FILE* sourceFile) {
     return 0;
 }
 
-
-
-
 /**
  * @name error
  *
@@ -265,26 +248,21 @@ char *cleanQuery(char *word) {
 }
 
 /**
- * @name strIsIn
+ * @name strSearchInArray
  *
- * @brief Checks if a given string is in a list of string
+ * @brief Checks if a given string is in an array of strings.
  *
  * @param char* str : string to search for.
- * @param char** strList : list of string to search in.
+ * @param arrayOfStrings array : array of string to search in.
  *
  * @return (if found) the position of the occurrence in the list.
  * @return (otherwise) -1
  */
-int strIsIn(char* str, char strList[][MAX]) {
+int strSearchInArray(char* str, arrayOfStrings array) {
 	int i;
-	int listSize;
 
-	listSize = sizeof(strList)/sizeof(*strList);
-	printf("Size : %d/%d = %d\n", sizeof(strList), sizeof(*strList), listSize);
-	for(i=0 ; i < listSize ; i++) {
-		printf("In loop : %d\n", i);
-		if(strcmp(str, strList[i]) == 0) {
-			printf("Stop : %s\n", i);
+	for(i=0 ; i < array.stringsNb ; i++) {
+		if(strcmp(str, array.array[i]) == 0) {
 			return i;
 		}
 		printf("Next.\n");
@@ -360,7 +338,6 @@ arrayOfStrings updateArrayOfStrings(arrayOfStrings arrayToUpdate, unsigned int n
 	return arrayToUpdate;
 }
 
-
 /**
  * @name freeArrayOfStrings
  *
@@ -388,3 +365,18 @@ void freeArrayOfStrings(arrayOfStrings* arrayToFree) {
 
 }
 
+/**
+ * @name compare
+ *
+ * @brief takes two values and a comparator to apply on them.
+ *
+ * @param char* str1 : first value.
+ * @param char* comparator : string containing the comparator. Will call a pointer of function depending on the string.
+ * @param char* str2 : second value.
+ *
+ * @return (if true)  1
+ * @return (if false) 0
+ */
+int compare(char* str1, char* comparator, char* str2) {
+
+}
