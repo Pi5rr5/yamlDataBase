@@ -13,7 +13,7 @@ int createDB(char *dbName) {
     if(isExist(dbName)) {
         return 0;
     }
-    char cmd[100];
+    char cmd[255];
     strcpy(cmd, "mkdir resources\\");
     strcat(cmd, dbName);
     strcat(cmd, " >nul 2>nul");
@@ -37,29 +37,46 @@ int useDB(char *dbName) {
     return 0;
 }
 
+
+
 /**
-* Create table if database
+* Create folder table and data/structure.yaml inside if CURRENT_DATABASE
 * @param  : tableName
 * @return : success ? 1 : 0
-* TODO use the current database instead using parameter
 **/
 int createTable(char *tableName) {
     if(CURRENT_DATABASE == NULL){
         return 0;
     }
-    char cmd[100];
+    char cmd[255];
+    // create folder
+    strcpy(cmd, "mkdir resources\\");
+    strcat(cmd, CURRENT_DATABASE);
+    strcat(cmd, "\\");
+    strcat(cmd, tableName);
+    strcat(cmd, " >nul 2>nul");
+    if(system(cmd))
+        return 0;
+    // create generic files
     strcpy(cmd, "fsutil file createnew resources\\");
     strcat(cmd, CURRENT_DATABASE);
     strcat(cmd, "\\");
     strcat(cmd, tableName);
-    strcat(cmd, ".yaml 0 >nul 2>nul");
+    strcat(cmd, "\\data.yaml 0 >nul 2>nul");
     if(!system(cmd)) {
-        return 1;
+        strcpy(cmd, "fsutil file createnew resources\\");
+        strcat(cmd, CURRENT_DATABASE);
+        strcat(cmd, "\\");
+        strcat(cmd, tableName);
+        strcat(cmd, "\\structure.yaml 0 >nul 2>nul");
+        if(!system(cmd))
+            return 1;
     } else {
         return 0;
     }
     return 1;
 }
+
 
 /**
 * Check if exist database
@@ -70,7 +87,7 @@ int isExist(char *dbName) {
     if(dbName == 0 || dbName == NULL) {
         return 0;
     }
-    char cmd[100];
+    char cmd[255];
     strcpy(cmd, "cd resources\\");
     strcat(cmd, dbName);
     strcat(cmd, " >nul 2>nul");
@@ -81,7 +98,7 @@ int isExist(char *dbName) {
 }
 
 /**
-* Drop table if database and if exist
+* Drop table if CURRENT_DATABASE and if exist
 * @param  : tableName
 * TODO add return
 **/
@@ -89,14 +106,17 @@ int dropTable(char *tableName){
     if(CURRENT_DATABASE == NULL){
         return 0;
     }
-    char cmd[100];
-    strcpy(cmd, "resources\\");
+    char cmd[255];
+    strcpy(cmd, "rmdir /s /q resources\\");
     strcat(cmd, CURRENT_DATABASE);
     strcat(cmd, "\\");
     strcat(cmd, tableName);
-    strcat(cmd, ".yaml");
-    int result = remove(cmd);
-    return result+1;
+    strcat(cmd, " >nul 2>nul");
+    if(!system(cmd)){
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 /**
@@ -105,7 +125,7 @@ int dropTable(char *tableName){
 * @return : success ? 1 : 0
 **/
 int dropDB(char *dbName) {
-    char cmd[100];
+    char cmd[255];
     strcpy(cmd, "rmdir /s /q resources\\");
     strcat(cmd, dbName);
     strcat(cmd, " >nul 2>nul");
