@@ -2,12 +2,14 @@
     #define SYSTEM_FUNCTION_H_INCLUDED
 
     int createDB(char *);
-    
+
+    int useDB(char *);
+
+    int createTable(char *);
+
     int isExist(char *);
 
-    int createTable(char *, char *);
-
-    void dropTable(char *, char *);
+    int dropTable(char *);
 
     int dropDB(char *);
 

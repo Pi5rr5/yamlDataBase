@@ -1,8 +1,21 @@
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "../h/some_funct.h"
+#include "../h/globals.h"
+#include "../h/system_function.h"
 
 int main() {
-
-    menu();
+    //printf("create: %d\n",createTable("aa"));
+    //printf("current: %s\n",CURRENT_DATABASE);
+    //printf("use: %d\n",useDB("test"));
+    printf("create db: %d\n",createDB("test"));
+    printf("use: %d\n",useDB("test"));
+    printf("current: %s\n",CURRENT_DATABASE);
+    printf("create: %d\n",createTable("aa"));
+    //printf("remove table: %d\n", dropTable("bb"));
+    //printf("remove DB: %d\n", dropDB("test"));
+    //menu();
 
     return 0;
 
