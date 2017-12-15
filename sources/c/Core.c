@@ -81,7 +81,7 @@ void query_drop_table(char *buffer) {
     if (countArgs(buffer, " ") == 1) {
         if (isAlphaNum(buffer)) {
             //if (funcyaml(buffer)) {
-            if (dropTable(buffer, "nomtable")) {
+            if (dropTable(buffer)) {
                 printf("Query : Table dropped");
             } else {
                 printf("Error : Can't drop table on CMD");
@@ -115,13 +115,13 @@ void query_create_table(char *buffer) {
             printf("Error: Not an alpha-numeric argument");
             error = 1;
         }
-        if(table != NULL) {
+        if (table != NULL) {
             free(table);
         }
         if (!error) {
             if (createQuery[0] == 40 && createQuery[strlen(createQuery) - 1] == 41) {
-                 createQuery[strlen(createQuery) - 1] = '\0';
-                splitCreateQuery(createQuery+1, ",");
+                createQuery[strlen(createQuery) - 1] = '\0';
+                splitCreateQuery(createQuery + 1, ",");
             } else {
                 printf("Error : bad request");
             }
@@ -150,7 +150,7 @@ void splitCreateQuery(char *createQuery, const char *delim) {
 /**
  * Desc: check & call function for insert into YAML files
  *
- * Param: Char * word : String to check 
+ * Param: Char * word : String to check
  *
  */
 void goSplitCreateQuery(char *createQuery, const char *delim) {
@@ -164,7 +164,8 @@ void goSplitCreateQuery(char *createQuery, const char *delim) {
     strcpy(primary, "");
     strcpy(null, "");
     if (countArgs(createQuery, " ") > 1) {
-        (createQuery[0] == 32) ? strcpy(name, splitWord(createQuery+1, delim)) :  strcpy(name, splitWord(createQuery, delim));
+        (createQuery[0] == 32) ? strcpy(name, splitWord(createQuery + 1, delim)) : strcpy(name, splitWord(createQuery,
+                                                                                                          delim));
         if (correctWord(name)) {
             if (!isAlphaNum(name)) {
                 printf("Error: Not an alpha-numeric argument(blop)\n");
@@ -209,5 +210,99 @@ char *strtok1(char *s, const char *delim) {
         *lasts++ = 0;
     return s;
 }
+
+//********************************************************************************************
+//Partie 2
+
+
+// INSERT INTO table VALUES ('valeur 1', 'valeur 2', ...)
+
+
+void query_insert(char *buffer) {
+    char name[255] = "";
+    int error;
+    error = 0;
+    if (countArgs(buffer, " ") > 1) {
+        (buffer[0] == 32) ? strcpy(name, splitWord(buffer + 1, " ")) : strcpy(name, splitWord(buffer, " "));
+        if (correctWord(name)) {
+            if (!isAlphaNum(name)) {
+                printf("Error: Not an alpha-numeric argument(blop)\n");
+                error = 1;
+            }
+        } else {
+            printf("Error: Use of a forbidden word");
+            error = 1;
+        }
+        if (!error) {
+            buffer += strlen(name) + 1;
+            if (!strncmp(buffer, "VALUES (", 8) && buffer[strlen(buffer) - 1] == ')') {
+                buffer += 8;
+                insertSqlValues(buffer);
+            } else {
+                printf("Error : Missing VALUES word");
+            }
+        }
+    }
+}
+
+// 'valeur 1', 'valeur 2', ...
+// 'test', 1, 'deux');
+// insert into coucou VALUES ('test', 1, 'deux');
+void insertSqlValues(char *buffer) {
+    char word[512];
+    int start;
+    int end;
+    int control;
+    control = 0;
+    start = 0;
+    end = 0;
+    printf("%d\n", strlen(buffer));
+    for (int i = 0; i < strlen(buffer); i++) {
+        if (i == 0 && buffer[i] == 39) { // 39 : aspostrophe, 92 : antislash, 44 : virgule
+            control = 1;
+            start = 1;
+            continue;
+        }
+        if (i != 0 && ((buffer[i] == 39 && buffer[i - 1] != 92) || (buffer[i] == 44 && buffer[i - 1] != 92)) &&
+            control == 0) {
+            control = 1;
+            start = i + 1;
+            end = 0;
+            continue;
+        }
+        if (i != 0 && ((buffer[i] == 39 && buffer[i - 1] != 92) || (buffer[i] == 44 && buffer[i - 1] != 92)) &&
+            control == 1) {
+            printf("start:%d --- end:%d\n", start, end);
+            strncat(word, buffer + start, end);
+            strcat(word, "-");
+            control = 0;
+            if (buffer[i + 1] == ',') {
+                i++;
+                if (buffer[i + 1] == ' ') { i++; }
+                control = 1;
+            }
+            start = i + 1;
+            end = 0;
+            continue;
+        }
+        if (i >= 40) { printf("rah\n"); }
+        end++;
+    }
+    printf(word);
+}
+/* listOfEntities *request;
+ FILE *fp;
+ char path[255];
+ if ((fp = fopen(path, "r")) != NULL) {
+     // Suite
+ }
+
+// En écriture (pour un insert ou update)
+ if ((fp = fopen(path, "a+")) != NULL) {
+     // Suite
+ }
+ request = getAllFrom(sourceFile)
+ {
+ }*/
 
 

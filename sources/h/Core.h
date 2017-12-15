@@ -15,6 +15,10 @@ void query_drop_table(char *);
 
 void query_create_table(char *);
 
+void query_insert(char *);
+
+void insertSqlValues(char *);
+
 void splitCreateQuery(char *, const char *);
 
 void goSplitCreateQuery(char *, const char *);

@@ -19,7 +19,8 @@ commandSQL cmdSQL[] = {
         {"CREATE TABLE",    query_create_table},
         {"DROP DATABASE",   query_drop_database},
         {"DROP TABLE",      query_drop_table},
-        {"EXIT",           query_exit},
+        {"EXIT",            query_exit},
+        {"INSERT INTO",     query_insert},
         {NULL, NULL}
 };
 
@@ -46,7 +47,7 @@ void parserSQL(char *word) {
             lenWord = strlen(cmdSQL[loop].name) + 1;
             querySent = malloc(sizeof(char) * (lenQuery - lenWord + 1));
             strncpy(querySent, cleanQueryChar + lenWord, lenQuery - lenWord);
-            querySent[ lenQuery - lenWord - 1] = '\0';
+            querySent[lenQuery - lenWord - 1] = '\0';
             cmdSQL[loop].functionSQL(querySent);
             free(querySent);
             error = 0;
