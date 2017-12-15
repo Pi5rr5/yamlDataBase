@@ -17,4 +17,6 @@
     auto_increment : true
     primary : true
     length : 4
-...
+-
+-
+    test : valeur test

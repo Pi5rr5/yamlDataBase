@@ -601,7 +601,7 @@ int insertEntity(listOfLines* entity, FILE* destinationFile) {
 			if(!insertLine(entity->line, destinationFile)) {
 				return 0;
 			}
-			tempEntity = entity->next;
+			entity = entity->next;
 		}
 		return 1;
 	}
@@ -622,23 +622,22 @@ int insertEntity(listOfLines* entity, FILE* destinationFile) {
  * @see listOfEntities fSize() FILE_LINE_COUNTER freadLine() insertEntity()
  */
 int insertListOfEntities(listOfEntities* entities, FILE* destinationFile) {
+	int tempInt;
 	int fileSize;
 	char tempStr[MAX];
 	listOfEntities* tempEntity;
 
-	fileSize = fSize(destinationFile);
+	fseek(destinationFile,-5,SEEK_END);
 
 	if(destinationFile != NULL) {
-		while( ftell(destinationFile) < fileSize ) {
-			if(freadLine(tempStr, MAX, destinationFile)) {
-				if(isEOY(tempStr)) {
-					if(fprintf(destinationFile, "-\n") > 0) {
-						while ( (tempEntity = entities) != NULL) {
-							insertEntity(entities->entity, destinationFile);
-							entities = entities->next;
-						}
-					}
-				}
+		if ( fputs("-\n", destinationFile) >= 0) {
+			while ( (tempEntity = entities) != NULL) {
+				printf("ok");
+				insertEntity(entities->entity, destinationFile);
+				entities = entities->next;
+			}
+			if ( (fputs("...\n",destinationFile)) {
+				return 1;
 			}
 		}
 	}
