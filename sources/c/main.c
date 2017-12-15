@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
 	if ( (tempEntity = addLineToList(tempEntity, line)) != NULL) {
 		if ( (testList = addEntityToList(testList, tempEntity)) != NULL) {
 			if( (fp = fopen("resources/struct.yaml", "a+")) != NULL) {
-				if(!insertListOfEntities(testList, fp) ) {
+				if(!insertListOfEntities(testList, x) ) {
 					printf("Fail to insert.\n");
 				} else {
 					printf("Success to insert.");

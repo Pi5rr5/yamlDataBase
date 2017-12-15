@@ -19,7 +19,7 @@
  *			It allows to specify to the compiler that the variable may have been already declared in another file.
  *			And if it has been, then it will be not redeclared
  *
- * @see getEntity() getBlockWhere() getAllFrom() freadL()
+ * @see getEntity() getBlockWhere() getAllFrom() freadLine()
  */
 extern int FILE_LINE_COUNTER;
 
@@ -363,7 +363,7 @@ lineStruct getLineStruct(char* str) {
  * @return (on success) listOfLines* resultList : line linked list.
  * @return (on failure) null pointer.
  *
- * @see listOfLines lineStruct fGoToLine() freadL() countTab() verifLine() getLineStruct() addLineToList() FILE_LINE_COUNTER
+ * @see listOfLines lineStruct fGoToLine() freadLine() countTab() verifLine() getLineStruct() addLineToList() FILE_LINE_COUNTER
  */
 listOfLines* getEntity(int startLine, FILE* sourceFile) {
     char tempStr[MAX];
@@ -373,7 +373,7 @@ listOfLines* getEntity(int startLine, FILE* sourceFile) {
     resultList = NULL;
     if(sourceFile != NULL) {
         if(fGoToLine(startLine, sourceFile)) {		// Move the cursor the wanted line.
-            while(freadL(tempStr, MAX, sourceFile) && countTab(tempStr) != 0 && verifLine(tempStr)) {	// Read a line, checks if it's still inside the block and if it has to be treated
+            while(freadLine(tempStr, MAX, sourceFile) && countTab(tempStr) != 0 && verifLine(tempStr)) {	// Read a line, checks if it's still inside the block and if it has to be treated
             	line = getLineStruct(tempStr);					// Recover line object form the line.
             	resultList = addLineToList(resultList, line);	// Add that object to the list.
             }
@@ -388,6 +388,9 @@ listOfLines* getEntity(int startLine, FILE* sourceFile) {
 
 
 /* ----- YAML QUERY FUNCTIONS ----- */
+
+
+/* SELECTION */
 
 /**
  * @name getBlockWhere
@@ -406,7 +409,7 @@ listOfLines* getEntity(int startLine, FILE* sourceFile) {
  *
  * @warning No estimation of the danger the previous remark could generates. A review may be required.
  *
- * @see listOfEntities listOfLines FILE_LINE_COUNTER freadL() verifLine() countTab() getKey() getValue() getEntity() addEntityToList() error()
+ * @see listOfEntities listOfLines FILE_LINE_COUNTER freadLine() verifLine() countTab() getKey() getValue() getEntity() addEntityToList() error()
  */
 listOfEntities* getBlockWhere(arrayOfStrings keysList, arrayOfStrings comparators, arrayOfStrings valuesList, FILE* sourceFile) {
 	char line[MAX];
@@ -427,7 +430,7 @@ listOfEntities* getBlockWhere(arrayOfStrings keysList, arrayOfStrings comparator
 	fseek(sourceFile, 0, SEEK_SET);
 
     while(ftell(sourceFile) < fileSize) {					// Browse the file.
-		if(freadL(line, MAX, sourceFile)) {					// Read a line from the file.
+		if(freadLine(line, MAX, sourceFile)) {					// Read a line from the file.
         	if(verifLine(line)) {							// If the read line can be treated.
             	tabulation = countTab(line);
                 if(tabulation == 0 && strcmp("-", line) == 0) {		// If start of entity
@@ -475,7 +478,7 @@ listOfEntities* getBlockWhere(arrayOfStrings keysList, arrayOfStrings comparator
  *
  * @remarks Can be used for complex queries where the file manipulation will be too complicated compared to a linked list handling.
  *
- * @see listOfEntities listOfLines fSize() FILE_LINE_COUNTER freadL() countTab() getEntity() addEntityToList() error()
+ * @see listOfEntities listOfLines fSize() FILE_LINE_COUNTER freadLine() countTab() getEntity() addEntityToList() error()
  */
 listOfEntities* getAllFrom(FILE* sourceFile) {
     int fileSize;
@@ -492,7 +495,7 @@ listOfEntities* getAllFrom(FILE* sourceFile) {
 		/* End of initialization */
 
 		while(ftell(sourceFile) < fileSize) {					// Browse the file
-			if(freadL(line, MAX, sourceFile)) {					// Read a line from the file.
+			if(freadLine(line, MAX, sourceFile)) {					// Read a line from the file.
 				if(verifLine(line)) {							// If the line can be treated.
 					if(countTab(line) == 0 && strcmp("-", line) == 0) {								// If start of entity
 						if ( (tempEntity = getEntity(FILE_LINE_COUNTER+1, sourceFile)) != NULL) {	// Recover the entity
@@ -511,6 +514,9 @@ listOfEntities* getAllFrom(FILE* sourceFile) {
 	}
     return entities;
 }
+
+
+/* INSERTION */
 
 /*
 /\**
@@ -566,7 +572,7 @@ int updateValuesWhere(char** keysList, char* comparators, char** valuesList, cha
 int insertLine(lineStruct line, FILE* destinationFile) {
 	if(line.key != NULL && line.value != NULL && destinationFile != NULL) {
 		printf("    %s : %s\n", line.key, line.value);
-		return fprintf("    %s : %s\n", line.key, line.value) > 0;
+		return fprintf(destinationFile, "    %s : %s\n", line.key, line.value) > 0;
 	}
 	return 0;
 }
@@ -602,7 +608,6 @@ int insertEntity(listOfLines* entity, FILE* destinationFile) {
 	return 0;
 }
 
-
 /**
  * @name insertListOfEntities
  *
@@ -614,19 +619,18 @@ int insertEntity(listOfLines* entity, FILE* destinationFile) {
  * @return (on success) 1
  * @return (on failure) 0
  *
- * @see listOfEntities fSize() FILE_LINE_COUNTER freadL() insertEntity()
+ * @see listOfEntities fSize() FILE_LINE_COUNTER freadLine() insertEntity()
  */
 int insertListOfEntities(listOfEntities* entities, FILE* destinationFile) {
-	int i = 0;
 	int fileSize;
 	char tempStr[MAX];
 	listOfEntities* tempEntity;
 
-	if(destinationFile != NULL) {
+	fileSize = fSize(destinationFile);
 
+	if(destinationFile != NULL) {
 		while( ftell(destinationFile) < fileSize ) {
-			i++;
-			if(freadL(tempStr, MAX, destinationFile)) {
+			if(freadLine(tempStr, MAX, destinationFile)) {
 				if(isEOY(tempStr)) {
 					if(fprintf(destinationFile, "-\n") > 0) {
 						while ( (tempEntity = entities) != NULL) {

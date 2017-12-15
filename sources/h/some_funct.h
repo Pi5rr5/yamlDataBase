@@ -8,7 +8,7 @@
 
 
     int fSize(FILE*);
-    int freadL(char*, unsigned int, FILE*);
+    int freadLine(char*, unsigned int, FILE*);
     int countTab(char*);
     int fGoToLine(int, FILE*);
     void error(const char*);

@@ -103,11 +103,11 @@ int fSize(FILE *file) {
 }
 
 /**
- * @name freadL
+ * @name freadLine
  *
  * @brief Reads a line from the current cursor position in a file and stores it in the string passed as argument.
  *			`fgets` has as cons to recover the possible line break lying at the end of the line read.
- *			`freadL` (the function below) has as only purpose to solve that behavior.
+ *			`freadLine` (the function below) has as only purpose to solve that behavior.
  *
  * @param char* destination : string in which one the result will be stored
  * @param unsigned int sizeMax : characters number to read (large number like 255 recommended)
@@ -120,7 +120,7 @@ int fSize(FILE *file) {
  *
  * @see FILE_LINE_COUNTER
  */
-int freadL(char* destination, unsigned int sizeMax, FILE* sourceFile) {
+int freadLine(char* destination, unsigned int sizeMax, FILE* sourceFile) {
     int strLength;
     char result[MAX];
 
