@@ -143,20 +143,18 @@ void freeListOfLines(listOfLines** list) {
  */
 listOfEntities* addEntityToList(listOfEntities* list, listOfLines* entity) {
     listOfEntities* new_element;
-    listOfEntities* temp;
 
     new_element = malloc(sizeof(listOfEntities));	// Required memory allocation for the new element
     if(new_element != NULL) {				// If the allocation went well
-        new_element->entity = entity;		// We assign the value passed in argument to the corresponding attribute of the new element.
+		new_element->entity = entity;		// We assign the value passed in argument to the corresponding attribute of the new element.
         new_element->next = NULL;			// `next` pointer is set to NULL, the new element becoming the last node.
-        if(list == NULL) {					// If the given list is empty.
+		if(list == NULL) {					// If the given list is empty.
             return new_element;				// Return of the new element only (because it's the only node).
-        } else {
-            temp = list;					// Otherwise, adding of the new element to the list.
-            while(temp->next != NULL) {		// Browse the list.
-                temp = temp->next;
+        } else {								// Otherwise, adding of the new element to the list.
+            while( list->next != NULL ) {	// Browse the list.
+                list = list->next;
             }
-            temp->next = new_element;		// Make the current last node of the list points on the new element.
+            list->next = new_element;		// Make the current last node of the list points on the new element.
             return list;					// Returning of the updated list.
         }
     }
@@ -567,6 +565,7 @@ int updateValuesWhere(char** keysList, char* comparators, char** valuesList, cha
  */
 int insertLine(lineStruct line, FILE* destinationFile) {
 	if(line.key != NULL && line.value != NULL && destinationFile != NULL) {
+		printf("    %s : %s\n", line.key, line.value);
 		return fprintf("    %s : %s\n", line.key, line.value) > 0;
 	}
 	return 0;
@@ -618,22 +617,22 @@ int insertEntity(listOfLines* entity, FILE* destinationFile) {
  * @see listOfEntities fSize() FILE_LINE_COUNTER freadL() insertEntity()
  */
 int insertListOfEntities(listOfEntities* entities, FILE* destinationFile) {
+	int i = 0;
 	int fileSize;
 	char tempStr[MAX];
 	listOfEntities* tempEntity;
 
 	if(destinationFile != NULL) {
-		fileSize = fSize(destinationFile);
-		fseek(destinationFile, 0, SEEK_SET);
-		FILE_LINE_COUNTER = 0;
 
 		while( ftell(destinationFile) < fileSize ) {
+			i++;
 			if(freadL(tempStr, MAX, destinationFile)) {
 				if(isEOY(tempStr)) {
-					fprintf(destinationFile, "-\n");
-					while ( (tempEntity = entities) != NULL) {
-						insertEntity(entities->entity, destinationFile);
-						entities = entities->next;
+					if(fprintf(destinationFile, "-\n") > 0) {
+						while ( (tempEntity = entities) != NULL) {
+							insertEntity(entities->entity, destinationFile);
+							entities = entities->next;
+						}
 					}
 				}
 			}

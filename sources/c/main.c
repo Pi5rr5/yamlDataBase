@@ -10,38 +10,30 @@ int FILE_LINE_COUNTER;
 
 /* ----- MAIN ----- */
 int main(int argc, char **argv) {
-	int i;
 	FILE* fp;
-	arrayOfStrings keys;
-	arrayOfStrings values;
-	arrayOfStrings comparators;
+	lineStruct line;
+	listOfLines* tempEntity;
+	listOfEntities* testList;
 
-	keys = createArrayOfStrings((unsigned int)2);
-	values = createArrayOfStrings((unsigned int)2);
-	comparators = createArrayOfStrings((unsigned int)2);
+	strcpy(line.key, "test");
+	strcpy(line.value, "valeur test");
+	tempEntity = NULL;
+	testList = NULL;
 
-	strcpy(keys.array[0], "null");
-	strcpy(keys.array[1], "length");
-	strcpy(values.array[0], "false");
-	strcpy(values.array[1], "1023");
-	strcpy(comparators.array[0], "=");
-	strcpy(comparators.array[1], "<");
-
-	listOfEntities* test = NULL;
-	if( (fp = fopen("resources/struct.yaml", "r")) != NULL) {
-		if( (test = getBlockWhere(keys, comparators, values, fp)) != NULL) {
-			displayListOfEntities(test);
-			freeListOfEntities(&test);
-		} else {
-			printf("No recover.\n");
+	if ( (tempEntity = addLineToList(tempEntity, line)) != NULL) {
+		if ( (testList = addEntityToList(testList, tempEntity)) != NULL) {
+			if( (fp = fopen("resources/struct.yaml", "a+")) != NULL) {
+				if(!insertListOfEntities(testList, fp) ) {
+					printf("Fail to insert.\n");
+				} else {
+					printf("Success to insert.");
+					fclose(fp);
+				}
+				freeListOfEntities(&testList);
+			} else {
+				error("File not find.\n");
+			}
 		}
-	} else {
-		error("File not find.\n");
 	}
-
-	freeArrayOfStrings(&keys);
-	freeArrayOfStrings(&values);
-	freeArrayOfStrings(&comparators);
-
     return 0;
 }
