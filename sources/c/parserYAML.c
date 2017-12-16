@@ -518,8 +518,8 @@ listOfEntities* getAllFrom(FILE* sourceFile) {
 
 /* INSERTION */
 
-/*
-/\**
+
+/**
  * @name updateValuesWhere
  *
  * @brief update several values in following some conditions.
@@ -535,24 +535,23 @@ listOfEntities* getAllFrom(FILE* sourceFile) {
  * @return (on failure) 0
  *
  * @see
- *\/
-int updateValuesWhere(char** keysList, char* comparators, char** valuesList, char** keysToUpdate, char** newValues, FILE* destinationFile) {
-	int i;
-	int j;
-	size_t keysNb;
-	size_t keyEqualsNb;
-	size_t keysToUpdateNb;
-	size_t newValuesNb;
+ */
+int updateValuesWhere(	arrayOfStrings** keysList,
+						arrayOfStrings*  comparators,
+						arrayOfStrings** valuesList,
+						arrayOfStrings** keysToUpdate,
+						arrayOfStrings** newValues,
+						FILE* destinationFile) {
 
-	if ( destinationFile != NULL && keysToUpdate != NULL && newValues != NULL ) {
-		if ( keysNb == strALen(valuesList) && keysNb == strlen(comparators) ) {
-			for(i=0 ; i < keysNb ; i++) {
+	listOfEntities* tempEntities;
 
-			}
+	if(destinationFile != NULL) {
+		if( (listOfEntities = getAllFrom(destinationFile)) != NULL) {
+
 		}
 	}
 	return 0;
-}*/
+}
 
 /**
  * @name insertLine
@@ -571,7 +570,6 @@ int updateValuesWhere(char** keysList, char* comparators, char** valuesList, cha
  */
 int insertLine(lineStruct line, FILE* destinationFile) {
 	if(line.key != NULL && line.value != NULL && destinationFile != NULL) {
-		printf("    %s : %s\n", line.key, line.value);
 		return fprintf(destinationFile, "    %s : %s\n", line.key, line.value) > 0;
 	}
 	return 0;
@@ -629,11 +627,10 @@ int insertListOfEntities(listOfEntities* entities, FILE* destinationFile) {
 	if(destinationFile != NULL) {
 		if ( fputs("\n-\n", destinationFile) >= 0) {
 			while ( (tempEntity = entities) != NULL) {
-				printf("ok");
 				insertEntity(entities->entity, destinationFile);
 				entities = entities->next;
 			}
-			return (fputs("...\n",destinationFile)) >= 0;
+			return (fputs("...\n", destinationFile)) >= 0;
 		}
 	}
 	return 0;
