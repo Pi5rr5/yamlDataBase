@@ -7,6 +7,10 @@
 
     int createTable(char *);
 
+    int createEmptyFile(char *, char *);
+
+    int initYamlFile(char *, char *);
+
     int isExist(char *);
 
     int dropTable(char *);
