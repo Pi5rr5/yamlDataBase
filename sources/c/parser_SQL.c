@@ -21,6 +21,8 @@ commandSQL cmdSQL[] = {
         {"DROP TABLE",      query_drop_table},
         {"EXIT",            query_exit},
         {"INSERT INTO",     query_insert},
+        {"UPDATE",          query_update},
+        {"DELETE FROM",     query_delete},
         {NULL, NULL}
 };
 

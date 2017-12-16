@@ -337,3 +337,69 @@ char *checkTypeSQL(char *line) {
     } else { type[3] = '\0'; }
     return type;
 }
+
+
+char* insertSplitWord(char *buffer, int number) {
+    char *word;
+    word = malloc(sizeof(char) * 512);
+    int arr[5] = { 0, 1, 0, 0, 1}; // 0:start, 1:end, 2:control, 3:quote, 4:count
+    for (int i = 0; i < strlen(buffer); i++) {
+        if (buffer[i] == 39 && (arr[2] == 0 || arr[3] == 0)) {// 39 : aspostrophe, 92 : antislash, 44 : virgule
+            arr[3] = 1;
+            arr[2] = 1;
+            arr[0] = i;
+            arr[1] = 1;
+            continue;
+        }
+        if (((((buffer[i] == 39 && arr[3] == 1) || (buffer[i] == 44 && arr[3] == 0)) && arr[2] == 1)) || ((i == strlen(buffer) - 1) && buffer[i-1] != 39)) {
+            arr[1]++;
+            if(number == arr[4]) {
+                strncpy(word, buffer + arr[0], arr[1]);
+                word[arr[1]] = '\0';
+                return word;
+            } else {
+                arr[3] = 0;
+                arr[2] = 0;
+                arr[0] = i;
+                arr[1] = 1;
+                arr[4]++;
+                continue;
+            }
+        }
+        if (buffer[i] == 44 && arr[2] == 0 && arr[3] == 0) {
+            arr[2] = 1;
+            arr[0] = (buffer[i + 1] == 32) ? i + 2 : i + 1;
+            arr[1] = (buffer[i + 1] == 32) ? -2 : -1;
+            continue;
+        }
+        arr[1]++;
+    }
+    return NULL;
+}
+
+
+
+char* whichType(char *buffer) {
+    int intType = 1;
+    int floatType = 0;
+    if (buffer[0] == 39 && buffer[strlen(buffer) - 1] == 39) {
+        if (strlen(buffer) > 3) {
+            return "varchar";
+        } else {
+            return "char";
+        }
+    } else {
+for(int i = 0; i < strlen(buffer); i++) {
+    if ((buffer[i] >= '0' && buffer[i] <= '9') || buffer[i] == 46) {
+        if (buffer[i] == 46) { floatType = 1; }
+    } else { intType = 0; break; }
+}
+        if (intType && floatType) { return "float"; }
+        if (intType && !floatType) { return "int"; }
+    }
+    return "Wrong Type";
+}
+
+char* updateSplitWord(char *buffer, int number) {
+
+}

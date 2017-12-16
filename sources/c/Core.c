@@ -20,9 +20,9 @@ void query_use(char *use) {
         if (isAlphaNum(use)) {
             if ((tempList = getBlockWhere("name", use, "databases.yaml")) != NULL) {
                 freeListOfEntities(&tempList);
-                /*if (!useDB(use)) {
+                if (!useDB(use)) {
                     printf("Error: Problem for change db use (system cmd)");
-                }*/
+                }
             } else {
                 printf("Error: Base not exist");
             }
@@ -97,6 +97,8 @@ void query_drop_table(char *buffer) {
     }
 }
 
+
+
 void query_create_table(char *buffer) {
     char createQuery[512] = "";
     const char delim[2] = " ";
@@ -107,10 +109,10 @@ void query_create_table(char *buffer) {
         table = splitWord(buffer, delim);
         if (isAlphaNum(table)) {
             strncpy(createQuery, buffer + strlen(table) + 1, strlen(buffer) - strlen(table));
-/*            if (!createTable(table, "nomtable")) {
+            if (!createTable(table)) {
                 printf("Error : Can't create table on CMD");
                 error = 1;
-            }*/
+            }
         } else {
             printf("Error: Not an alpha-numeric argument");
             error = 1;
@@ -215,7 +217,7 @@ char *strtok1(char *s, const char *delim) {
 //Partie 2
 
 
-// INSERT INTO table VALUES ('valeur 1', 'valeur 2', ...)
+
 
 
 void query_insert(char *buffer) {
@@ -235,7 +237,7 @@ void query_insert(char *buffer) {
         }
         if (!error) {
             buffer += strlen(name) + 1;
-            if (!strncmp(buffer, "VALUES (", 8) && buffer[strlen(buffer) - 1] == ')') {
+            if (!strncmp(upWord(buffer), "VALUES (", 8) && buffer[strlen(buffer) - 1] == ')') {
                 buffer += 8;
                 insertSqlValues(buffer);
             } else {
@@ -245,51 +247,26 @@ void query_insert(char *buffer) {
     }
 }
 
-// 'valeur 1', 'valeur 2', ...
-// 'test', 1, 'deux');
-// insert into coucou VALUES ('test', 1, 'deux');
+
 void insertSqlValues(char *buffer) {
-    char word[512];
-    int start;
-    int end;
-    int control;
-    control = 0;
-    start = 0;
-    end = 0;
-    printf("%d\n", strlen(buffer));
-    for (int i = 0; i < strlen(buffer); i++) {
-        if (i == 0 && buffer[i] == 39) { // 39 : aspostrophe, 92 : antislash, 44 : virgule
-            control = 1;
-            start = 1;
-            continue;
+    int count;
+    count = 1;
+    while (1) {
+        if (insertSplitWord(buffer, count) == NULL) {
+            break;
+        } else {
+            printf("mot:%s -- type: %s \n", insertSplitWord(buffer, count), whichType(insertSplitWord(buffer, count)));
+            //free malloc
+            count++;
         }
-        if (i != 0 && ((buffer[i] == 39 && buffer[i - 1] != 92) || (buffer[i] == 44 && buffer[i - 1] != 92)) &&
-            control == 0) {
-            control = 1;
-            start = i + 1;
-            end = 0;
-            continue;
-        }
-        if (i != 0 && ((buffer[i] == 39 && buffer[i - 1] != 92) || (buffer[i] == 44 && buffer[i - 1] != 92)) &&
-            control == 1) {
-            printf("start:%d --- end:%d\n", start, end);
-            strncat(word, buffer + start, end);
-            strcat(word, "-");
-            control = 0;
-            if (buffer[i + 1] == ',') {
-                i++;
-                if (buffer[i + 1] == ' ') { i++; }
-                control = 1;
-            }
-            start = i + 1;
-            end = 0;
-            continue;
-        }
-        if (i >= 40) { printf("rah\n"); }
-        end++;
     }
-    printf(word);
+
 }
+
+
+
+
+
 /* listOfEntities *request;
  FILE *fp;
  char path[255];
@@ -306,3 +283,93 @@ void insertSqlValues(char *buffer) {
  }*/
 
 
+// UPDATE table
+//SET colonne_1 = 'valeur 1', colonne_2 = 'valeur 2', colonne_3 = 'valeur 3'
+//WHERE condition
+
+void query_update(char *buffer) {
+    char *table;
+    int error;
+    char updateQuery[512] = "";
+    const char delim[2] = " ";
+    error = 0;
+    if (countArgs(buffer, delim) > 1) {
+        table = splitWord(buffer, delim);
+        if (isAlphaNum(table)) {
+            strncpy(updateQuery, buffer + strlen(table) + 1, strlen(buffer) - strlen(table));
+        }  else {
+            printf("Error: Not an alpha-numeric argument");
+            error = 1;
+        }
+        if (table != NULL) {
+            free(table);
+        }
+        if (!error) {
+            if(!strncmp(upWord(updateQuery), "SET ", 4)) {
+                valuesUpdateQuery(updateQuery +4);
+            }
+        }
+    } else {
+        printf("Error : Not enough args");
+    }
+}
+
+//update coucou set cl1 = 'k', cl2 = 9, cl3 = 'ggggg';
+void valuesUpdateQuery(char* buffer) {
+    printf("%s\n", buffer);
+ for(int i = 0; i < strlen(buffer); i++) {
+
+    }
+
+  /*  while (1) {
+        if (insertSplitWord(buffer, count) == NULL) {
+            break;
+        } else {
+            printf("mot:%s -- type: %s \n", updateSplitWord(buffer, count), whichType(updateSplitWord(buffer, count)));
+            //free malloc
+            count++;
+        }
+    }*/
+}
+
+
+
+
+
+
+
+//DELETE FROM `table`
+//WHERE condition
+
+void query_delete(char* buffer) {
+    char *table;
+    int error;
+    char deleteQuery[512] = "";
+    const char delim[2] = " ";
+    error = 0;
+    if (countArgs(buffer, delim) > 1) {
+        table = splitWord(buffer, delim);
+        if (isAlphaNum(table)) {
+            strncpy(deleteQuery, buffer + strlen(table) + 1, strlen(buffer) - strlen(table));
+        }  else {
+            printf("Error: Not an alpha-numeric argument");
+            error = 1;
+        }
+        if (table != NULL) {
+            free(table);
+        }
+        if (!error) {
+            if(!strncmp(upWord(deleteQuery), "WHERE ", 6)) {
+                condDeleteQuery(deleteQuery +6);
+            }
+        }
+    } else {
+        printf("Error : Not enough args");
+    }
+}
+
+
+void condDeleteQuery(char* buffer) {
+    printf("%s\n", buffer);
+
+}

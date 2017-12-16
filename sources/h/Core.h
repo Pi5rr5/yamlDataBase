@@ -17,6 +17,10 @@ void query_create_table(char *);
 
 void query_insert(char *);
 
+void query_update(char *);
+
+void query_delete(char *);
+
 void insertSqlValues(char *);
 
 void splitCreateQuery(char *, const char *);
@@ -24,5 +28,9 @@ void splitCreateQuery(char *, const char *);
 void goSplitCreateQuery(char *, const char *);
 
 char *strtok1(char *, const char *);
+
+void valuesUpdateQuery(char *);
+
+void condDeleteQuery(char *);
 
 #endif //YAMLDATABASE_CORE_H

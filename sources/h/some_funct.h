@@ -34,4 +34,10 @@ int fGoToLine(int, FILE *);
 
 void error(const char *);
 
+char* insertSplitWord(char *, int);
+
+char* whichType(char *);
+
+//char* updateSplitWord(char *, int);
+
 #endif /* YAML_SOME_FUNCT_H */
