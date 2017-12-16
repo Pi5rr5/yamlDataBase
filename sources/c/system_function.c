@@ -37,46 +37,71 @@ int useDB(char *dbName) {
     return 0;
 }
 
-
-
 /**
 * Create folder table and data/structure.yaml inside if CURRENT_DATABASE
 * @param  : tableName
 * @return : success ? 1 : 0
 **/
 int createTable(char *tableName) {
-    if(CURRENT_DATABASE == NULL){
+    if(CURRENT_DATABASE == NULL)
         return 0;
-    }
     char cmd[255];
-    // create folder
-    strcpy(cmd, "mkdir resources\\");
-    strcat(cmd, CURRENT_DATABASE);
-    strcat(cmd, "\\");
-    strcat(cmd, tableName);
+    char path[255];
+    // concatenate neutral path
+    strcpy(path, "resources\\");
+    strcat(path, CURRENT_DATABASE);
+    strcat(path, "\\");
+    strcat(path, tableName);
+    // create table folder
+    strcpy(cmd, "mkdir ");
+    strcat(cmd, path);
     strcat(cmd, " >nul 2>nul");
     if(system(cmd))
         return 0;
-    // create generic files
-    strcpy(cmd, "fsutil file createnew resources\\");
-    strcat(cmd, CURRENT_DATABASE);
-    strcat(cmd, "\\");
-    strcat(cmd, tableName);
-    strcat(cmd, "\\data.yaml 0 >nul 2>nul");
-    if(!system(cmd)) {
-        strcpy(cmd, "fsutil file createnew resources\\");
-        strcat(cmd, CURRENT_DATABASE);
-        strcat(cmd, "\\");
-        strcat(cmd, tableName);
-        strcat(cmd, "\\structure.yaml 0 >nul 2>nul");
-        if(!system(cmd))
-            return 1;
-    } else {
-        return 0;
+    // create data.yaml file
+    if(createEmptyFile(path, "\\data.yaml")) {
+        if(!initYamlFile(path))
+            return 0;
+        // truncate path
+        path[strlen(path) - 9] = 0;
+        // create structure.yaml file
+        if(createEmptyFile(path, "structure.yaml"))
+            if(!initYamlFile(path))
+                return 0;
     }
     return 1;
 }
 
+/**
+* Create empty file
+* @param  : path
+* @return : success ? 1 : 0
+**/
+int createEmptyFile(char *path, char *fileName) {
+    char cmd[255];
+    strcpy(cmd, "fsutil file createnew ");
+    strcat(path, fileName);
+    strcat(cmd, path);
+    strcat(cmd, " 0 >nul 2>nul");
+    return !system(cmd);
+}
+
+/**
+* Initiate yaml file
+* @param  : tableName, path
+* @return : success ? 1 : 0
+**/
+int initYamlFile(char *path) {
+    FILE* f;
+    f = fopen(path, "r+");
+    if(f != NULL)
+        if(fprintf(f,"# yaml file\n# path: %s\n---\n...\n",path) <= 0) {
+            fclose(f);
+            return 0;
+        }
+    fclose(f);
+    return 1;
+}
 
 /**
 * Check if exist database
