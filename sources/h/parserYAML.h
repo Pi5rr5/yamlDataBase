@@ -25,4 +25,6 @@ listOfEntities *getBlockWhere(char *, char *, FILE *);
 
 listOfEntities *getAllFrom(FILE *);
 
+
+
 #endif // PARSERYAML_H_INCLUDED

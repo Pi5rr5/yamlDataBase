@@ -339,47 +339,69 @@ char *checkTypeSQL(char *line) {
 }
 
 
-char* insertSplitWord(char *buffer, int number) {
+char *insertSplit(char *buffer, int number) {
     char *word;
+    int i;
+    int temp = 0;
+    int count = 1;
     word = malloc(sizeof(char) * 512);
-    int arr[5] = { 0, 1, 0, 0, 1}; // 0:start, 1:end, 2:control, 3:quote, 4:count
-    for (int i = 0; i < strlen(buffer); i++) {
-        if (buffer[i] == 39 && (arr[2] == 0 || arr[3] == 0)) {// 39 : aspostrophe, 92 : antislash, 44 : virgule
-            arr[3] = 1;
-            arr[2] = 1;
-            arr[0] = i;
-            arr[1] = 1;
+    for (i = 0; i < strlen(buffer); i++) {
+        if (i == 0 && buffer[i] == 32) {
             continue;
         }
-        if (((((buffer[i] == 39 && arr[3] == 1) || (buffer[i] == 44 && arr[3] == 0)) && arr[2] == 1)) || ((i == strlen(buffer) - 1) && buffer[i-1] != 39)) {
-            arr[1]++;
-            if(number == arr[4]) {
-                strncpy(word, buffer + arr[0], arr[1]);
-                word[arr[1]] = '\0';
+        if (buffer[i] == 39) {
+            temp = i;
+            while (buffer[++i] != 39 && buffer[i - 1] != 92) {
+                if (i > strlen(buffer)) {
+                    strcpy(word, "%%%%%");
+                    return word;
+                }
+            }
+            if (count == number) {
+                strncpy(word, buffer + temp, i - temp + 1);
+                word[i - temp + 1] = '\0';
                 return word;
             } else {
-                arr[3] = 0;
-                arr[2] = 0;
-                arr[0] = i;
-                arr[1] = 1;
-                arr[4]++;
-                continue;
+                count++;
             }
+        } else if (isNumber(buffer[i])) {
+            temp = i;
+            while (buffer[++i] != ',' && (isNumber(buffer[i]) || buffer[i] == '.')) {
+                if (i > strlen(buffer)) {
+                    strcpy(word, "%%%%%");
+                    return word;
+                }
+            }
+            if (count == number) {
+                strncpy(word, buffer + temp, i - temp);
+                word[i - temp] = '\0';
+                return word;
+            } else {
+                count++;
+            }
+        } else {
+            if (buffer[i + 1] == 32) { ++i; continue;} else {
+                strcpy(word, "%%%%%");
+                return word;
+            }
+
         }
-        if (buffer[i] == 44 && arr[2] == 0 && arr[3] == 0) {
-            arr[2] = 1;
-            arr[0] = (buffer[i + 1] == 32) ? i + 2 : i + 1;
-            arr[1] = (buffer[i + 1] == 32) ? -2 : -1;
-            continue;
-        }
-        arr[1]++;
+
     }
+    free(word);
     return NULL;
 }
 
 
+int isNumber(char buffer) {
+    if (buffer < 48 || buffer > 57) {
+        return 0;
+    } else {
+        return 1;
+    }
+}
 
-char* whichType(char *buffer) {
+char *whichType(char *buffer) {
     int intType = 1;
     int floatType = 0;
     if (buffer[0] == 39 && buffer[strlen(buffer) - 1] == 39) {
@@ -389,17 +411,69 @@ char* whichType(char *buffer) {
             return "char";
         }
     } else {
-for(int i = 0; i < strlen(buffer); i++) {
-    if ((buffer[i] >= '0' && buffer[i] <= '9') || buffer[i] == 46) {
-        if (buffer[i] == 46) { floatType = 1; }
-    } else { intType = 0; break; }
-}
+        for (int i = 0; i < strlen(buffer); i++) {
+            if ((buffer[i] >= '0' && buffer[i] <= '9') || buffer[i] == 46) {
+                if (buffer[i] == 46) { floatType = 1; }
+            } else {
+                intType = 0;
+                break;
+            }
+        }
         if (intType && floatType) { return "float"; }
         if (intType && !floatType) { return "int"; }
     }
     return "Wrong Type";
 }
 
-char* updateSplitWord(char *buffer, int number) {
 
+char *updateSplitWord(char *buffer, int number, int type) {
+    int control = 1;
+    int constraint = 0;
+    int start = 0;
+    int end = 1;
+    char *word;
+    int count = 1;
+    word = malloc(sizeof(char) * 512);
+    for (int i = 0; i < strlen(buffer); i++) {
+        if (buffer[i] == 61 && control == 1) {
+            end = (buffer[i - 1] == 32) ? end - 2 : end - 1;
+            strncpy(word, buffer + start, end);
+            word[end] = '\0';
+            if (number == count) {
+                if (type == 1) {
+                    return word;
+                } else if (type == 2) {
+                    word = insertSplit(buffer + i + 1, 1);
+                    return word;
+                }
+            } else {
+                start = i + 1;
+                end = 1;
+                control = 0;
+                constraint = i + strlen(insertSplit(buffer + i + 1, 1)) + 3;
+                count++;
+                continue;
+            }
+        }
+        if (buffer[i] == 44 && control == 0) {
+            control = 1;
+            start = (buffer[i + 1] == 32) ? i + 2 : i + 1;
+            end = 1;
+            continue;
+        }
+        end++;
+    }
+    if (!strncmp(upWord(buffer + constraint), "WHERE ", 5)) {
+        if (type == 3) {
+            word = updateSplitWord(buffer + constraint + 5, 1, 1);
+            return word;
+        } else if (type == 4) {
+            word = updateSplitWord(buffer + constraint + 5, 1, 2);
+            return word;
+        } else {
+            return NULL;
+        }
+    }
+    free(word);
+    return NULL;
 }

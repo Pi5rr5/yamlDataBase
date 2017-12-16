@@ -34,10 +34,12 @@ int fGoToLine(int, FILE *);
 
 void error(const char *);
 
-char* insertSplitWord(char *, int);
+char *whichType(char *);
 
-char* whichType(char *);
+char *updateSplitWord(char *, int, int);
 
-//char* updateSplitWord(char *, int);
+int isNumber(char);
+
+char *insertSplit(char *buffer, int number);
 
 #endif /* YAML_SOME_FUNCT_H */
