@@ -1,7 +1,11 @@
 #ifndef SYSTEM_FUNCTION_H_INCLUDED
     #define SYSTEM_FUNCTION_H_INCLUDED
 
-    extern char *CURRENT_DATABASE;
+	#ifndef MAX
+		#define MAX 255
+	#endif // MAX
+
+    extern char CURRENT_DATABASE[MAX];
 
     int createDB(char *);
 

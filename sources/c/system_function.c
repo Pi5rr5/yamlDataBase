@@ -32,7 +32,7 @@ int createDB(char *dbName) {
 **/
 int useDB(char *dbName) {
     if(isExist(dbName)) {
-        CURRENT_DATABASE = dbName;
+        strcpy(CURRENT_DATABASE, dbName);
         return 1;
     }
     return 0;

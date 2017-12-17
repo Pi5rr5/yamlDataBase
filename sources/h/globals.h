@@ -1,8 +1,12 @@
 #ifndef GLOBALS_H_INCLUDED
     #define GLOBALS_H_INCLUDED
 
+	#ifndef MAX
+		#define MAX 255
+	#endif // MAX
+
     // storage current database
-    char *CURRENT_DATABASE;
+    char CURRENT_DATABASE[MAX];
 	/**
 	 * @name FILE_LINE_COUNTER
 	 *
