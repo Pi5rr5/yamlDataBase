@@ -514,7 +514,7 @@ int compareIntoEntity(listOfLines* entity, char* key, char* comparator, char* va
 /* SELECTION */
 
 /**
- * @name getBlockWhere
+ * @name getBlocksWhere
  *
  * @brief Returns all the entities having the a matching the key and value passed as parameters.
  *
@@ -532,7 +532,7 @@ int compareIntoEntity(listOfLines* entity, char* key, char* comparator, char* va
  *
  * @see listOfEntities listOfLines FILE_LINE_COUNTER freadLine() verifLine() countTab() getKey() getValue() getEntity() addEntityToList() error()
  */
-listOfEntities* getBlockWhere(arrayOfStrings keys, arrayOfStrings comparators, arrayOfStrings values, char* filePath) {
+listOfEntities* getBlocksWhere(arrayOfStrings keys, arrayOfStrings comparators, arrayOfStrings values, char* filePath) {
 	char line[MAX];
 	int i;
 	int fileSize;
@@ -900,3 +900,7 @@ int updateValuesWhere(AoS keys, AoS comparators, AoS values, AoS keysToUpdate, A
 	}
 	return 0;
 }
+
+
+/* DELETION */
+

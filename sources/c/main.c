@@ -8,7 +8,9 @@
 
 /* ----- MAIN ----- */
 int main(int argc, char **argv) {
-    //menu();
+    menu();
+
+    /*
     char filePath[MAX] = "resources/struct.yaml";
     arrayOfStrings keys;
     arrayOfStrings values;
@@ -42,7 +44,7 @@ int main(int argc, char **argv) {
     strcpy(keysToUpdate.array[3], "primary");
 
 	if(updateValuesWhere(keys, comparators, values, keysToUpdate, newValues, filePath)) {
-		if ( (testList = getBlockWhere(keys, comparators, values, filePath)) != NULL) {
+		if ( (testList = getBlocksWhere(keys, comparators, values, filePath)) != NULL) {
 			displayListOfEntities(testList);
 			freeListOfEntities(&testList);
 		}
@@ -50,6 +52,6 @@ int main(int argc, char **argv) {
 
     freeArrayOfStrings(&keys);
     freeArrayOfStrings(&values);
-    freeArrayOfStrings(&comparators);
+    freeArrayOfStrings(&comparators);*/
     return 0;
 }
