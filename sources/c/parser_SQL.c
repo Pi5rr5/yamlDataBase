@@ -24,9 +24,9 @@ commandSQL cmdSQL[] = {
         {"EXIT",            query_exit},
         {"INSERT INTO",     query_insert},
         {"UPDATE",          query_update},
-        {"DELETE FROM",     query_delete},
-        {NULL, NULL}
+        {"DELETE FROM",     query_delete}
 };
+
 
 /**
  * Desc: parse the SQL query & call functions

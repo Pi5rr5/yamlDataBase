@@ -15,7 +15,6 @@
 
 void query_use(char *use) {
     listOfEntities *tempList;
-
     if (countArgs(use, " ") == 1) {
         if (isAlphaNum(use)) {
 /*            if ((tempList = getBlockWhere("name", use, "databases.yaml")) != NULL) {
