@@ -2,11 +2,7 @@
 #define PARSERYAML_H_INCLUDED
 
 
-int freadL(char *, unsigned int, FILE *);
-
-int hasKey(char *, char *);
-
-
+int freadLine(char *, unsigned int, FILE *);
 
 
 extern int FILE_LINE_COUNTER;

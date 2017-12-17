@@ -16,15 +16,15 @@
  *
  */
 commandSQL cmdSQL[] = {
-        {"USE",             query_use},
-        {"CREATE DATABASE", query_create_database},
-        {"CREATE TABLE",    query_create_table},
-        {"DROP DATABASE",   query_drop_database},
-        {"DROP TABLE",      query_drop_table},
-        {"EXIT",            query_exit},
-        {"INSERT INTO",     query_insert},
-        {"UPDATE",          query_update},
-        {"DELETE FROM",     query_delete}
+        {"USE",             queryUse},
+        {"CREATE DATABASE", queryCreateDatabase},
+        {"CREATE TABLE",    queryCreateTable},
+        {"DROP DATABASE",   queryDropDatabase},
+        {"DROP TABLE",      queryDropTable},
+        {"EXIT",            queryExit},
+        {"INSERT INTO",     queryInsert},
+        {"UPDATE",          queryUpdate},
+        {"DELETE FROM",     queryDelete}
 };
 
 
@@ -58,16 +58,16 @@ void parserSQL(char *word) {
             break;
         }
     }
-    error ? query_error(word) : NULL;
+    error ? queryError(word) : NULL;
     free(cleanQueryChar);
     free(upWordChar);
 }
 
 // count & quit
-void query_exit(char *exit) {
+void queryExit(char *exit) {
     printf("Goodbye ( ^_^)／");
 }
 
-void query_error(char *error) {
+void queryError(char *error) {
     printf("Error: Invalid Command (╯°□°）╯︵ ┻━┻");
 }

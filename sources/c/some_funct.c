@@ -22,8 +22,8 @@ void menu() {
     printf("WELCOME\ntype exit or blanck query for exit");
 
     while (1) {
-        char requestsql[1024] = "";
-        char word[255] = "";
+        char requestsql[MAX] = "";
+        char word[MAX] = "";
         int counter;
         counter = 1;
         printf("\n%d>", counter);
@@ -40,7 +40,7 @@ void menu() {
             printf("%d>", ++counter);
         }
         if (strlen(word) == 0) {
-            query_exit("");
+            queryExit("");
             break;
         }
         if (!strcmp(upWord(word), "EXIT;")) {
@@ -268,7 +268,6 @@ int isAlphaNum(char *word) {
     size_t len;
     int isOk;
     int i;
-
     isOk = 1;
     len = strlen(word);
     for (i = 0; i < len; i++) {
@@ -392,7 +391,7 @@ char *insertSplit(char *buffer, int number) {
     int i;
     int temp = 0;
     int count = 1;
-    word = malloc(sizeof(char) * 512);
+    word = malloc(sizeof(char) * MAX);
     for (i = 0; i < strlen(buffer); i++) {
         if (i == 0 && buffer[i] == 32) {
             continue;
@@ -481,7 +480,7 @@ char *updateSplitWord(char *buffer, int number, int type) {
     int end = 1;
     char *word;
     int count = 1;
-    word = malloc(sizeof(char) * 512);
+    word = malloc(sizeof(char) * MAX);
     for (int i = 0; i < strlen(buffer); i++) {
         if (buffer[i] == 61 && control == 1) {
             end = (buffer[i - 1] == 32) ? end - 2 : end - 1;
