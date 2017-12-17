@@ -466,10 +466,10 @@ listOfLines* getEntity(int startLine, char* filePath) {
  * @return (on success) 1
  * @return (on failure) 0
  *
- * @see listOfEntities compareCoupleInEntity
+ * @see lineStruct
  */
 int compareIntoLine(lineStruct line, char* key, char* comparator, char* value) {
-	if(key != NULL && value != NULL) {
+	if(key != NULL && comparator != NULL && value != NULL) {
 		return compare(line.value, comparator, value);
 	}
     return 0;
@@ -488,7 +488,7 @@ int compareIntoLine(lineStruct line, char* key, char* comparator, char* value) {
  * @return (on success) 1
  * @return (on failure) 0
  *
- * @see listOfEntities compareCoupleInEntity
+ * @see listOfLines compareIntoLine
  */
 int compareIntoEntity(listOfLines* entity, char* key, char* comparator, char* value) {
 	int occurrenceFound;
@@ -511,36 +511,61 @@ int compareIntoEntity(listOfLines* entity, char* key, char* comparator, char* va
 }
 
 /**
- * @name compareIntoList
+ * @name updateLine
  *
  * @brief
  *
- * @param listOfEntities** list : pointer of the concerned linked list.
+ * @param lineStruct line : concerned line.
  * @param char* key : key to find and to compare.
  * @param char* value : value to find and to pair up with the key.
  * @param char* comparator : comparator to pair up with the value.
  *
- * @return (on success) 1
- * @return (on failure) 0
+ * @return (on success) updated line
+ * @return (on failure) non-updated line
  *
- * @see listOfEntities compareCoupleInEntity
+ * @see lineStruct
  */
-int compareIntoList(listOfEntities* entities, char* key,  char* comparator, char* value) {
-    listOfEntities* tempList;
+int updateLine(lineStruct* line, char* key, char* value) {
 
-	if(entities != NULL && key != NULL && value != NULL) {
-        while( (tempList = entities) != NULL) {
-            if(!compareIntoEntity(entities->entity, key, comparator, value)) {
-                return 0;
-            }
-            entities = entities->next;
-        }
-    }
+	if(line != NULL && key != NULL && value != NULL) {
+		strcpy((*line).key, key);
+		strcpy((*line).value, value);
+		return 1;
+	}
     return 0;
 }
 
+/**
+ * @name updateEntity
+ *
+ * @brief
+ *
+ * @param listOfLines** entity : pointer of the concerned linked list.
+ * @param char* key : key to find and to compare.
+ * @param char* value : value to find and to pair up with the key.
+ * @param char* comparator : comparator to pair up with the value.
+ *
+ * @return (on success) updated entity
+ * @return (on failure) non-updated or partially updated entity
+ *
+ * @see listOfEntities updateLine
+ */
+int updateEntity(listOfLines** entity, char* key, char* value) {
+    listOfLines* tempList;
 
-
+	if(*entity != NULL && key != NULL && value != NULL) {
+        while( (tempList = *entity) != NULL) {
+			if(strcmp((*entity)->line.key, key) == 0) {
+				if(!updateLine(&((*entity)->line), key, value)) {
+					break;
+				}
+            }
+            (*entity) = (*entity)->next;
+        }
+        return 1;
+    }
+    return 0;
+}
 
 
 /* SELECTION */
@@ -550,9 +575,9 @@ int compareIntoList(listOfEntities* entities, char* key,  char* comparator, char
  *
  * @brief Returns all the entities having the a matching the key and value passed as parameters.
  *
- * @param char** keys : list of keys to search which will be compare to `valuesList`
+ * @param char** keys : list of keys to search which will be compare to `values`
  * @param char* comparators : list of comparators (treated as string)
- * @param char** valuesList : list of values which will be compare to `keys`
+ * @param char** values : list of values which will be compare to `keys`
  * @param char* filePath : path of the concerned file.
  *
  * @return (on success) listOfEntities* entities : linked list of entities matching the request.
@@ -564,7 +589,7 @@ int compareIntoList(listOfEntities* entities, char* key,  char* comparator, char
  *
  * @see listOfEntities listOfLines FILE_LINE_COUNTER freadLine() verifLine() countTab() getKey() getValue() getEntity() addEntityToList() error()
  */
-listOfEntities* getBlockWhere(arrayOfStrings keys, arrayOfStrings comparators, arrayOfStrings valuesList, char* filePath) {
+listOfEntities* getBlockWhere(arrayOfStrings keys, arrayOfStrings comparators, arrayOfStrings values, char* filePath) {
 	char line[MAX];
 	int i;
 	int fileSize;
@@ -572,7 +597,7 @@ listOfEntities* getBlockWhere(arrayOfStrings keys, arrayOfStrings comparators, a
 	listOfEntities* entities;
 	FILE* fp;
 
-	if(filePath != NULL && keys.stringsNb > 0 && keys.stringsNb == comparators.stringsNb && comparators.stringsNb == valuesList.stringsNb) {
+	if(filePath != NULL && keys.stringsNb > 0 && keys.stringsNb == comparators.stringsNb && comparators.stringsNb == values.stringsNb) {
 		if ( (fp = fopen(filePath, "r")) ) {
 			/* Initialization */
 			FILE_LINE_COUNTER = 0;
@@ -590,7 +615,7 @@ listOfEntities* getBlockWhere(arrayOfStrings keys, arrayOfStrings comparators, a
 							if ( (tempEntity = getEntity(++FILE_LINE_COUNTER, filePath)) != NULL) {				// Recovers the entity containing those key and value.
 								if ( (entities = addEntityToList(entities, tempEntity)) != NULL) {			// Add this entity to the list of entities.
 									for(i=0 ; i <= keys.stringsNb ; i++) {
-										if(!compareIntoEntity(tempEntity, keys.array[i], comparators.array[i], valuesList.array[i])) {
+										if(!compareIntoEntity(tempEntity, keys.array[i], comparators.array[i], values.array[i])) {
 											entities = removeLastEntity(&entities);
 											break;
 										}
@@ -683,7 +708,7 @@ listOfEntities* getAllFrom(char* filePath) {
  *
  * @param char** keys : list of keys having a condition to comply with.
  * @param char* comparator : array of char listing comparator (has to finish by '\0' as a string)
- * @param char** valuesList : list of values compare to `keys` (bind by index).
+ * @param char** values : list of values compare to `keys` (bind by index).
  * @param char** keysToUpdate : list of keys to update.
  * @param char** newValues : values to set to the keys being updated.
  * @param FILE* fp : YAML file to which do the update.
@@ -693,20 +718,48 @@ listOfEntities* getAllFrom(char* filePath) {
  *
  * @see
  */
-int updateValuesWhere(AoS keys, AoS comparators, AoS valuesList, AoS keysToUpdate, AoS newValues, char* filePath) {
+int updateValuesWhere(AoS keys, AoS comparators, AoS values, AoS keysToUpdate, AoS newValues, char* filePath) {
 	int i;
+	int comparisonsAllTrue;
 	FILE* fp;
-	listOfEntities* tempEntities;
+	listOfEntities* cursor;
+	listOfEntities* entities;
 
-	tempEntities = NULL;
-	if(filePath != NULL) {
+	if(filePath != NULL
+	&& keys.stringsNb > 0
+	&& keysToUpdate.stringsNb > 0
+	&& keysToUpdate.stringsNb == newValues.stringsNb
+	&& keys.stringsNb == comparators.stringsNb
+	&& comparators.stringsNb == values.stringsNb
+	) {
 		if ( (fp = fopen(filePath, "r")) ) {
-			if ( (tempEntities = getAllFrom(filePath)) != NULL) {
-				if(keys.stringsNb == comparators.stringsNb && keys.stringsNb == valuesList.stringsNb) {
+			/* Initialization */
+			cursor = NULL;
+			entities = NULL;
+			entities = NULL;
+			/* End of initialization */
+
+			if ( (entities = getAllFrom(filePath)) != NULL) {
+				cursor = entities;
+				while(cursor != NULL) {
+					comparisonsAllTrue = 0;
 					for(i=0 ; i < keys.stringsNb ; i++) {
-						//
+						if(!compareIntoEntity(cursor->entity, keys.array[i], comparators.array[i], values.array[i])) {
+							entities = removeLastEntity(&entities);
+							comparisonsAllTrue = 0;
+							break;
+						} else {
+							comparisonsAllTrue = 1;
+						}
 					}
+					if(comparisonsAllTrue) {
+						for(i=0 ; i < keysToUpdate.stringsNb ; i++) {
+							updateEntity(&cursor->entity, keysToUpdate.array[i], newValues.array[i]);
+						}
+					}
+					cursor = cursor->next;
 				}
+				freeListOfEntities(&entities);
 			}
 		}
 	}
