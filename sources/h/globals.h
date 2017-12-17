@@ -2,7 +2,6 @@
     #define GLOBALS_H_INCLUDED
 
     // storage current database
-    extern char *CURRENT_DATABASE;
     char *CURRENT_DATABASE;
 	/**
 	 * @name FILE_LINE_COUNTER
