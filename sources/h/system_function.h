@@ -3,7 +3,7 @@
 
     int createDB(char *);
 
- //   int useDB(char *);
+    int useDB(char *);
 
     int createTable(char *);
 
