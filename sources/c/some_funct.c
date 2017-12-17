@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "../h/globals.h"
 #include "../h/struct.h"
 #include "../h/some_funct.h"
 #include "../h/parserYAML.h"
@@ -155,7 +156,7 @@ int countTab(char* str) {
     if(str != NULL) {
         strLength = strlen(str);
         if(strLength > 0) {
-            for(i=0 ; i < strLength && str[i] == ' '; i++);
+            for(i=0 ; i < strLength && str[i] == ' ' ; i++);
             i /= 4;
         }
     }
@@ -181,20 +182,24 @@ int fGoToLine(int line, FILE* sourceFile) {
     int fileSize;
     char temp[MAX];
 
-    fileSize = fSize(sourceFile);
     if(sourceFile != NULL) {
+		fileSize = fSize(sourceFile);
         fseek(sourceFile, 0, SEEK_SET);					// Shifting to the start of the file.
         FILE_LINE_COUNTER = 0;
         for(i=0 ; i < line-1 ; i++) {					// Loop up to the wanted line.
             if(ftell(sourceFile) > fileSize) {			// If the file limit is exceed.
+				error("out of file");
                 return 0;
-            } else if(fgets(temp, MAX, sourceFile)) {	// Next line.
+            } else if(fgets(temp, MAX, sourceFile) != NULL) {	// Next line.
                 FILE_LINE_COUNTER++;
             } else {
+            	error("couldn't read line");
                 return 0;
             }
         }
         return 1;
+    } else {
+		error("file empty");
     }
     return 0;
 }
@@ -212,7 +217,7 @@ int fGoToLine(int line, FILE* sourceFile) {
  */
 void error(const char* message) {
     if(message != NULL)
-        fprintf(stderr, message);
+        fprintf(stderr, "%s\n", message);
 }
 
 char *cleanQuery(char *word) {
@@ -385,7 +390,7 @@ void freeArrayOfStrings(arrayOfStrings* arrayToFree) {
  */
 int compare(char* str1, char* comparator, char* str2) {
 	if(str1 != NULL && comparator != NULL && str2 != NULL) {
-		if(strcmp(comparator, "=") == 0)
+		if(strcmp(comparator, "=") == 0 || strcmp(comparator, "==") == 0)
 			return strcmp(str1, str2) == 0;
 
 		if(strcmp(comparator, ">") == 0)
@@ -394,7 +399,7 @@ int compare(char* str1, char* comparator, char* str2) {
 		if(strcmp(comparator, "<") == 0)
 			return atof(str1)  < atof(str2);
 
-		if(strcmp(comparator, "!=") == 0)
+		if(strcmp(comparator, "!=") == 0 || strcmp(comparator, "<>") == 0)
 			return strcmp(str1, str2) != 0;
 
 		if(strcmp(comparator,">=") == 0)

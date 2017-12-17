@@ -19,7 +19,7 @@
 	typedef struct arrayOfStrings {
 		char** array;
 		unsigned int stringsNb;
-	} arrayOfStrings;
+	} arrayOfStrings, AoS;
 
 
     /* 		----- "BY ENTITY" YAML SELECTION -----

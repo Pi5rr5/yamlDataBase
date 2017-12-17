@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "../h/globals.h"
 #include "../h/struct.h"
 #include "../h/some_funct.h"
 #include "../h/parserYAML.h"
@@ -8,26 +9,6 @@
 #ifndef MAX
     #define MAX 255     // Maximum size for the non-dynamic strings.
 #endif // MAX
-
-/* ---------------- GLOBALS ---------------- */
-/**
- * @name FILE_LINE_COUNTER
- *
- * @brief global counting le current line number on which is the file cursor. Updated by few functions.
- *
- * @remarks `extern` is exclusive to globals variables.
- *			It allows to specify to the compiler that the variable may have been already declared in another file.
- *			And if it has been, then it will be not redeclared
- *
- * @see getEntity() getBlockWhere() getAllFrom() freadLine()
- */
-extern int FILE_LINE_COUNTER;
-
-
-
-
-
-
 
 
 /* ---------------- FUNCTIONS ---------------- */
@@ -119,7 +100,7 @@ void freeListOfLines(listOfLines** list) {
 
     if(*list != NULL) {
         while( (temp = *list) != NULL ) {	// Browsing the list
-        	*list = (*list)->next;
+			*list = (*list)->next;
 			free(temp);
         }
     }
@@ -137,7 +118,7 @@ void freeListOfLines(listOfLines** list) {
  * @param value : value to put in the new element.
  *
  * @return (on success) : pointer to the updated linked list
- * @return (on failure) : in case of allocation error, returns a null pointer
+ * @return (on failure) : in case of allocation error, returns the non-updated list.
  *
  * @see listOfEntities listOfLines addLineToList()
  */
@@ -159,6 +140,82 @@ listOfEntities* addEntityToList(listOfEntities* list, listOfLines* entity) {
         }
     }
     return list;		// If allocation error, returns the passed list, unchanged.
+}
+
+/**
+ * @name removeLastEntity
+ *
+ * @brief Add an element to a linked list typed as `listOfEntites`.
+ *
+ * @param listOfEntities* list : pointer of the start of the linked list.
+ *
+ * @return (on success) : pointer to the updated linked list
+ * @return (on failure) : null
+ *
+ * @see listOfEntities listOfLines addLineToList()
+ */
+listOfEntities* removeLastEntity(listOfEntities** list) {
+	int i;
+	listOfEntities* theOneToFree;
+	listOfEntities* previous;
+
+	if(*list != NULL) {
+		i = 0;
+		theOneToFree = *list;
+		while(theOneToFree->next != NULL ) {	// Browse the list.
+			previous = theOneToFree;
+			theOneToFree = theOneToFree->next;
+			i++;
+		}
+		if(i > 0) {
+			freeListOfLines(&theOneToFree->entity);	// Frees last node.
+			free(theOneToFree);
+			if(previous != NULL)
+				previous->next = NULL;		// Sets the before-last "next" attribute node of the list to NULL.
+			return *list;				// Returns updated list.
+		} else {
+			freeListOfLines(&theOneToFree->entity);
+			return NULL;
+		}
+
+	}
+    return *list;		// If allocation error, returns the passed list, unchanged.
+}
+
+/**
+ * @name removeEntityAt
+ *
+ * @brief Add an element to a linked list typed as `listOfEntites`.
+ *
+ * @param listOfEntities* list : pointer of the start of the linked list.
+ *
+ * @return (on success) : pointer to the updated linked list
+ * @return (on failure) : null
+ *
+ * @see listOfEntities listOfLines addLineToList()
+ */
+listOfEntities* removeEntityAt(listOfEntities** list, int pos) {
+	int i;
+	listOfEntities* theOneToFree;
+	listOfEntities* previous;
+
+	if(list != NULL && pos >= 0) {
+		i = 0;
+		theOneToFree = *list;
+		while(theOneToFree->next != NULL && i != pos) {	// Browse the list.
+			previous = theOneToFree;
+			theOneToFree = theOneToFree->next;
+			i++;
+		}
+		if(i > 0) {
+			previous->next = theOneToFree->next;
+		} else {
+			*list = (*list)->next;
+		}
+		freeListOfLines(&theOneToFree->entity);	// Frees appropriated nodes.
+		return *list;					// Returns updated list.
+	}
+    return *list;		// If allocation error, returns the passed list, unchanged.
 }
 
 /**
@@ -358,29 +415,33 @@ lineStruct getLineStruct(char* str) {
  * @brief Recover the entirety of an entity.
  *
  * @param int startLine : Line where start the entity.
- * @param FILE* sourceFile : file pointer of the concerned file.
+ * @param char* filePath : path of the concerned file.
  *
  * @return (on success) listOfLines* resultList : line linked list.
  * @return (on failure) null pointer.
  *
  * @see listOfLines lineStruct fGoToLine() freadLine() countTab() verifLine() getLineStruct() addLineToList() FILE_LINE_COUNTER
  */
-listOfLines* getEntity(int startLine, FILE* sourceFile) {
+listOfLines* getEntity(int startLine, char* filePath) {
     char tempStr[MAX];
     lineStruct line;
     listOfLines* resultList;
+    FILE* fp;
 
-    resultList = NULL;
-    if(sourceFile != NULL) {
-        if(fGoToLine(startLine, sourceFile)) {		// Move the cursor the wanted line.
-            while(freadLine(tempStr, MAX, sourceFile) && countTab(tempStr) != 0 && verifLine(tempStr)) {	// Read a line, checks if it's still inside the block and if it has to be treated
-            	line = getLineStruct(tempStr);					// Recover line object form the line.
-            	resultList = addLineToList(resultList, line);	// Add that object to the list.
-            }
-            fseek(sourceFile, -strlen(tempStr)-2, SEEK_CUR);	// Return to previous line
-            FILE_LINE_COUNTER--;
-        }
-    }
+	if(filePath != NULL) {
+		if ( (fp = fopen(filePath, "r")) != NULL) {
+			resultList = NULL;
+			if(fGoToLine(startLine, fp)) {		// Move the cursor the wanted line.
+				while(freadLine(tempStr, MAX, fp) && countTab(tempStr) != 0 && verifLine(tempStr)) {	// Read a line, checks if it's still inside the block and if it has to be treated
+					line = getLineStruct(tempStr);					// Recover line object form the line.
+					resultList = addLineToList(resultList, line);	// Add that object to the list.
+				}
+				fseek(fp, -strlen(tempStr)-2, SEEK_CUR); // Return to previous line
+				FILE_LINE_COUNTER--;
+			}
+			fclose(fp);
+		}
+	}
     return resultList;
 }
 
@@ -390,6 +451,98 @@ listOfLines* getEntity(int startLine, FILE* sourceFile) {
 /* ----- YAML QUERY FUNCTIONS ----- */
 
 
+/* COMPARISONS */
+
+/**
+ * @name compareIntoLine
+ *
+ * @brief
+ *
+ * @param lineStruct line : concerned line.
+ * @param char* key : key to find and to compare.
+ * @param char* value : value to find and to pair up with the key.
+ * @param char* comparator : comparator to pair up with the value.
+ *
+ * @return (on success) 1
+ * @return (on failure) 0
+ *
+ * @see listOfEntities compareCoupleInEntity
+ */
+int compareIntoLine(lineStruct line, char* key, char* comparator, char* value) {
+	if(line.key != NULL && line.value != NULL && key != NULL && value != NULL) {
+		return compare(line.value, comparator, value);
+	}
+    return 0;
+}
+
+/**
+ * @name compareIntoEntities
+ *
+ * @brief
+ *
+ * @param listOfLines* list : concerned linked list.
+ * @param char* key : key to find and to compare.
+ * @param char* value : value to find and to pair up with the key.
+ * @param char* comparator : comparator to pair up with the value.
+ *
+ * @return (on success) 1
+ * @return (on failure) 0
+ *
+ * @see listOfEntities compareCoupleInEntity
+ */
+int compareIntoEntity(listOfLines* entity, char* key, char* comparator, char* value) {
+	int occurrenceFound;
+    listOfLines* tempList;
+
+	if(entity != NULL && key != NULL && value != NULL) {
+		occurrenceFound = 0;
+        while( (tempList = entity) != NULL) {
+			if(strcmp(entity->line.key, key) == 0) {
+				occurrenceFound++;
+				if(!compareIntoLine(entity->line, key, comparator, value)) {
+					return 0;
+				}
+            }
+            entity = entity->next;
+        }
+        return occurrenceFound > 0;
+    }
+    return 0;
+}
+
+/**
+ * @name compareIntoList
+ *
+ * @brief
+ *
+ * @param listOfEntities** list : pointer of the concerned linked list.
+ * @param char* key : key to find and to compare.
+ * @param char* value : value to find and to pair up with the key.
+ * @param char* comparator : comparator to pair up with the value.
+ *
+ * @return (on success) 1
+ * @return (on failure) 0
+ *
+ * @see listOfEntities compareCoupleInEntity
+ */
+int compareIntoList(listOfEntities* entities, char* key,  char* comparator, char* value) {
+    listOfEntities* tempList;
+
+	if(entities != NULL && key != NULL && value != NULL) {
+        while( (tempList = entities) != NULL) {
+            if(!compareIntoEntity(entities->entity, key, comparator, value)) {
+                return 0;
+            }
+            entities = entities->next;
+        }
+    }
+    return 0;
+}
+
+
+
+
+
 /* SELECTION */
 
 /**
@@ -397,10 +550,10 @@ listOfLines* getEntity(int startLine, FILE* sourceFile) {
  *
  * @brief Returns all the entities having the a matching the key and value passed as parameters.
  *
- * @param char** keysList : list of keys to search which will be compare to `valuesList`
+ * @param char** keys : list of keys to search which will be compare to `valuesList`
  * @param char* comparators : list of comparators (treated as string)
- * @param char** valuesList : list of values which will be compare to `keysList`
- * @param FILE* sourceFile : file pointer of the concerned file.
+ * @param char** valuesList : list of values which will be compare to `keys`
+ * @param char* filePath : path of the concerned file.
  *
  * @return (on success) listOfEntities* entities : linked list of entities matching the request.
  * @return (on failure) null pointer
@@ -411,58 +564,52 @@ listOfLines* getEntity(int startLine, FILE* sourceFile) {
  *
  * @see listOfEntities listOfLines FILE_LINE_COUNTER freadLine() verifLine() countTab() getKey() getValue() getEntity() addEntityToList() error()
  */
-listOfEntities* getBlockWhere(arrayOfStrings keysList, arrayOfStrings comparators, arrayOfStrings valuesList, FILE* sourceFile) {
+listOfEntities* getBlockWhere(arrayOfStrings keys, arrayOfStrings comparators, arrayOfStrings valuesList, char* filePath) {
 	char line[MAX];
-	char tempKey[MAX];
-	char tempValue[MAX];
-	int tempInt;
+	int i;
 	int fileSize;
-	int tabulation;
-	int startingLine;
 	listOfLines* tempEntity;
 	listOfEntities* entities;
+	FILE* fp;
 
-    startingLine = 0;
-    FILE_LINE_COUNTER = 0;
-    entities   = NULL;
-    tempEntity = NULL;
-	fileSize   = fSize(sourceFile);
-	fseek(sourceFile, 0, SEEK_SET);
+	if(filePath != NULL && keys.stringsNb > 0 && keys.stringsNb == comparators.stringsNb && comparators.stringsNb == valuesList.stringsNb) {
+		if ( (fp = fopen(filePath, "r")) ) {
+			/* Initialization */
+			FILE_LINE_COUNTER = 0;
+			entities   = NULL;
+			tempEntity = NULL;
+			fileSize   = fSize(fp);
+			fseek(fp, 0, SEEK_SET);
+			/* End of initialization */
 
-    while(ftell(sourceFile) < fileSize) {					// Browse the file.
-		if(freadLine(line, MAX, sourceFile)) {					// Read a line from the file.
-        	if(verifLine(line)) {							// If the read line can be treated.
-            	tabulation = countTab(line);
-                if(tabulation == 0 && strcmp("-", line) == 0) {		// If start of entity
-                    startingLine = FILE_LINE_COUNTER;				// Stores the current line number.
-                } else if(tabulation > 0) {																// Will be '-1' if an error occurred before.
-                    if(strcpy(tempKey, getKey(line)) != NULL) {											// Recovers the key.
-						if( (tempInt = strSearchInArray(tempKey, keysList)) >= 0) {							// Checks if this key is the wanted one.
-							if(strcpy(tempValue, getValue(line)) != NULL) {									// Recovers the value.
-								if( compare(tempValue, comparators.array[tempInt], valuesList.array[tempInt]) ) {	// Checks if this value matches the wanted comparison.
-									if((tempEntity = getEntity(startingLine+1, sourceFile)) != NULL) {				// Recovers the entity containing those key and value.
-                                        if ( (entities = addEntityToList(entities, tempEntity)) == NULL) {			// Add this entity to the list of entities.
-                                            error("Error while adding entity from file.");							// If an occurs during the previous manipulation,
-                                            break;																	// Then stop the process.
-                                        }
-                                    } else {
-                                        error("Error while recovering entity.");
-                                        break;
-                                    }
-                                }
-                            } else {
-                                error("Error while recovering value.");
-                                break;
-                            }
-                        }
-                    } else {
-                        error("Error while recovering key.");
-                        break;
-                    }
-                }
-            }
-        }
-    }
+			while(ftell(fp) < fileSize) {					// Browse the file.
+				if(freadLine(line, MAX, fp)) {				// Read a line from the file.
+					if(verifLine(line)) {					// If the read line can be treated.
+						if(countTab(line) == 0 && strcmp("-", line) == 0) {		// If start of entity
+							fclose(fp);
+							if ( (tempEntity = getEntity(++FILE_LINE_COUNTER, filePath)) != NULL) {				// Recovers the entity containing those key and value.
+								if ( (entities = addEntityToList(entities, tempEntity)) != NULL) {			// Add this entity to the list of entities.
+									for(i=0 ; i <= keys.stringsNb ; i++) {
+										if(!compareIntoEntity(tempEntity, keys.array[i], comparators.array[i], valuesList.array[i])) {
+											entities = removeLastEntity(&entities);
+											break;
+										}
+									}
+								}
+							} else {
+								error("Error while recovering entity.");
+								break;
+							}
+							if ( (fp = fopen(filePath, "r")) !=NULL) {
+								fGoToLine(++FILE_LINE_COUNTER, fp);
+							}
+						}
+					}
+				}
+			}
+			fclose(fp);
+		}
+	}
     return entities;
 }
 
@@ -471,45 +618,55 @@ listOfEntities* getBlockWhere(arrayOfStrings keysList, arrayOfStrings comparator
  *
  * @brief Recovers all the entities from a given table
  *
- * @param FILE* sourceFile : file pointer of the concerned file.
+ * @param FILE* fp : file pointer of the concerned file.
  *
- * @return (on success) listOfEntities* entities :
+ * @return (on success) listOfEntities* entities
  * @return (on failure) NULL
  *
  * @remarks Can be used for complex queries where the file manipulation will be too complicated compared to a linked list handling.
  *
  * @see listOfEntities listOfLines fSize() FILE_LINE_COUNTER freadLine() countTab() getEntity() addEntityToList() error()
  */
-listOfEntities* getAllFrom(FILE* sourceFile) {
+listOfEntities* getAllFrom(char* filePath) {
     int fileSize;
 	char line[MAX];
 	listOfLines* tempEntity;
 	listOfEntities* entities;
+	FILE* fp;
 
-	if(sourceFile != NULL) {
-		/* Initialization */
-		entities = NULL;
-		fileSize = fSize(sourceFile);
-		FILE_LINE_COUNTER = 0;
-		fseek(sourceFile, 0, SEEK_SET);
-		/* End of initialization */
+	if(filePath != NULL) {
+		if( (fp = fopen(filePath, "r")) != NULL) {
+			/* Initialization */
+			entities = NULL;
+			fileSize = fSize(fp);
+			FILE_LINE_COUNTER = 0;
+			fseek(fp, 0, SEEK_SET);
+			/* End of initialization */
 
-		while(ftell(sourceFile) < fileSize) {					// Browse the file
-			if(freadLine(line, MAX, sourceFile)) {					// Read a line from the file.
-				if(verifLine(line)) {							// If the line can be treated.
-					if(countTab(line) == 0 && strcmp("-", line) == 0) {								// If start of entity
-						if ( (tempEntity = getEntity(FILE_LINE_COUNTER+1, sourceFile)) != NULL) {	// Recover the entity
-							if ( (entities = addEntityToList(entities, tempEntity)) == NULL) {		// Add the entity to the list of entities
-								error("Error while adding entity from file.");							// If an error occurred during the previous manipulation,
-								break;																	// Stop the process.
+			while(ftell(fp) < fileSize) {			// Browse the file
+				if(freadLine(line, MAX, fp)) {		// Read a line from the file.
+					if(verifLine(line)) {			// If the line can be treated.
+						if(countTab(line) == 0 && strcmp("-", line) == 0) {						// If start of entity
+							fclose(fp);
+							if ( (tempEntity = getEntity(FILE_LINE_COUNTER+1, filePath)) != NULL) {		// Recover the entity
+								if ( (entities = addEntityToList(entities, tempEntity)) == NULL) {	// Add the entity to the list of entities
+									error("Error while adding entity from file.");					// If an error occurred during the previous manipulation,
+									break;															// Stop the process.
+								}
+							} else {
+								error("Error while recovering entity.");
+								break;
 							}
-						} else {
-							error("Error while recovering entity.");
-							break;
+							if ( (fp = fopen(filePath, "r")) == NULL) {
+								break;
+							} else if(!fGoToLine(FILE_LINE_COUNTER, fp)) {
+								break;
+							}
 						}
 					}
 				}
 			}
+			fclose(fp);
 		}
 	}
     return entities;
@@ -524,30 +681,33 @@ listOfEntities* getAllFrom(FILE* sourceFile) {
  *
  * @brief update several values in following some conditions.
  *
- * @param char** keysList : list of keys having a condition to comply with.
+ * @param char** keys : list of keys having a condition to comply with.
  * @param char* comparator : array of char listing comparator (has to finish by '\0' as a string)
- * @param char** valuesList : list of values compare to `keysList` (bind by index).
+ * @param char** valuesList : list of values compare to `keys` (bind by index).
  * @param char** keysToUpdate : list of keys to update.
  * @param char** newValues : values to set to the keys being updated.
- * @param FILE* destinationFile : YAML file to which do the update.
+ * @param FILE* fp : YAML file to which do the update.
  *
  * @return (on success) 1
  * @return (on failure) 0
  *
  * @see
  */
-int updateValuesWhere(	arrayOfStrings** keysList,
-						arrayOfStrings*  comparators,
-						arrayOfStrings** valuesList,
-						arrayOfStrings** keysToUpdate,
-						arrayOfStrings** newValues,
-						FILE* destinationFile) {
-
+int updateValuesWhere(AoS keys, AoS comparators, AoS valuesList, AoS keysToUpdate, AoS newValues, char* filePath) {
+	int i;
+	FILE* fp;
 	listOfEntities* tempEntities;
 
-	if(destinationFile != NULL) {
-		if( (listOfEntities = getAllFrom(destinationFile)) != NULL) {
-
+	tempEntities = NULL;
+	if(filePath != NULL) {
+		if ( (fp = fopen(filePath, "r")) ) {
+			if ( (tempEntities = getAllFrom(filePath)) != NULL) {
+				if(keys.stringsNb == comparators.stringsNb && keys.stringsNb == valuesList.stringsNb) {
+					for(i=0 ; i < keys.stringsNb ; i++) {
+						//
+					}
+				}
+			}
 		}
 	}
 	return 0;
@@ -559,7 +719,7 @@ int updateValuesWhere(	arrayOfStrings** keysList,
  * @brief Insert a line in the given file at the current cursor position which is then set to a new empty line bellow the inserted one.
  *
  * @param lineStruct line : line to insert.
- * @param FILE* destinationFile : file pointer to the concerned pointer.
+ * @param FILE* fp : file pointer to the concerned pointer.
  *
  * @return (on success) 1
  * @return (on failure) 0
@@ -568,9 +728,15 @@ int updateValuesWhere(	arrayOfStrings** keysList,
  *
  * @see lineStruct insertEntity() insertEntity()
  */
-int insertLine(lineStruct line, FILE* destinationFile) {
-	if(line.key != NULL && line.value != NULL && destinationFile != NULL) {
-		return fprintf(destinationFile, "    %s : %s\n", line.key, line.value) > 0;
+int insertLine(lineStruct line, char* filePath) {
+	FILE* fp;
+
+	if(filePath != NULL) {
+		if ( (fp = fopen(filePath, "r+")) ) {
+			if(line.key != NULL && line.value != NULL && fp != NULL) {
+				return fprintf(fp, "    %s : %s\n", line.key, line.value) > 0;
+			}
+		}
 	}
 	return 0;
 }
@@ -581,7 +747,7 @@ int insertLine(lineStruct line, FILE* destinationFile) {
  * @brief Insert an entity in the given file at the current cursor position.
  *
  * @param listOfLines* entity : entity to insert.
- * @param FILE* destinationFile : file pointer to the concerned file.
+ * @param FILE* fp : file pointer to the concerned file.
  *
  * @return (on success) 1
  * @return (on failure) 0
@@ -591,17 +757,19 @@ int insertLine(lineStruct line, FILE* destinationFile) {
  *
  * @see listOfLines insertLine() insertListOfEntities()
  */
-int insertEntity(listOfLines* entity, FILE* destinationFile) {
+int insertEntity(listOfLines* entity, char* filePath) {
 	listOfLines* tempEntity;
 
-	if(entity != NULL && destinationFile != NULL) {
-		while ( (tempEntity = entity) != NULL) {
-			if(!insertLine(entity->line, destinationFile)) {
-				return 0;
+	if(filePath != NULL) {
+		if(entity != NULL && filePath != NULL) {
+			while ( (tempEntity = entity) != NULL) {
+				if(!insertLine(entity->line, filePath)) {
+					return 0;
+				}
+				entity = entity->next;
 			}
-			entity = entity->next;
+			return 1;
 		}
-		return 1;
 	}
 	return 0;
 }
@@ -619,18 +787,22 @@ int insertEntity(listOfLines* entity, FILE* destinationFile) {
  *
  * @see listOfEntities fSize() FILE_LINE_COUNTER freadLine() insertEntity()
  */
-int insertListOfEntities(listOfEntities* entities, FILE* destinationFile) {
+int insertListOfEntities(listOfEntities* entities, char* filePath) {
 	listOfEntities* tempEntity;
+	FILE* fp;
 
-	fseek(destinationFile,-5,SEEK_END);
-
-	if(destinationFile != NULL) {
-		if ( fputs("\n-\n", destinationFile) >= 0) {
-			while ( (tempEntity = entities) != NULL) {
-				insertEntity(entities->entity, destinationFile);
-				entities = entities->next;
+	if(filePath != NULL) {
+		if ( (fp = fopen(filePath, "r+")) != NULL ) {
+			fseek(fp, -5 ,SEEK_END);
+			if ( fputs("\n-\n", fp) >= 0) {
+				fclose(fp);
+				while ( (tempEntity = entities) != NULL) {
+					insertEntity(entities->entity, filePath);
+					entities = entities->next;
+				}
+				return (fputs("...\n", fp)) >= 0;
 			}
-			return (fputs("...\n", destinationFile)) >= 0;
+			fclose(fp);
 		}
 	}
 	return 0;

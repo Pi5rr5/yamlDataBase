@@ -1,6 +1,6 @@
 #ifndef YAML_SOME_FUNCT_H
 	#define YAML_SOME_FUNCT_H
-
+	extern int FILE_LINE_COUNTER;
     void menu();
 
     char *upWord(char *);

@@ -9,7 +9,7 @@
     auto_increment : false
     primary : false
     length : 255
-    
+
 -
     name : column2
     type : int
