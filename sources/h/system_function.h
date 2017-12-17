@@ -9,7 +9,7 @@
 
     int createEmptyFile(char *, char *);
 
-    int initYamlFile(char *, char *);
+    int initYamlFile(char *);
 
     int isExist(char *);
 
