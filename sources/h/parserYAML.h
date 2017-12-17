@@ -24,7 +24,7 @@
     int compareIntoList(listOfEntities*, char*, char*, char*);
     int updateLine(lineStruct*, char*, char*);
 
-    listOfEntities* getBlockWhere(arrayOfStrings, arrayOfStrings, arrayOfStrings, char*);
+    listOfEntities* getBlocksWhere(arrayOfStrings, arrayOfStrings, arrayOfStrings, char*);
     listOfEntities* getAllFrom(char*);
 
 	int updateFile(char*, listOfEntities*);
