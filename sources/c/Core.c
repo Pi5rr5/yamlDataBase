@@ -20,16 +20,13 @@
  */
 void queryUse(char *use) {
     listOfEntities *tempList;
-    if (countArgs(use, " ") == 1) {                                                             // check num of args (query)
-        if (isAlphaNum(use)) {                                                                  // check if alphanum : go
-/*            if ((tempList = getBlockWhere("name", use, "databases.yaml")) != NULL) {          // if db exist (YAML) : go
-                freeListOfEntities(&tempList);
-                if (!useDB(use)) {                                                              // if move in the directory : go (sysCMD)
-                    printf("Error: Problem for change db use (system cmd)");
-                }
+    if (countArgs(use, " ") == 1) {                               // check num of args (query)
+        if (isAlphaNum(use)) {                                    // check if alphanum : go
+            if (useDB(use)) {                                     // check is database exist then change global
+                printf("Base changed for: %s",use);
             } else {
-                printf("Error: Base not exist");
-            }*/
+                printf("Base '%s' not found !",use);
+            }
         } else {
             printf("Error: Not an alpha-numeric argument");
         }
