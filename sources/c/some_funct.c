@@ -17,9 +17,7 @@ extern int FILE_LINE_COUNTER;
 
 
 void menu() {
-    //  verifFirstInit();
-    //  showInfo();
-    printf("WELCOME\ntype exit or blanck query for exit");
+    printf("WELCOME\ntype exit or return for exit");
 
     while (1) {
         char requestsql[MAX] = "";
@@ -431,9 +429,7 @@ char *insertSplit(char *buffer, int number) {
                 strcpy(word, "%%%%%");
                 return word;
             }
-
         }
-
     }
     free(word);
     return NULL;
@@ -563,7 +559,6 @@ int strSearchInArray(char* str, arrayOfStrings array) {
 arrayOfStrings createArrayOfStrings(unsigned int nbOfStrings) {
 	int i;
 	arrayOfStrings result;
-
 	if(nbOfStrings > 0) {
 		if ( (result.array = malloc(sizeof(char*) * nbOfStrings)) != NULL) {
 			result.stringsNb = -1;
@@ -680,3 +675,4 @@ int compare(char* str1, char* comparator, char* str2) {
 	}
 	return 0;
 }
+
