@@ -9,6 +9,7 @@
 /* ----- MAIN ----- */
 int main(int argc, char **argv) {
     //menu();
+    char filePath[MAX] = "resources/struct.yaml";
     arrayOfStrings keys;
     arrayOfStrings values;
     arrayOfStrings comparators;
@@ -31,13 +32,21 @@ int main(int argc, char **argv) {
     strcpy(comparators.array[1], "==");
     strcpy(values.array[1], "false");
 
-    strcpy(newValues.array[0], "column3");
+    strcpy(newValues.array[0], "the one");
+    strcpy(newValues.array[1], "undefined");
+    strcpy(newValues.array[2], "true");
+    strcpy(newValues.array[3], "false");
+    strcpy(keysToUpdate.array[0], "name");
+    strcpy(keysToUpdate.array[1], "type");
+    strcpy(keysToUpdate.array[2], "null");
+    strcpy(keysToUpdate.array[3], "primary");
 
-	if(testList = updateValuesWhere(keys, comparators, values, ))
-    if ( (testList = getBlockWhere(keys, comparators, values, "resources/struct.yaml")) != NULL) {
-        displayListOfEntities(testList);
-        freeListOfEntities(&testList);
-    }
+	if(updateValuesWhere(keys, comparators, values, keysToUpdate, newValues, filePath)) {
+		if ( (testList = getBlockWhere(keys, comparators, values, filePath)) != NULL) {
+			displayListOfEntities(testList);
+			freeListOfEntities(&testList);
+		}
+	}
 
     freeArrayOfStrings(&keys);
     freeArrayOfStrings(&values);

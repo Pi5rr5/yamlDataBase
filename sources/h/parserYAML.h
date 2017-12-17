@@ -27,6 +27,7 @@
     listOfEntities* getBlockWhere(arrayOfStrings, arrayOfStrings, arrayOfStrings, char*);
     listOfEntities* getAllFrom(char*);
 
+	int updateFile(char*, listOfEntities*);
     int updateValuesWhere(AoS, AoS, AoS, AoS, AoS, char*);
     int insertLine(lineStruct, char*);
     int insertEntity(listOfLines*, char*);
