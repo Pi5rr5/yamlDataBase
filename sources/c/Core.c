@@ -18,14 +18,14 @@ void query_use(char *use) {
 
     if (countArgs(use, " ") == 1) {
         if (isAlphaNum(use)) {
-            if ((tempList = getBlockWhere("name", use, "databases.yaml")) != NULL) {
+/*            if ((tempList = getBlockWhere("name", use, "databases.yaml")) != NULL) {
                 freeListOfEntities(&tempList);
                 if (!useDB(use)) {
                     printf("Error: Problem for change db use (system cmd)");
                 }
             } else {
                 printf("Error: Base not exist");
-            }
+            }*/
         } else {
             printf("Error: Not an alpha-numeric argument");
         }

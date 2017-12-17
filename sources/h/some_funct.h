@@ -9,6 +9,7 @@
 
 void menu();
 
+extern int FILE_LINE_COUNTER;
 
 char *upWord(char *);
 
@@ -26,10 +27,6 @@ char *checkExprSQL(char *, char *);
 
 char *checkTypeSQL(char *);
 
-int fSize(FILE *);
-
-int countTab(char *);
-
 int fGoToLine(int, FILE *);
 
 void error(const char *);
@@ -41,5 +38,21 @@ char *updateSplitWord(char *, int, int);
 int isNumber(char);
 
 char *insertSplit(char *buffer, int number);
+
+int fSize(FILE *);
+
+int freadLine(char *, unsigned int, FILE *);
+
+int countTab(char *);
+
+int strSearchInArray(char *, arrayOfStrings);
+
+arrayOfStrings createArrayOfStrings(unsigned int);
+
+arrayOfStrings updateArrayOfStrings(arrayOfStrings, unsigned int);
+
+void freeArrayOfStrings(arrayOfStrings *);
+
+int compare(char *, char *, char *);
 
 #endif /* YAML_SOME_FUNCT_H */

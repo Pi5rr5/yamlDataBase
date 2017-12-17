@@ -3,13 +3,13 @@
 
     int createDB(char *);
 
-    int useDB(char *);
+ //   int useDB(char *);
 
     int createTable(char *);
 
     int createEmptyFile(char *, char *);
 
-    int initYamlFile(char *, char *);
+    int initYamlFile(char *);
 
     int isExist(char *);
 

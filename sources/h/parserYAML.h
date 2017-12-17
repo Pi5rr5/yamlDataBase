@@ -1,30 +1,60 @@
-#include <stdio.h>
-
 #ifndef PARSERYAML_H_INCLUDED
 #define PARSERYAML_H_INCLUDED
 
-listOfLines *addLineToList(listOfLines *, lineStruct);
-
-listOfEntities *addEntityToList(listOfEntities *, listOfLines *);
-
-void displayListOfLines(listOfLines *);
-
-void displayListOfEntities(listOfEntities *);
-
-void freeListOfLines(listOfLines **);
-
-void freeListOfEntities(listOfEntities **);
 
 int freadL(char *, unsigned int, FILE *);
 
-int verifLine(char *);
-
 int hasKey(char *, char *);
 
-listOfEntities *getBlockWhere(char *, char *, FILE *);
-
-listOfEntities *getAllFrom(FILE *);
 
 
+
+extern int FILE_LINE_COUNTER;
+
+listOfLines *addLineToList(listOfLines *, lineStruct);
+
+void displayListOfLines(listOfLines *);
+
+void freeListOfLines(listOfLines **);
+
+listOfEntities *addEntityToList(listOfEntities *, listOfLines *);
+
+listOfEntities *removeLastEntity(listOfEntities **);
+
+listOfEntities *removeEntityAt(listOfEntities **, int);
+
+void displayListOfEntities(listOfEntities *);
+
+void freeListOfEntities(listOfEntities **);
+
+int isEOY(char *);
+
+int verifLine(char *);
+
+char *getKey(char *);
+
+char *getValue(char *);
+
+lineStruct getLineStruct(char *);
+
+listOfLines *getEntity(int, char *);
+
+int compareIntoLine(lineStruct, char *, char *, char *);
+
+int compareIntoEntity(listOfLines *, char *, char *, char *);
+
+int compareIntoList(listOfEntities *, char *, char *, char *);
+
+listOfEntities *getBlockWhere(arrayOfStrings, arrayOfStrings, arrayOfStrings, char *);
+
+listOfEntities *getAllFrom(char *);
+
+int updateValuesWhere(AoS, AoS, AoS, AoS, AoS, char *);
+
+int insertLine(lineStruct, char *);
+
+int insertEntity(listOfLines *, char *);
+
+int insertListOfEntities(listOfEntities *, char *);
 
 #endif // PARSERYAML_H_INCLUDED

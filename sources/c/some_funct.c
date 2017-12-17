@@ -5,13 +5,15 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "../h/globals.h"
 #include "../h/struct.h"
 #include "../h/some_funct.h"
+#include "../h/parserYAML.h"
 #include "../h/parser_SQL.h"
-#include "../h/struct.h"
 
 /* ----- GLOBALS ----- */
 extern int FILE_LINE_COUNTER;
+
 
 
 void menu() {
@@ -48,6 +50,7 @@ void menu() {
     }
 }
 
+
 /**
  * Desc: up the string
  *
@@ -55,6 +58,7 @@ void menu() {
  *
  * Return: (char *) upper string
  */
+
 char *upWord(char *word) {
     size_t len;
     int i;
@@ -69,32 +73,72 @@ char *upWord(char *word) {
 
 
 /**
- * @brief Renvoie le nombre de caractï¿½res prï¿½sents dans un fichiers.
- *               Sauvegarde la position du curseur avant le calcul pour pouvoir le remplacer ï¿½ cet endroit ï¿½ la fin de l'opï¿½ration.
- * Paramï¿½tre(s) :
- *      FILE* file : Pointeur de fichier du fichier concernï¿½.
+ * @name fSize
+ *
+ * @brief Returns the number of characters present in the given file. In another meaning, the size of the file.
+ *
+ * @param FILE* file : file pointer of the concerned file.
+ *
+ * @remarks Reset the cursor at its initial position at the end of the process.
  */
 int fSize(FILE *file) {
     int value = 0;
     int initialCursor;
-
-    if (file != NULL) {
-        initialCursor = ftell(file);            // Sauvegarde de la position du curseur actuelle
-        fseek(file, 0, SEEK_END);               // Déplacement vers la fin du fichier
-        value = ftell(file);                    // Renvoi le nombre de charactères dans le fichier
-        fseek(file, initialCursor, SEEK_SET);   // Repositionnement du curseur à son emplacement initial.
-    }
-    return value;
+	if(file != NULL) {
+		initialCursor = ftell(file);            // Save the current cursor position.
+		fseek(file, 0, SEEK_END);               // Shifting to the end of the file.
+		value = ftell(file);                    // Recover the cursor position (i.e the number of characters)
+		fseek(file, initialCursor, SEEK_SET);   // Reset the cursor to its original position.
+	}
+	return value;	// Return result.
 }
 
 
 /**
- * @brief Compte le nombre de tabulations au dï¿½but de la chaï¿½ne donnï¿½e.
- * Paramï¿½tre(s) :
- *      char* str : chaï¿½ne de caractï¿½res concernï¿½e.
- * Renvoi :
- *      Succï¿½s : Le nombre de tabulations comptï¿½es.
- *      ï¿½chec  : Renvoie -1
+ * @name freadLine
+ *
+ * @brief Reads a line from the current cursor position in a file and stores it in the string passed as argument.
+ *			`fgets` has as cons to recover the possible line break lying at the end of the line read.
+ *			`freadLine` (the function below) has as only purpose to solve that behavior.
+ *
+ * @param char* destination : string in which one the result will be stored
+ * @param unsigned int sizeMax : characters number to read (large number like 255 recommended)
+ * @param FILE* sourceFile : file pointer of the concerned file.
+ *
+ * @return (on success) 1
+ * @return (on failure) 0
+ *
+ * @remarks Cursor position not handled.
+ *
+ * @see FILE_LINE_COUNTER
+ */
+int freadLine(char* destination, unsigned int sizeMax, FILE* sourceFile) {
+    int strLength;
+    char result[MAX];
+
+    if(sourceFile != NULL) {
+        if(fgets(result, sizeMax, sourceFile) != NULL) {    // Read a line in the file
+            FILE_LINE_COUNTER++;
+            strLength = strlen(result);
+            if(result[strLength-1] == '\n') {	// If the last character is a line break
+                result[strLength-1] = '\0';		// Then it is replace by '\0' (known as end of string character)
+                strcpy(destination, result);	// Copy the result in the passed argument
+            }
+            return 1;
+        }
+    }
+    return 0;
+}
+
+/**
+ * @name countTab
+ *
+ * @brief Counts the number of tabulation (one tabulation is 4 space characters)
+ *
+ * @param char* str : concerned string
+ *
+ * @return (on success) Counted tabulations.
+ * @return (on failure) -1;
  */
 int countTab(char *str) {
     int i = -1;
@@ -102,12 +146,8 @@ int countTab(char *str) {
 
     if (str != NULL) {
         strLength = strlen(str);
-        if (strLength > 0) {
-            for (i = 0; i < strLength; i++) {
-                if (str[i] != ' ') {
-                    break;
-                }
-            }
+        if(strLength > 0) {
+            for(i=0 ; i < strLength && str[i] == ' ' ; i++);
             i /= 4;
         }
     }
@@ -115,53 +155,60 @@ int countTab(char *str) {
 }
 
 /**
- * @brief Dï¿½place le curseur du fichier jusqu'au dï¿½but de la ligne voulue.
- * Paramï¿½tres :
- *      int line : numï¿½ro de ligne auquel se dï¿½placer.
- *      FILE* sourceFile : pointeur de fichier du fichier concernï¿½.
- * Retour :
- *      Succï¿½s : renvoie 1.
- *      ï¿½chec  : renvoie -1
- * Remarque : En cas de dï¿½passement du fichier, c'est-ï¿½-dire si le numï¿½ro de ligne demandï¿½ est supï¿½rieur
- *            au nombre actuel de lignes dans le fichier, place le curseur en fin de fichier.
+ * @brief Shift the file cursor at the start of the wanted line.
+ *
+ * @param int line : number of the line to shift to.
+ * @param FILE* sourceFile : file pointer of the concerned file.
+ *
+ * @return (on success) 1
+ * @return (on failure) 0
+ *
+ * @remarks If the end of line is exceed, i.e if the given number is superior of the line in the file,
+ *			then put the cursor at the end of the file.
+ *
+ * @see FILE_LINE_COUNTER
  */
-int fGoToLine(int line, FILE *sourceFile) {
+int fGoToLine(int line, FILE* sourceFile) {
     int i;
     int fileSize;
     char temp[MAX];
 
-    fileSize = fSize(sourceFile);
-    if (sourceFile != NULL) {
-        fseek(sourceFile, 0, SEEK_SET);                 // Dï¿½placement au dï¿½but du fichier
+    if(sourceFile != NULL) {
+        fileSize = fSize(sourceFile);
+        fseek(sourceFile, 0, SEEK_SET);					// Shifting to the start of the file.
         FILE_LINE_COUNTER = 0;
-        for (i = 0; i < line - 1; i++) {                   // Dï¿½placement jusqu'ï¿½ la ligne voulue
-            if (ftell(sourceFile) >=
-                fileSize) {         // Si on dï¿½passe la fin du fichier (ligne demandï¿½e plus grande que le nombre de lignes du fichier)
-                return 0;                               // Alors reotur d'erreur
-            } else if (fgets(temp, MAX, sourceFile)) {   // Sinon passage ï¿½ la lign suivante
+        for(i=0 ; i < line-1 ; i++) {					// Loop up to the wanted line.
+            if(ftell(sourceFile) > fileSize) {			// If the file limit is exceed.
+                error("out of file");
+                return 0;
+            } else if(fgets(temp, MAX, sourceFile) != NULL) {	// Next line.
                 FILE_LINE_COUNTER++;
             } else {
+                error("couldn't read line");
                 return 0;
             }
         }
         return 1;
+    } else {
+        error("file empty");
     }
     return 0;
 }
 
-
 /**
- * @brief Fonction de gestion d'erreur. ï¿½crit dans l'outpout dï¿½diï¿½ au erreurs.
+ * @name error
  *
- * @param char* message : message d'erreur.
+ * @brief Error displaying handler. Write in `stderr` (output dedicated to the errors).
  *
- * @return void.
+ * @param char* message : error message.
  *
- * @remarks : peut ï¿½tre modifiï¿½ en crï¿½ant un rï¿½pertoire d'erreur avec chaque erreur correspondant ï¿½ un message prï¿½cis.
+ * @return void
+ *
+ * @remarks Can be modify to have an index in which the function picks up the wanted error specify by in ID passed by argument.
  */
-void error(const char *message) {
-    if (message != NULL)
-        fprintf(stderr, message);
+void error(const char* message) {
+    if(message != NULL)
+        fprintf(stderr, "%s\n", message);
 }
 
 
@@ -207,6 +254,7 @@ char *cleanQuery(char *word) {
     }
     return cleanquery;
 }
+
 
 
 /**
@@ -476,4 +524,158 @@ char *updateSplitWord(char *buffer, int number, int type) {
     }
     free(word);
     return NULL;
+}
+/**
+ * @name strSearchInArray
+ *
+ * @brief Checks if a given string is in an array of strings.
+ *
+ * @param char* str : string to search for.
+ * @param arrayOfStrings array : array of string to search in.
+ *
+ * @return (if found) the position of the occurrence in the list.
+ * @return (otherwise) -1
+ */
+int strSearchInArray(char* str, arrayOfStrings array) {
+	int i;
+
+	for(i=0 ; i < array.stringsNb ; i++) {
+		if(strcmp(str, array.array[i]) == 0) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+/**
+ * @name createArrayOfStrings
+ *
+ * @brief Creates an "object" arrayOfStrings
+ *
+ * @param unsigned int nbOfStrings : number of strings possible in the array
+ *
+ * @return (on success) new object
+ * @return (on failure) unknown
+ *
+ * @see arrayOfStrings
+ */
+arrayOfStrings createArrayOfStrings(unsigned int nbOfStrings) {
+	int i;
+	arrayOfStrings result;
+
+	if(nbOfStrings > 0) {
+		if ( (result.array = malloc(sizeof(char*) * nbOfStrings)) != NULL) {
+			result.stringsNb = -1;
+			for(i=0 ; i < nbOfStrings ; i++) {
+				if ( (result.array[i] = malloc(sizeof(char)*MAX)) == NULL) {
+					while(i >= 0) {
+						free(result.array[--i]);
+						result.stringsNb--;
+					}
+					free(result.array);
+				}
+				result.stringsNb++;
+			}
+		}
+	}
+	return result;
+}
+
+/**
+ * @name updateArrayOfStrings
+ *
+ * @brief Allocates columns to the given array typed as `char**`
+ *
+ * @param arrayOfStrings arrayToUpdate : concerned array
+ * @param unsigned int nbOfNewStrings : number of rows to add to the concerned array.
+ *
+ * @return (on success) updated array
+ * @return (on failure) non-updated array
+ *
+ * @see arrayOfStrings
+ */
+arrayOfStrings updateArrayOfStrings(arrayOfStrings arrayToUpdate, unsigned int nbOfNewStrings) {
+	int i;
+	char** temp;
+
+	if ( (temp = malloc(sizeof(char*)*arrayToUpdate.stringsNb + nbOfNewStrings)) != NULL ) {
+		for(i=0 ; i < arrayToUpdate.stringsNb + nbOfNewStrings ; i++) {
+			if ( (temp[i] = malloc(sizeof(char)*MAX)) == NULL ) {
+				while(--i >= 0) {
+					if(temp[i] != NULL)
+						free(temp[i]);
+				}
+				if(temp != NULL)
+					free(temp);
+				break;
+			} else if(i < arrayToUpdate.stringsNb) {
+				temp[i] = arrayToUpdate.array[i];
+			}
+		}
+		free(arrayToUpdate.array);
+		arrayToUpdate.array = temp;
+	}
+	return arrayToUpdate;
+}
+
+/**
+ * @name freeArrayOfStrings
+ *
+ * @brief free recursively the given array of strings.
+ *
+ * @param char** arrayOfStrings : pointer to the concerned array.
+ *
+ * @return void
+ *
+ * @see arrayOfStrings
+ */
+void freeArrayOfStrings(arrayOfStrings* arrayToFree) {
+	int i;
+	unsigned int tempUInt;
+
+	tempUInt = (*arrayToFree).stringsNb;
+
+	for(i=0 ; i < tempUInt ; i++)
+		if ( (*arrayToFree).array[i] != NULL) {
+			free( (*arrayToFree).array[i]);
+			(*arrayToFree).stringsNb--;
+		}
+	if ( (*arrayToFree).array != NULL)
+		free( (*arrayToFree).array);
+
+}
+
+/**
+ * @name compare
+ *
+ * @brief takes two values and a comparator to apply on them.
+ *
+ * @param char* str1 : first value.
+ * @param char* comparator : string containing the comparator. Will call a pointer of function depending on the string.
+ * @param char* str2 : second value.
+ *
+ * @return (if true) 1
+ * @return (if false or error) 0
+ */
+int compare(char* str1, char* comparator, char* str2) {
+	if(str1 != NULL && comparator != NULL && str2 != NULL) {
+		if(strcmp(comparator, "=") == 0 || strcmp(comparator, "==") == 0)
+			return strcmp(str1, str2) == 0;
+
+		if(strcmp(comparator, ">") == 0)
+			return atof(str1)  > atof(str2);
+
+		if(strcmp(comparator, "<") == 0)
+			return atof(str1)  < atof(str2);
+
+		if(strcmp(comparator, "!=") == 0 || strcmp(comparator, "<>") == 0)
+			return strcmp(str1, str2) != 0;
+
+		if(strcmp(comparator,">=") == 0)
+			return atof(str1) >= atof(str2);
+
+		if(strcmp(comparator,"<=") == 0)
+			return atof(str1) <= atof(str2);
+	}
+	return 0;
 }
