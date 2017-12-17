@@ -469,7 +469,7 @@ listOfLines* getEntity(int startLine, char* filePath) {
  * @see listOfEntities compareCoupleInEntity
  */
 int compareIntoLine(lineStruct line, char* key, char* comparator, char* value) {
-	if(line.key != NULL && line.value != NULL && key != NULL && value != NULL) {
+	if(key != NULL && value != NULL) {
 		return compare(line.value, comparator, value);
 	}
     return 0;
@@ -733,7 +733,7 @@ int insertLine(lineStruct line, char* filePath) {
 
 	if(filePath != NULL) {
 		if ( (fp = fopen(filePath, "r+")) ) {
-			if(line.key != NULL && line.value != NULL && fp != NULL) {
+			if(fp != NULL) {
 				return fprintf(fp, "    %s : %s\n", line.key, line.value) > 0;
 			}
 		}
