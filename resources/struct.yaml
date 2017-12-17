@@ -1,0 +1,21 @@
+---
+# struct.yaml
+# structure of a table
+
+-
+    name : column1
+    type : VARCHAR
+    null : false
+    auto_increment : false
+    primary : false
+    length : 255
+
+-
+    name : column2
+    type : int
+    null : false
+    auto_increment : true
+    primary : true
+    length : 4
+
+...

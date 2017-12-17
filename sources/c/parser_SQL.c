@@ -1,12 +1,14 @@
 //
 // Created by Qut on 29/10/2017.
 //
-#include "../h/parser_SQL.h"
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
+#include "../h/struct.h"
 #include "../h/some_funct.h"
 #include "../h/Core.h"
+#include "../h/parserYAML.h"
+#include "../h/parser_SQL.h"
 
 
 /**
@@ -14,14 +16,17 @@
  *
  */
 commandSQL cmdSQL[] = {
-        {"USE",             query_use},
-        {"CREATE DATABASE", query_create_database},
-        {"CREATE TABLE",    query_create_table},
-        {"DROP DATABASE",   query_drop_database},
-        {"DROP TABLE",      query_drop_table},
-        {"EXIT",           query_exit},
-        {NULL, NULL}
+        {"USE",             queryUse},
+        {"CREATE DATABASE", queryCreateDatabase},
+        {"CREATE TABLE",    queryCreateTable},
+        {"DROP DATABASE",   queryDropDatabase},
+        {"DROP TABLE",      queryDropTable},
+        {"EXIT",            queryExit},
+        {"INSERT INTO",     queryInsert},
+        {"UPDATE",          queryUpdate},
+        {"DELETE FROM",     queryDelete}
 };
+
 
 /**
  * Desc: parse the SQL query & call functions
@@ -46,23 +51,23 @@ void parserSQL(char *word) {
             lenWord = strlen(cmdSQL[loop].name) + 1;
             querySent = malloc(sizeof(char) * (lenQuery - lenWord + 1));
             strncpy(querySent, cleanQueryChar + lenWord, lenQuery - lenWord);
-            querySent[ lenQuery - lenWord - 1] = '\0';
+            querySent[lenQuery - lenWord - 1] = '\0';
             cmdSQL[loop].functionSQL(querySent);
             free(querySent);
             error = 0;
             break;
         }
     }
-    error ? query_error(word) : NULL;
+    error ? queryError(word) : NULL;
     free(cleanQueryChar);
     free(upWordChar);
 }
 
 // count & quit
-void query_exit(char *exit) {
+void queryExit(char *exit) {
     printf("Goodbye ( ^_^)／");
 }
 
-void query_error(char *error) {
+void queryError(char *error) {
     printf("Error: Invalid Command (╯°□°）╯︵ ┻━┻");
 }

@@ -7,23 +7,15 @@
 
 typedef struct commandSQL {
     char *name;
-
     void (*functionSQL)(char *);
 } commandSQL;
 
 void parserSQL(char *);
 
 
+void queryExit(char *);
 
-
-
-
-
-
-
-void query_exit(char *);
-
-void query_error(char *);
+void queryError(char *);
 
 #endif /* MY_PROJ_PARSER_H */
 
