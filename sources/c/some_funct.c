@@ -449,6 +449,7 @@ int isNumber(char buffer) {
 }
 
 char *whichType(char *buffer) {
+    int i;
     int intType = 1;
     int floatType = 0;
     if (buffer[0] == 39 && buffer[strlen(buffer) - 1] == 39) {
@@ -458,7 +459,7 @@ char *whichType(char *buffer) {
             return "char";
         }
     } else {
-        for (int i = 0; i < strlen(buffer); i++) {
+        for (i = 0; i < strlen(buffer); i++) {
             if ((buffer[i] >= '0' && buffer[i] <= '9') || buffer[i] == 46) {
                 if (buffer[i] == 46) { floatType = 1; }
             } else {
@@ -474,6 +475,7 @@ char *whichType(char *buffer) {
 
 
 char *updateSplitWord(char *buffer, int number, int type) {
+    int i;
     int control = 1;
     int constraint = 0;
     int start = 0;
@@ -481,7 +483,7 @@ char *updateSplitWord(char *buffer, int number, int type) {
     char *word;
     int count = 1;
     word = malloc(sizeof(char) * MAX);
-    for (int i = 0; i < strlen(buffer); i++) {
+    for (i = 0; i < strlen(buffer); i++) {
         if (buffer[i] == 61 && control == 1) {
             end = (buffer[i - 1] == 32) ? end - 2 : end - 1;
             strncpy(word, buffer + start, end);
