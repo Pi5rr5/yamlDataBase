@@ -1,6 +1,8 @@
 #ifndef SYSTEM_FUNCTION_H_INCLUDED
     #define SYSTEM_FUNCTION_H_INCLUDED
 
+    extern char *CURRENT_DATABASE;
+
     int createDB(char *);
 
     int useDB(char *);
