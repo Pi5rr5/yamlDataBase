@@ -22,10 +22,12 @@
     int compareIntoLine(lineStruct, char*, char*, char*);
     int compareIntoEntity(listOfLines*, char*, char*, char*);
     int compareIntoList(listOfEntities*, char*, char*, char*);
+    int updateLine(lineStruct*, char*, char*);
 
-    listOfEntities* getBlockWhere(arrayOfStrings, arrayOfStrings, arrayOfStrings, char*);
+    listOfEntities* getBlocksWhere(arrayOfStrings, arrayOfStrings, arrayOfStrings, char*);
     listOfEntities* getAllFrom(char*);
 
+	int updateFile(char*, listOfEntities*);
     int updateValuesWhere(AoS, AoS, AoS, AoS, AoS, char*);
     int insertLine(lineStruct, char*);
     int insertEntity(listOfLines*, char*);

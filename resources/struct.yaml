@@ -1,6 +1,6 @@
----
 # struct.yaml
 # structure of a table
+---
 
 -
     name : column1
