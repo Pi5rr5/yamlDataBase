@@ -18,8 +18,9 @@
 
 ## Découpage & choix d'implémentations gloable du projet
 * __Fonction système__
-   
+
    Toutes les fonctions qui interagissent avec le système. Comme la création ou la suppression d'un fichier.
+   Le stockage sur le disque des fichier yaml est découpé par dossier ou une dossier représente une database. Dans une database il peut y avoir une liste de table représentée par un dossier chacune, et dans une table deux fichier générique data.yaml et structure.yaml
 * __Parser yaml__
 
    BLABLA
