@@ -46,6 +46,7 @@ int useDB(char *dbName) {
 int createTable(char *tableName) {
     if(CURRENT_DATABASE == NULL)
         return 0;
+	printf("Creating table\n");
     char cmd[255];
     char path[255];
     // concatenate neutral path
@@ -70,6 +71,7 @@ int createTable(char *tableName) {
             if(!initYamlFile(path))
                 return 0;
     }
+    printf("Table created\n");
     return 1;
 }
 

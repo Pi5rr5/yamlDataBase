@@ -1,0 +1,9 @@
+# yaml file
+# path: resources\deleteme\t\data.yaml
+---
+
+-
+    v1 : 1
+    v2 : 'ab'
+
+...

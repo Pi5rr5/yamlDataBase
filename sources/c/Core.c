@@ -9,8 +9,7 @@
 #include "../h/some_funct.h"
 #include "../h/parserYAML.h"
 #include "../h/system_function.h"
-
-
+#include "../h/funcSQLtoYAML.h"
 
 /**
  * Desc: go on a db
@@ -19,13 +18,12 @@
  *
  */
 void queryUse(char *use) {
-    listOfEntities *tempList;
     if (countArgs(use, " ") == 1) {                               // check num of args (query)
         if (isAlphaNum(use)) {                                    // check if alphanum : go
             if (useDB(use)) {                                     // check is database exist then change global
-                printf("Base changed for: %s",use);
+                printf("Base changed for: %s", use);
             } else {
-                printf("Base '%s' not found !",use);
+                printf("Base '%s' not found !", use);
             }
         } else {
             printf("Error: Not an alpha-numeric argument");
@@ -42,17 +40,16 @@ void queryUse(char *use) {
  *
  */
 void queryCreateDatabase(char *buffer) {
-    if (countArgs(buffer, " ") == 1) {                                                          // check num of args (query)
-        if (isAlphaNum(buffer)) {                                                               // check if alphanum : go
-            //if (funcyaml(buffer)) {                                                           // check if db not exist : go (YAML)
-            if (createDB(buffer)) {                                                             // create file system : go (sysCMD)
+    if (countArgs(buffer, " ") ==
+        1) {                                                          // check num of args (query)
+        if (isAlphaNum(
+                buffer)) {                                                           // check if db not exist : go (YAML)
+            if (createDB(
+                    buffer)) {                                                             // create file system : go (sysCMD)
                 printf("Query : Database created");
             } else {
                 printf("Error : Can't create database on CMD");
             }
-            /*} else {
-                printf("Error : Can't create database on YAML");
-            }*/
         } else {
             printf("Error: Not an alpha-numeric argument");
         }
@@ -68,17 +65,16 @@ void queryCreateDatabase(char *buffer) {
  *
  */
 void queryDropDatabase(char *buffer) {
-    if (countArgs(buffer, " ") == 1) {                                                          // check num of args (query)
-        if (isAlphaNum(buffer)) {                                                               // check if alphanum : go
-            //if (funcyaml(buffer)) {                                                           // check if db drop : go (YAML)
-            if (dropDB(buffer)) {                                                               // check if db drop : go (sysCMD)
+    if (countArgs(buffer, " ") ==
+        1) {                                                          // check num of args (query)
+        if (isAlphaNum(
+                buffer)) {                                                               // check if alphanum : go
+            if (dropDB(
+                    buffer)) {                                                               // check if db drop : go (sysCMD)
                 printf("Query : Database dropped");
             } else {
                 printf("Error : Can't drop database on CMD");
             }
-            /*} else {
-                printf("Error : Can't drop database on YAML");
-            }*/
         } else {
             printf("Error: Not an alpha-numeric argument");
         }
@@ -94,10 +90,13 @@ void queryDropDatabase(char *buffer) {
  *
  */
 void queryDropTable(char *buffer) {
-    if (countArgs(buffer, " ") == 1) {                                                          // check num of args (query)
-        if (isAlphaNum(buffer)) {                                                               // check if alphanum : go
+    if (countArgs(buffer, " ") ==
+        1) {                                                          // check num of args (query)
+        if (isAlphaNum(
+                buffer)) {                                                               // check if alphanum : go
             //if (funcyaml(buffer)) {                                                           // check if table drop (erase table info in db struct) (YAML)
-            if (dropTable(buffer)) {                                                            // check if table drop (sysCMD)
+            if (dropTable(
+                    buffer)) {                                                            // check if table drop (sysCMD)
                 printf("Query : Table dropped");
             } else {
                 printf("Error : Can't drop table on CMD");
@@ -125,11 +124,16 @@ void queryCreateTable(char *buffer) {       // CREATE TABLE name ( cl1 type1 typ
     int error;
     char *table;
     error = 0;
-    if (countArgs(buffer, delim) > 1) {                                                              // check num of args (query)
-        table = splitWord(buffer, delim);                                                            // split query and take the first word (table)
-        if (isAlphaNum(table)) {                                                                     // check if alphanum : go
-            strncpy(createQuery, buffer + strlen(table) + 1, strlen(buffer) - strlen(table));        // alter query and begin after table name (+1 count the space after name)
-            if (!createTable(table)) {                                                               // check if table create : go (sysCMD)
+    if (countArgs(buffer, delim) >
+        1) {                                                              // check num of args (query)
+        table = splitWord(buffer,
+                          delim);                                                            // split query and take the first word (table)
+        if (isAlphaNum(
+                table)) {                                                                     // check if alphanum : go
+            strncpy(createQuery, buffer + strlen(table) + 1, strlen(buffer) -
+                                                             strlen(table));        // alter query and begin after table name (+1 count the space after name)
+            if (!createTable(
+                    table)) {                                                               // check if table create : go (sysCMD)
                 printf("Error : Can't create table on CMD");
                 error = 1;
             }
@@ -137,13 +141,14 @@ void queryCreateTable(char *buffer) {       // CREATE TABLE name ( cl1 type1 typ
             printf("Error: Not an alpha-numeric argument");
             error = 1;
         }
-        if (table != NULL) {
-            free(table);
-        }
+
         if (!error) {
-            if (createQuery[0] == 40 && createQuery[strlen(createQuery) - 1] == 41) {                // if rest of the query start with ( and end with ) : go
+            if (createQuery[0] == 40 && createQuery[strlen(createQuery) - 1] ==
+                                        41) {                // if rest of the query start with ( and end with ) : go
                 createQuery[strlen(createQuery) - 1] = '\0';                                         // remove the )
-                splitCreateQuery(createQuery + 1, ",");                                              // split the query with , delimiter
+                splitCreateQuery(createQuery + 1, ",",
+                                 table);                                              // split the query with , delimiter
+				printf("Query : table created");
             } else {
                 printf("Error : bad request");
             }
@@ -151,7 +156,9 @@ void queryCreateTable(char *buffer) {       // CREATE TABLE name ( cl1 type1 typ
     } else {
         printf("Error : Not enough args");
     }
-
+    if (table != NULL) {
+        free(table);
+    }
 }
 
 /**
@@ -160,11 +167,14 @@ void queryCreateTable(char *buffer) {       // CREATE TABLE name ( cl1 type1 typ
  * Param: Char * word : String to split
  *
  */
-void splitCreateQuery(char *createQuery, const char *delim) {               // cl1 type1 type2   // cl2 type1 type2 type3
+void
+splitCreateQuery(char *createQuery, const char *delim,
+                 char *name) {               // cl1 type1 type2   // cl2 type1 type2 type3
     char *token;
     token = strtok1(createQuery, delim);
     while (token != NULL) {
-        goSplitCreateQuery(token, " ");                                                             // split the string with space delimiter
+        goSplitCreateQuery(token, " ",
+                           name);                                                             // split the string with space delimiter
         token = strtok1(NULL, delim);
     }
 }
@@ -175,7 +185,7 @@ void splitCreateQuery(char *createQuery, const char *delim) {               // c
  * Param: Char * word : String to check
  *
  */
-void goSplitCreateQuery(char *createQuery, const char *delim) {             // cl1 // type // type2
+void goSplitCreateQuery(char *createQuery, const char *delim, char *tablename) {             // cl1 // type // type2
     char name[MAX] = "";
     char type[MAX] = "";
     char null[6];
@@ -185,11 +195,14 @@ void goSplitCreateQuery(char *createQuery, const char *delim) {             // c
     strcpy(auto_increment, "");
     strcpy(primary, "");
     strcpy(null, "");
-    if (countArgs(createQuery, " ") > 1) {                                                                                                // check num of args : go
+    if (countArgs(createQuery, " ") >
+        1) {                                                                                                // check num of args : go
         (createQuery[0] == 32) ? strcpy(name, splitWord(createQuery + 1, delim)) : strcpy(name, splitWord(createQuery,
                                                                                                           delim));                        // take the name of column (without space)
-        if (correctWord(name)) {                                                                                                          // check if name of column is correct : go
-            if (!isAlphaNum(name)) {                                                                                                      // check if name if alphanum : go
+        if (correctWord(
+                name)) {                                                                                                          // check if name of column is correct : go
+            if (!isAlphaNum(
+                    name)) {                                                                                                      // check if name if alphanum : go
                 printf("Error: Not an alpha-numeric argument(blop)\n");
                 error = 1;
             }
@@ -198,14 +211,19 @@ void goSplitCreateQuery(char *createQuery, const char *delim) {             // c
             error = 1;
         }
         if (!error) {
-            strcpy(null, checkExprSQL(createQuery, "NOT NULL"));                                                                          // check if NOT NULL is an arg
-            strcpy(auto_increment, checkExprSQL(createQuery, "AUTO INCREMENT"));                                                          // check if AUTO INC is an arg
-            strcpy(primary, checkExprSQL(createQuery, "PRIMARY KEY"));                                                                    // check if PK is an arg
-            strcpy(type, checkTypeSQL(createQuery));                                                                                      // check if type is correct & the type
+            strcpy(null, checkExprSQL(createQuery,
+                                      "NOT NULL"));                                                                          // check if NOT NULL is an arg
+            strcpy(auto_increment, checkExprSQL(createQuery,
+                                                "AUTO INCREMENT"));                                                          // check if AUTO INC is an arg
+            strcpy(primary, checkExprSQL(createQuery,
+                                         "PRIMARY KEY"));                                                                    // check if PK is an arg
+            strcpy(type, checkTypeSQL(
+                    createQuery));
+            // si false = error;// check if type is correct & the type
             if (!type) { error = 1; }
         }
         if (!error) {
-            printf("--type:%s--null:%s--auto:%s--primary:%s\n", type, null, auto_increment, primary);
+            createSQLtoYAML(name, type, null, primary, tablename);
         } else {
             printf("Error : No type selected");
         }
@@ -239,6 +257,53 @@ char *strtok1(char *s, const char *delim) {
 //Partie 2
 
 
+void insertSqlValues(char *buffer, char *tablename) {
+    int count;
+    char *word;
+    char path[MAX];
+    char column[MAX];
+    lineStruct templine;
+    listOfLines *insertlines;
+    listOfEntities *allstruct;
+
+    count = 1;
+    insertlines = NULL;
+
+    sprintf(path, "resources\\%s\\%s\\structure.yaml", CURRENT_DATABASE, tablename);
+    allstruct = getAllFrom(path);
+
+
+    while (1) {
+        if ( (word = insertSplit(buffer, count)) == NULL) {
+            if (allstruct != NULL) {
+                printf("Error");
+                freeListOfLines(&insertlines);
+            }
+            break;
+        } else {
+            strcpy(column, allstruct->entity->line.value);
+            allstruct->entity = allstruct->entity->next;
+            if (!strcmp(whichType(word), allstruct->entity->line.value)) {
+                strcpy(templine.key, column);
+                strcpy(templine.value, word);
+                insertlines = addLineToList(insertlines, templine);
+            } else {
+                printf("Error : Wrong type (%s) ", word);
+                freeListOfLines(&insertlines);
+                break;
+            }
+            allstruct = allstruct->next;
+            free(word);
+            count++;
+        }
+    }
+    if (insertlines != NULL) {
+        sprintf(path, "resources\\%s\\%s\\data.yaml", CURRENT_DATABASE, tablename);
+        insertEntity(insertlines, path);
+        freeListOfLines(&insertlines);
+    }
+}
+
 
 
 /**
@@ -264,37 +329,16 @@ void queryInsert(char *buffer) {
         }
         if (!error) {
             buffer += strlen(name) + 1;                                                                                     // alter query and begin after table name (+1 count the space after name)
+
             if (!strncmp(upWord(buffer), "VALUES (", 8) && buffer[strlen(buffer) - 1] == ')') {                             // check if values ( is present : go
                 buffer += 8;
-                insertSqlValues(buffer);
+                buffer[strlen(buffer) - 1] = '\0';
+                insertSqlValues(buffer, name);
             } else {
                 printf("Error : Missing VALUES word");
             }
         }
     }
-}
-
-
-void insertSqlValues(char *buffer) {            //
-    int count;
-    count = 1;
-    char *word;
-    while (1) {
-        word = insertSplit(buffer, count);
-        if (word == NULL) {
-            free(word);
-            break;
-        } else {
-            if (!strcmp(word, "%%%%%")) {
-                printf("Erreur");
-                break;
-            }
-            printf("mot:%s -- type: %s \n", word, whichType(word));
-            free(word);
-            count++;
-        }
-    }
-
 }
 
 
@@ -316,53 +360,91 @@ void queryUpdate(char *buffer) {
             printf("Error: Not an alpha-numeric argument");
             error = 1;
         }
-        if (table != NULL) {
-            free(table);
-        }
+
         if (!error) {
             if (!strncmp(upWord(updateQuery), "SET ", 4)) {
-                valuesUpdateQuery(updateQuery + 4);
+                valuesUpdateQuery(updateQuery + 4, table);
             }
         }
     } else {
         printf("Error : Not enough args");
     }
+    if (table != NULL) {
+        free(table);
+    }
 }
 
 //update coucou set cl1 = 'k', cl2 = 9, cl3 = 'ggggg';
-void valuesUpdateQuery(char *buffer) {
-    char *key;
-    char *value;
+void valuesUpdateQuery(char *buffer, char *tablename) {
+    int i;
+    char key[MAX];
+    char value[MAX];
+    char path[MAX] = {'\0'};
+    AoS tabKeysToUpdate;
+    AoS tabNewValues;
+    AoS tabConstraintKey;
+    AoS tabConstraintValue;
+    AoS tabCompare;
     int count;
     int error;
     count = 1;
     error = 0;
+    sprintf(path, "resources\\%s\\%s\\data.yaml", CURRENT_DATABASE, tablename);
+    printf("The path : %s\n", path);
     while (1) {
-        key = updateSplitWord(buffer, count, 1);
-        if (key == NULL) {
-            free(key);
+        if( strcpy(key, updateSplitWord(buffer, count, 1)) == NULL) {
+			printf("break1\n");
             break;
         } else {
-            value = updateSplitWord(buffer, count, 2);
-            if (!strncmp(value, "%%%%%", 5)) {
+            if ( strcpy(value, updateSplitWord(buffer, count, 2)) == NULL) {
                 printf("Erreur\n");
                 free(key);
                 free(value);
                 error = 1;
                 break;
             }
-            printf("key:%s -- value:%s -- type:%s\n", key, value, whichType(value));
-            free(key);
-            free(value);
+            if (count == 1) {
+				printf("creating...\n");
+                tabKeysToUpdate = createArrayOfStrings(1);
+                tabNewValues = createArrayOfStrings(1);
+				printf("done\n");
+            } else {
+				printf("updating...\n");
+                tabKeysToUpdate = updateArrayOfStrings(tabKeysToUpdate, 1);
+                tabNewValues = updateArrayOfStrings(tabNewValues, 1);
+				printf("done\n");
+            }
+            printf("copying %s\n", key);
+            if(tabKeysToUpdate.array == NULL)
+				printf("	NANI\n");
+            strcpy(tabKeysToUpdate.array[count], key);
+            printf("copying %s\n", value);
+            strcpy(tabNewValues.array[count], value);
             count++;
         }
     }
     if (!error) {
-        key = updateSplitWord(buffer, 0, 3);
-        value = updateSplitWord(buffer, 0, 4);
-        printf("contrainte key:%s -- contrainte value:%s -- contrainte type:%s", key, value, whichType(value));
-        free(key);
-        free(value);
+        if (strcpy(key, updateSplitWord(buffer, 0, 3)) == NULL) {
+            tabCompare = createArrayOfStrings(count);
+            for (i = 0; i < count; i++) {
+                strcpy(tabCompare.array[i], "<>");
+            }
+            updateValuesWhere(tabKeysToUpdate, tabCompare, tabNewValues, tabKeysToUpdate, tabNewValues, path);
+        } else {
+			strcpy(value, updateSplitWord(buffer, 0, 4));
+            tabCompare = createArrayOfStrings(1);
+            tabConstraintKey = createArrayOfStrings(1);
+            tabConstraintValue = createArrayOfStrings(1);
+            strcpy(tabCompare.array[0], "=");
+            strcpy(tabConstraintKey.array[0], key);
+            strcpy(tabConstraintValue.array[0], value);
+            updateValuesWhere(tabConstraintKey, tabCompare, tabConstraintValue, tabKeysToUpdate, tabNewValues, path);
+        }
+        freeArrayOfStrings(&tabCompare);
+        freeArrayOfStrings(&tabConstraintKey);
+        freeArrayOfStrings(&tabConstraintValue);
+        freeArrayOfStrings(&tabKeysToUpdate);
+        freeArrayOfStrings(&tabNewValues);
     }
 }
 

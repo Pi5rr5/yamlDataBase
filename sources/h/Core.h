@@ -21,15 +21,15 @@ void queryUpdate(char *);
 
 void queryDelete(char *);
 
-void insertSqlValues(char *);
+void insertSqlValues(char*, char*);
 
-void splitCreateQuery(char *, const char *);
+void splitCreateQuery(char *, const char *, char *);
 
-void goSplitCreateQuery(char *, const char *);
+void goSplitCreateQuery(char *, const char *, char *);
 
 char *strtok1(char *, const char *);
 
-void valuesUpdateQuery(char *);
+void valuesUpdateQuery(char *, char *);
 
 void condDeleteQuery(char *);
 

@@ -17,9 +17,7 @@ extern int FILE_LINE_COUNTER;
 
 
 void menu() {
-    //  verifFirstInit();
-    //  showInfo();
-    printf("WELCOME\ntype exit or blanck query for exit");
+    printf("WELCOME\ntype exit or return for exit");
 
     while (1) {
         char requestsql[MAX] = "";
@@ -387,21 +385,20 @@ char *checkTypeSQL(char *line) {
 
 
 char *insertSplit(char *buffer, int number) {
-    char *word;
     int i;
-    int temp = 0;
-    int count = 1;
-    word = malloc(sizeof(char) * MAX);
+    int temp;
+    int count;
+    char word[MAX];
+
+	temp = 0;
+	count = 1;
+
     for (i = 0; i < strlen(buffer); i++) {
-        if (i == 0 && buffer[i] == 32) {
-            continue;
-        }
         if (buffer[i] == 39) {
             temp = i;
-            while (buffer[++i] != 39 && buffer[i - 1] != 92) {
+            while (buffer[++i] != 39 && buffer[i-1] != 92) {
                 if (i > strlen(buffer)) {
-                    strcpy(word, "%%%%%");
-                    return word;
+                    return NULL;
                 }
             }
             if (count == number) {
@@ -415,8 +412,8 @@ char *insertSplit(char *buffer, int number) {
             temp = i;
             while (buffer[++i] != ',' && (isNumber(buffer[i]) || buffer[i] == '.')) {
                 if (i > strlen(buffer)) {
-                    strcpy(word, "%%%%%");
-                    return word;
+					printf("Maximum length overpassed for %s\n", buffer);
+                    return NULL;
                 }
             }
             if (count == number) {
@@ -426,16 +423,11 @@ char *insertSplit(char *buffer, int number) {
             } else {
                 count++;
             }
-        } else {
-            if (buffer[i + 1] == 32) { ++i; continue;} else {
-                strcpy(word, "%%%%%");
-                return word;
-            }
-
+        } else if(buffer[i] != 32) {
+			printf("error point : buffer[%d/%d] = %c\n", i, strlen(buffer), buffer[i]);
+			return NULL;
         }
-
     }
-    free(word);
     return NULL;
 }
 
@@ -454,9 +446,9 @@ char *whichType(char *buffer) {
     int floatType = 0;
     if (buffer[0] == 39 && buffer[strlen(buffer) - 1] == 39) {
         if (strlen(buffer) > 3) {
-            return "varchar";
+            return "VARCHAR";
         } else {
-            return "char";
+            return "CHAR";
         }
     } else {
         for (i = 0; i < strlen(buffer); i++) {
@@ -467,8 +459,8 @@ char *whichType(char *buffer) {
                 break;
             }
         }
-        if (intType && floatType) { return "float"; }
-        if (intType && !floatType) { return "int"; }
+        if (intType && floatType) { return "FLOAT"; }
+        if (intType && !floatType) { return "INT"; }
     }
     return "Wrong Type";
 }
@@ -480,9 +472,9 @@ char *updateSplitWord(char *buffer, int number, int type) {
     int constraint = 0;
     int start = 0;
     int end = 1;
-    char *word;
+    char word[MAX];
     int count = 1;
-    word = malloc(sizeof(char) * MAX);
+
     for (i = 0; i < strlen(buffer); i++) {
         if (buffer[i] == 61 && control == 1) {
             end = (buffer[i - 1] == 32) ? end - 2 : end - 1;
@@ -492,7 +484,7 @@ char *updateSplitWord(char *buffer, int number, int type) {
                 if (type == 1) {
                     return word;
                 } else if (type == 2) {
-                    word = insertSplit(buffer + i + 1, 1);
+                    strcpy(word, insertSplit(buffer + i + 1, 1));
                     return word;
                 }
             } else {
@@ -514,16 +506,15 @@ char *updateSplitWord(char *buffer, int number, int type) {
     }
     if (!strncmp(upWord(buffer + constraint), "WHERE ", 5)) {
         if (type == 3) {
-            word = updateSplitWord(buffer + constraint + 5, 1, 1);
+            strcpy(word, updateSplitWord(buffer + constraint + 5, 1, 1));
             return word;
         } else if (type == 4) {
-            word = updateSplitWord(buffer + constraint + 5, 1, 2);
+            strcpy(word, updateSplitWord(buffer + constraint + 5, 1, 2));
             return word;
         } else {
             return NULL;
         }
     }
-    free(word);
     return NULL;
 }
 /**
@@ -560,23 +551,24 @@ int strSearchInArray(char* str, arrayOfStrings array) {
  *
  * @see arrayOfStrings
  */
-arrayOfStrings createArrayOfStrings(unsigned int nbOfStrings) {
+arrayOfStrings createArrayOfStrings(int nbOfStrings) {
 	int i;
 	arrayOfStrings result;
-
 	if(nbOfStrings > 0) {
 		if ( (result.array = malloc(sizeof(char*) * nbOfStrings)) != NULL) {
 			result.stringsNb = -1;
 			for(i=0 ; i < nbOfStrings ; i++) {
 				if ( (result.array[i] = malloc(sizeof(char)*MAX)) == NULL) {
-					while(i >= 0) {
-						free(result.array[--i]);
+					while(--i >= 0) {
+						free(result.array[i]);
 						result.stringsNb--;
 					}
 					free(result.array);
 				}
 				result.stringsNb++;
 			}
+		} else {
+			error("Allocation error\n");
 		}
 	}
 	return result;
@@ -595,7 +587,7 @@ arrayOfStrings createArrayOfStrings(unsigned int nbOfStrings) {
  *
  * @see arrayOfStrings
  */
-arrayOfStrings updateArrayOfStrings(arrayOfStrings arrayToUpdate, unsigned int nbOfNewStrings) {
+arrayOfStrings updateArrayOfStrings(arrayOfStrings arrayToUpdate, int nbOfNewStrings) {
 	int i;
 	char** temp;
 
@@ -680,3 +672,4 @@ int compare(char* str1, char* comparator, char* str2) {
 	}
 	return 0;
 }
+
