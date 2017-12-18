@@ -170,4 +170,7 @@ __L'interface est découpé en trois parties :__
 * L'arborescence disque
 * Le contenu du fichier
 ## Bilan THE END
-BLA BLA
+Nous avions plutôt bien demarré en établissant un découpage plutôt efficace du projet. Mais le temps passe vite.
+Nous avons pu délivrer un résultat mais qui ne répond pas aux attentes fixées.
+Nous espérions réussir à répondre à plus de critère des différentes parties. Nous avons mis trop de temps à réunir les différentes morceaux de chacun pour faire un bilan et avancé plus efficacement. Nous avons donc du faire des choix et modification de dernière minute.
+Malgrès tous ça, il y a quand même des points positifs. Nous avons réussi à garder un rythme de travail, communiquer et échanger entre nous pour faire valoir nos idées et points de vue.
