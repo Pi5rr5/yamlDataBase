@@ -1,7 +1,7 @@
 # Rapport 3A IBD
 ## Projet   : yamlDB
 *QUERET Olivier, LINCK Hugo, SIMON Pierre*
-## Outils utilisé :tools:
+## Outils utilisé :wrench:
 ### Partage & Communication
 <p align="center">
     <a href="https://github.com/rypall/yamlDataBase/tree/part4/gtk">
