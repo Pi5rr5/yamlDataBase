@@ -375,10 +375,10 @@ char* getValue(char* line) {
     while(line[tempInt++] == ' ');      // Founds the index of the next character that is not ' '
 
     switch(line[tempInt]) {
-        case 39:    // Texte sur une ligne simple quote (39 en ASCII)
+        /*case 39:    // Texte sur une ligne simple quote (39 en ASCII)
             break;
         case 34:    // Texte sur une ligne double quote (34 en ASCII)
-            break;
+            break;*/
         default:    // Valeur classique
             return line+tempInt-1;	/* line+tempInt-1 : position to start the copy.
 										Line is the address of the string. The size of a `char` is, in almost any case, 1.
@@ -689,17 +689,28 @@ int insertLine(lineStruct line, char* filePath) {
  * @see listOfLines insertLine() insertListOfEntities()
  */
 int insertEntity(listOfLines* entity, char* filePath) {
+	FILE* fp;
 	listOfLines* tempEntity;
 
 	if(filePath != NULL) {
 		if(entity != NULL && filePath != NULL) {
-			while ( (tempEntity = entity) != NULL) {
-				if(!insertLine(entity->line, filePath)) {
-					return 0;
+			if ( (fp = fopen(filePath, "r+")) != NULL ) {
+				fseek(fp, -5, SEEK_END);
+				fputs("\n-\n...\n", fp);
+				fclose(fp);
+				while ( (tempEntity = entity) != NULL) {
+					if(!insertLine(entity->line, filePath)) {
+						return 0;
+					}
+					entity = entity->next;
 				}
-				entity = entity->next;
+				if ( (fp = fopen(filePath, "r+")) != NULL ) {
+					fseek(fp, -5, SEEK_END);
+					fputs("\n...\n", fp);
+					fclose(fp);
+					return 1;
+				}
 			}
-			return 1;
 		}
 	}
 	return 0;
@@ -724,22 +735,10 @@ int insertListOfEntities(listOfEntities* entities, char* filePath) {
 
 	if(filePath != NULL) {
 		while ( (tempEntity = entities) != NULL) {
-			if ( (fp = fopen(filePath, "r+")) != NULL ) {
-				fseek(fp, -5, SEEK_END);
-				fputs("\n-\n...\n", fp);
-				fclose(fp);
-				if(!insertEntity(entities->entity, filePath)) {
-					return 0;
-				}
-				if ( (fp = fopen(filePath, "r+")) != NULL ) {
-					fseek(fp, -5, SEEK_END);
-					fputs("\n...\n", fp);
-					fclose(fp);
-				}
-				entities = entities->next;
-			} else {
+			if(!insertEntity(entities->entity, filePath)) {
 				return 0;
 			}
+			entities = entities->next;
 		}
 		return 1;
 	}

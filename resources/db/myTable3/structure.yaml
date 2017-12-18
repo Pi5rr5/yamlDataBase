@@ -1,0 +1,12 @@
+# yaml file
+# path: resources\db\myTable3\structure.yaml
+---
+    name : id
+    type : false
+    null : true
+    primary : true
+    name : name
+    type : VARCHAR
+    null : false
+    primary : false
+...

@@ -1,0 +1,18 @@
+# yaml file
+# path: resources\deleteme\t\structure.yaml
+---
+
+-
+    name : v1
+    type : INT
+    null : false
+    primary : false
+
+
+-
+    name : v2
+    type : VARCHAR
+    null : false
+    primary : false
+
+...

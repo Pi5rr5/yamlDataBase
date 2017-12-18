@@ -47,9 +47,9 @@ int countTab(char *);
 
 int strSearchInArray(char *, arrayOfStrings);
 
-arrayOfStrings createArrayOfStrings(unsigned int);
+arrayOfStrings createArrayOfStrings(int);
 
-arrayOfStrings updateArrayOfStrings(arrayOfStrings, unsigned int);
+arrayOfStrings updateArrayOfStrings(arrayOfStrings, int);
 
 void freeArrayOfStrings(arrayOfStrings *);
 

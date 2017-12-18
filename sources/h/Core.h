@@ -21,7 +21,7 @@ void queryUpdate(char *);
 
 void queryDelete(char *);
 
-void insertSqlValues(char *, char *);
+void insertSqlValues(char*, char*);
 
 void splitCreateQuery(char *, const char *, char *);
 

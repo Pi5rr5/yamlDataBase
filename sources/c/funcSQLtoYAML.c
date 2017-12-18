@@ -29,12 +29,7 @@ int createSQLtoYAML(char *name, char *type, char *null, char *primary, char *tab
     strcpy(line.key, "primary");
     strcpy(line.value, primary);
     column = addLineToList(column, line);
-    sprintf(table, "resources\\%s\\%s.yaml", CURRENT_DATABASE, tablename);
-/*    strcat(table, "resources\\");
-    strcat(table, CURRENT_DATABASE);
-    strcat(table, "\\");
-    strcat(table, tablename);
-    strcat(table, ".yaml");*/
+    sprintf(table, "resources\\%s\\%s\\structure.yaml", CURRENT_DATABASE, tablename);
     if (insertEntity(column, table)) {
         freeListOfLines(&column);
         return 1;

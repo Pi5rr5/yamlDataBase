@@ -148,6 +148,7 @@ void queryCreateTable(char *buffer) {       // CREATE TABLE name ( cl1 type1 typ
                 createQuery[strlen(createQuery) - 1] = '\0';                                         // remove the )
                 splitCreateQuery(createQuery + 1, ",",
                                  table);                                              // split the query with , delimiter
+				printf("Query : table created");
             } else {
                 printf("Error : bad request");
             }
@@ -223,7 +224,6 @@ void goSplitCreateQuery(char *createQuery, const char *delim, char *tablename) {
         }
         if (!error) {
             createSQLtoYAML(name, type, null, primary, tablename);
-            //  printf("name:%s--type:%s--null:%s--auto:%s--primary:%s\n",name, type, null, auto_increment, primary);
         } else {
             printf("Error : No type selected");
         }
@@ -257,6 +257,53 @@ char *strtok1(char *s, const char *delim) {
 //Partie 2
 
 
+void insertSqlValues(char *buffer, char *tablename) {
+    int count;
+    char *word;
+    char path[MAX];
+    char column[MAX];
+    lineStruct templine;
+    listOfLines *insertlines;
+    listOfEntities *allstruct;
+
+    count = 1;
+    insertlines = NULL;
+
+    sprintf(path, "resources\\%s\\%s\\structure.yaml", CURRENT_DATABASE, tablename);
+    allstruct = getAllFrom(path);
+
+
+    while (1) {
+        if ( (word = insertSplit(buffer, count)) == NULL) {
+            if (allstruct != NULL) {
+                printf("Error");
+                freeListOfLines(&insertlines);
+            }
+            break;
+        } else {
+            strcpy(column, allstruct->entity->line.value);
+            allstruct->entity = allstruct->entity->next;
+            if (!strcmp(whichType(word), allstruct->entity->line.value)) {
+                strcpy(templine.key, column);
+                strcpy(templine.value, word);
+                insertlines = addLineToList(insertlines, templine);
+            } else {
+                printf("Error : Wrong type (%s) ", word);
+                freeListOfLines(&insertlines);
+                break;
+            }
+            allstruct = allstruct->next;
+            free(word);
+            count++;
+        }
+    }
+    if (insertlines != NULL) {
+        sprintf(path, "resources\\%s\\%s\\data.yaml", CURRENT_DATABASE, tablename);
+        insertEntity(insertlines, path);
+        freeListOfLines(&insertlines);
+    }
+}
+
 
 
 /**
@@ -269,14 +316,10 @@ void queryInsert(char *buffer) {
     char name[MAX] = "";
     int error;
     error = 0;
-    if (countArgs(buffer, " ") >
-        1) {                                                                                       // check num of args : go
-        (buffer[0] == 32) ? strcpy(name, splitWord(buffer + 1, " ")) : strcpy(name, splitWord(buffer,
-                                                                                              " "));                // take the name of column (without space)
-        if (correctWord(
-                name)) {                                                                                            // check if name of column is correct : go
-            if (!isAlphaNum(
-                    name)) {                                                                                        // check if name if alphanum : go
+    if (countArgs(buffer, " ") > 1) {                                                                                       // check num of args : go
+        (buffer[0] == 32) ? strcpy(name, splitWord(buffer + 1, " ")) : strcpy(name, splitWord(buffer, " "));                // take the name of column (without space)
+        if (correctWord(name)) {                                                                                            // check if name of column is correct : go
+            if (!isAlphaNum(name)) {                                                                                        // check if name if alphanum : go
                 printf("Error: Not an alpha-numeric argument(blop)\n");
                 error = 1;
             }
@@ -285,10 +328,9 @@ void queryInsert(char *buffer) {
             error = 1;
         }
         if (!error) {
-            buffer += strlen(name) +
-                      1;                                                                                     // alter query and begin after table name (+1 count the space after name)
-            if (!strncmp(upWord(buffer), "VALUES (", 8) &&
-                buffer[strlen(buffer) - 1] == ')') {                             // check if values ( is present : go
+            buffer += strlen(name) + 1;                                                                                     // alter query and begin after table name (+1 count the space after name)
+
+            if (!strncmp(upWord(buffer), "VALUES (", 8) && buffer[strlen(buffer) - 1] == ')') {                             // check if values ( is present : go
                 buffer += 8;
                 buffer[strlen(buffer) - 1] = '\0';
                 insertSqlValues(buffer, name);
@@ -298,60 +340,6 @@ void queryInsert(char *buffer) {
         }
     }
 }
-
-
-void insertSqlValues(char *buffer, char *tablename) {            //
-    int count;
-    listOfEntities *allstruct;
-    listOfLines *insertlines;
-    lineStruct templine;
-    char column[MAX];
-    char *word;
-    char path[MAX];
-    count = 1;
-    sprintf(path, "resources\\%s\\%s.yaml", CURRENT_DATABASE, tablename);
-    allstruct = getAllFrom(path);
-    while (1) {
-        word = insertSplit(buffer, count);
-        if (word == NULL) {
-            if (allstruct != NULL) {
-                printf("Error");
-                freeListOfLines(&insertlines);
-            }
-            break;
-        } else {
-            if (!strcmp(word, "%%%%%") && allstruct == NULL) {
-                printf("Erreur");
-                freeListOfLines(&insertlines);
-                break;
-            }
-            strcpy(column, allstruct->entity->line.value);
-            allstruct->entity = allstruct->entity->next;
-
-            if (!strcmp(whichType(word), allstruct->entity->line.value)) {
-                strcpy(templine.key, column);
-                strcpy(templine.value, word);
-                insertlines = addLineToList(insertlines, templine);
-                //  printf("mot:%s -- type: %s \n", word, whichType(word));
-            } else {
-                printf("Error : Wrong type (%s) ", word);
-                freeListOfLines(&insertlines);
-                break;
-            }
-            allstruct = allstruct->next;
-            free(word);
-            count++;
-
-
-        }
-    }
-    if (insertlines != NULL) {
-        sprintf(path, "resources\\%s\\%s.yaml", CURRENT_DATABASE, tablename);
-        insertEntity(insertlines, path);
-        freeListOfLines(&insertlines);
-    }
-}
-
 
 
 // UPDATE table
@@ -389,8 +377,8 @@ void queryUpdate(char *buffer) {
 //update coucou set cl1 = 'k', cl2 = 9, cl3 = 'ggggg';
 void valuesUpdateQuery(char *buffer, char *tablename) {
     int i;
-    char *key;
-    char *value;
+    char key[MAX];
+    char value[MAX];
     char path[MAX] = {'\0'};
     AoS tabKeysToUpdate;
     AoS tabNewValues;
@@ -401,14 +389,14 @@ void valuesUpdateQuery(char *buffer, char *tablename) {
     int error;
     count = 1;
     error = 0;
-    sprintf(path, "resources\\%s\\%s.yaml", CURRENT_DATABASE, tablename);
+    sprintf(path, "resources\\%s\\%s\\data.yaml", CURRENT_DATABASE, tablename);
+    printf("The path : %s\n", path);
     while (1) {
-        key = updateSplitWord(buffer, count, 1);
-        if (key == NULL) {
+        if( strcpy(key, updateSplitWord(buffer, count, 1)) == NULL) {
+			printf("break1\n");
             break;
         } else {
-            value = updateSplitWord(buffer, count, 2);
-            if (!strncmp(value, "%%%%%", 5)) {
+            if ( strcpy(value, updateSplitWord(buffer, count, 2)) == NULL) {
                 printf("Erreur\n");
                 free(key);
                 free(value);
@@ -416,29 +404,34 @@ void valuesUpdateQuery(char *buffer, char *tablename) {
                 break;
             }
             if (count == 1) {
+				printf("creating...\n");
                 tabKeysToUpdate = createArrayOfStrings(1);
                 tabNewValues = createArrayOfStrings(1);
+				printf("done\n");
             } else {
+				printf("updating...\n");
                 tabKeysToUpdate = updateArrayOfStrings(tabKeysToUpdate, 1);
                 tabNewValues = updateArrayOfStrings(tabNewValues, 1);
+				printf("done\n");
             }
+            printf("copying %s\n", key);
+            if(tabKeysToUpdate.array == NULL)
+				printf("	NANI\n");
             strcpy(tabKeysToUpdate.array[count], key);
+            printf("copying %s\n", value);
             strcpy(tabNewValues.array[count], value);
-            free(key);
-            free(value);
             count++;
         }
     }
     if (!error) {
-        key = updateSplitWord(buffer, 0, 3);
-        value = updateSplitWord(buffer, 0, 4);
-        if (key == NULL) {
+        if (strcpy(key, updateSplitWord(buffer, 0, 3)) == NULL) {
             tabCompare = createArrayOfStrings(count);
             for (i = 0; i < count; i++) {
                 strcpy(tabCompare.array[i], "<>");
             }
             updateValuesWhere(tabKeysToUpdate, tabCompare, tabNewValues, tabKeysToUpdate, tabNewValues, path);
         } else {
+			strcpy(value, updateSplitWord(buffer, 0, 4));
             tabCompare = createArrayOfStrings(1);
             tabConstraintKey = createArrayOfStrings(1);
             tabConstraintValue = createArrayOfStrings(1);
@@ -446,9 +439,6 @@ void valuesUpdateQuery(char *buffer, char *tablename) {
             strcpy(tabConstraintKey.array[0], key);
             strcpy(tabConstraintValue.array[0], value);
             updateValuesWhere(tabConstraintKey, tabCompare, tabConstraintValue, tabKeysToUpdate, tabNewValues, path);
-            //printf("contrainte key:%s -- contrainte value:%s -- contrainte type:%s", key, value, whichType(value));
-            free(key);
-            free(value);
         }
         freeArrayOfStrings(&tabCompare);
         freeArrayOfStrings(&tabConstraintKey);
