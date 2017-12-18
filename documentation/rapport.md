@@ -26,13 +26,13 @@
    BLABLA
 * __Parser SQL__
 
-   BLABLA
+   Permet de rediriger la requête en fonction de son type (create, use, drop,...).
 * __Core programme__
 
-   BLABLA
+   Toutes les fonctions qui sont appelées par le parserSQL afin de traiter les requêtes. Ces fonctions utilisent les fonctions système et YAML, soit directement soit par des fonctions intermédiaires.
 * __Fonctions Générique__
 
-   BLABLA
+   Toutes les fonctions annexes utilisées par les Parsers YAML & SQL ainsi que par le système.
 ## Fonctions principales
 ### Fonction système
 ```C
