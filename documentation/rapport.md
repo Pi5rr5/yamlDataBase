@@ -1,19 +1,19 @@
 # Rapport 3A IBD
 ## Projet   : yamlDB
 *QUERET Olivier, LINCK Hugo, SIMON Pierre*
-## Outils utilisé :wrench:
+## Outils utilisé
 ### Partage & Communication
 <p align="center">
     <a href="https://github.com/rypall/yamlDataBase/tree/part4/gtk">
-        <img src="https://image.flaticon.com/icons/png/512/25/25231.png" width="200" height="auto"/>
+        <img src="https://image.flaticon.com/icons/png/512/25/25231.png" width="100" height="auto"/>
     </a>
-    <img src="https://pbs.twimg.com/media/DCEe9aPXYAA4joh.png" width="200" height="auto"/>
+    <img src="https://pbs.twimg.com/media/DCEe9aPXYAA4joh.png" width="100" height="auto"/>
 </p>
 
 ### IDE
 <p align="center">
-    <img src="https://confluence.jetbrains.com/download/attachments/54342479/CLION?version=3&modificationDate=1449748289000&api=v2" width="173" height="auto"/>
-    <img src="https://i.imgur.com/FrSvn5s.png" width="400" height="auto"/>
+    <img src="https://confluence.jetbrains.com/download/attachments/54342479/CLION?version=3&modificationDate=1449748289000&api=v2" width="86" height="auto"/>
+    <img src="https://i.imgur.com/FrSvn5s.png" width="200" height="auto"/>
 </p>
 
 ## Découpage & choix d'implémentations gloable du projet :rocket:
@@ -62,7 +62,7 @@ __Syntaxe YAML__
 ```
 ### Partie 4 : GTK pour une belle interface
 <p align="center">
-    <img src="https://i.imgur.com/tB0hYxE.png" width="650" height="auto"/>
+    <img src="https://i.imgur.com/tB0hYxE.png" width="680" height="auto"/>
 </p>
 
 __L'interface est découpé en trois parties :__
