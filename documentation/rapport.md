@@ -33,106 +33,6 @@
 * __Fonctions Générique__
 
    Toutes les fonctions annexes utilisées par les Parsers YAML & SQL ainsi que par le système.
-## Fonctions principales :joystick: 
-### Fonction système
-```C
-extern char CURRENT_DATABASE[MAX];
-int createDB(char *);
-int useDB(char *);
-int createTable(char *);
-int createEmptyFile(char *, char *);
-int initYamlFile(char *);
-int isExist(char *);
-int dropTable(char *);
-int dropDB(char *);
-```
-### Parser yaml
-```C
-extern int FILE_LINE_COUNTER;
-listOfLines* addLineToList(listOfLines*, lineStruct);
-void displayListOfLines(listOfLines*);
-void freeListOfLines(listOfLines**);
-listOfEntities* addEntityToList(listOfEntities*, listOfLines*);
-listOfEntities* removeLastEntity(listOfEntities**);
-listOfEntities* removeEntityAt(listOfEntities**, int);
-void displayListOfEntities(listOfEntities*);
-void freeListOfEntities(listOfEntities**);
-int isEOY(char*);
-int verifLine(char*);
-char* getKey(char*);
-char* getValue(char*);
-lineStruct getLineStruct(char*);
-listOfLines* getEntity(int, char*);
-int compareIntoLine(lineStruct, char*, char*, char*);
-int compareIntoEntity(listOfLines*, char*, char*, char*);
-int compareIntoList(listOfEntities*, char*, char*, char*);
-int updateLine(lineStruct*, char*, char*);
-listOfEntities* getBlocksWhere(arrayOfStrings, arrayOfStrings, arrayOfStrings, char*);
-listOfEntities* getAllFrom(char*);
-int updateFile(char*, listOfEntities*);
-int updateValuesWhere(AoS, AoS, AoS, AoS, AoS, char*);
-int insertLine(lineStruct, char*);
-int insertEntity(listOfLines*, char*);
-int insertListOfEntities(listOfEntities*, char*);
-```
-### Parser SQL
-```C
-typedef struct commandSQL {
-    char *name;
-    void (*functionSQL)(char *);
-} commandSQL;
-void parserSQL(char *);
-void queryExit(char *);
-void queryError(char *);
-```
-### Core programme
-```C
-#define YAMLDATABASE_CORE_H
-void queryUse(char *);
-void queryCreateDatabase(char *);
-void queryDropDatabase(char *);
-void queryDropTable(char *);
-void queryCreateTable(char *);
-void queryInsert(char *);
-void queryUpdate(char *);
-void queryDelete(char *);
-void querySelectAll(char *);
-void insertSqlValues(char*, char*);
-void splitCreateQuery(char *, const char *, char *);
-void goSplitCreateQuery(char *, const char *, char *);
-char *strtok1(char *, const char *);
-void valuesUpdateQuery(char *, char *);
-void condDeleteQuery(char *);
-void condSelectQuery(char *);
-```
-### Fonctions Générique
-```C
-#define YAML_SOME_FUNCT_H
-void menu();
-extern int FILE_LINE_COUNTER;
-char *upWord(char *);
-char *cleanQuery(char *);
-int isAlphaNum(char *);
-int countArgs(char *, const char *);
-char *splitWord(char *, const char *);
-int correctWord(char *);
-char *checkExprSQL(char *, char *);
-char *checkTypeSQL(char *);
-int fGoToLine(int, FILE *);
-void error(const char *);
-char *whichType(char *);
-char *updateSplitWord(char *, int, int);
-int isNumber(char);
-char *insertSplit(char *buffer, int number);
-int fSize(FILE *);
-int freadLine(char *, unsigned int, FILE *);
-int countTab(char *);
-int strSearchInArray(char *, arrayOfStrings);
-arrayOfStrings createArrayOfStrings(int);
-int updateArrayOfStrings(arrayOfStrings*, int);
-void freeArrayOfStrings(arrayOfStrings *);
-int compare(char *, char *, char *);
-```
 ## Documentation :clipboard: 
 ### Partie 1 à 3 : yamlDB en ligne de commande
 __Syntaxe SQL__
@@ -162,7 +62,7 @@ __Syntaxe YAML__
 ```
 ### Partie 4 : GTK pour une belle interface
 <p align="center">
-    <img src="https://i.imgur.com/tB0hYxE.png" width="800" height="auto"/>
+    <img src="https://i.imgur.com/tB0hYxE.png" width="650" height="auto"/>
 </p>
 
 __L'interface est découpé en trois parties :__
