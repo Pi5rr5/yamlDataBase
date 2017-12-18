@@ -169,7 +169,7 @@ __L'interface est découpé en trois parties :__
 * Les actions possibles : *nouveau fichier, ouvrir, enregistrer, enregistrer sous, fermer le fichier, quitter*
 * L'arborescence disque
 * Le contenu du fichier
-## Bilan THE END
+## Bilan THE END :calendar: 
 Nous avions plutôt bien demarré en établissant un découpage plutôt efficace du projet. Mais le temps passe vite.
 Nous avons pu délivrer un résultat mais qui ne répond pas aux attentes fixées.
 Nous espérions réussir à répondre à plus de critère des différentes parties. Nous avons mis trop de temps à réunir les différentes morceaux de chacun pour faire un bilan et avancé plus efficacement. Nous avons donc du faire des choix et modification de dernière minute.
