@@ -21,6 +21,8 @@ void queryUpdate(char *);
 
 void queryDelete(char *);
 
+void querySelectAll(char *);
+
 void insertSqlValues(char*, char*);
 
 void splitCreateQuery(char *, const char *, char *);
@@ -32,5 +34,7 @@ char *strtok1(char *, const char *);
 void valuesUpdateQuery(char *, char *);
 
 void condDeleteQuery(char *);
+
+void condSelectQuery(char *);
 
 #endif //YAMLDATABASE_CORE_H

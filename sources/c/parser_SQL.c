@@ -24,7 +24,8 @@ commandSQL cmdSQL[] = {
         {"EXIT",            queryExit},
         {"INSERT INTO",     queryInsert},
         {"UPDATE",          queryUpdate},
-        {"DELETE FROM",     queryDelete}
+        {"DELETE FROM",     queryDelete},
+        {"SELECT * FROM",   querySelectAll}
 };
 
 
