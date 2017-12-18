@@ -1,7 +1,7 @@
 # Rapport 3A IBD
 ## Projet   : yamlDB
 *QUERET Olivier, LINCK Hugo, SIMON Pierre*
-## Outils utilisé
+## Outils utilisé :tools:
 ### Partage & Communication
 <p align="center">
     <a href="https://github.com/rypall/yamlDataBase/tree/part4/gtk">
@@ -16,7 +16,7 @@
     <img src="https://i.imgur.com/FrSvn5s.png" width="400" height="auto"/>
 </p>
 
-## Découpage & choix d'implémentations gloable du projet
+## Découpage & choix d'implémentations gloable du projet :rocket:
 * __Fonction système__
 
    Toutes les fonctions qui interagissent avec le système. Comme la création ou la suppression d'un fichier.
