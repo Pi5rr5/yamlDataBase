@@ -1,0 +1,9 @@
+# yaml file
+# path: resources\db\t\data.yaml
+---
+
+-
+    v : 'bonjour'
+    i : 34
+
+...

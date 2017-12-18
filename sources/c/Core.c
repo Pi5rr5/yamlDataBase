@@ -493,8 +493,9 @@ void querySelectAll(char *buffer) {
     listOfEntities *listRes;
     int error;
     char path[MAX] = {'\0'};
-    char selectQuery[MAX] = "";
+    char selectQuery[MAX];
     const char delim[2] = " ";
+    strcpy(selectQuery, "");
     error = 0;
     if (countArgs(buffer, delim) > 1) {
         table = splitWord(buffer, delim);
@@ -515,10 +516,13 @@ void querySelectAll(char *buffer) {
         }
     } else if(countArgs(buffer, delim) == 1) {
         table = splitWord(buffer, delim);
-        sprintf(path, "resources\\%s\\%s\\data.yaml", CURRENT_DATABASE, table);
-        listRes = getAllFrom(path);
-        displayListOfEntities(listRes);
-        freeListOfEntities(&listRes);
+        sprintf(path, "resources\\%s\\%s\\data.yaml", CURRENT_DATABASE, buffer);
+        if( (listRes = getAllFrom(path)) != NULL) {
+			displayListOfEntities(listRes);
+			freeListOfEntities(&listRes);
+        } else {
+			printf("Error.\n");
+        }
         if (table != NULL) {
             free(table);
         }

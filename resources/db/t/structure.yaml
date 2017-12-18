@@ -1,0 +1,18 @@
+# yaml file
+# path: resources\db\t\structure.yaml
+---
+
+-
+    name : v
+    type : VARCHAR
+    null : false
+    primary : false
+
+
+-
+    name : i
+    type : INT
+    null : true
+    primary : true
+
+...

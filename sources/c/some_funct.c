@@ -655,7 +655,6 @@ void freeArrayOfStrings(arrayOfStrings* arrayToFree) {
  * @return (if false or error) 0
  */
 int compare(char* str1, char* comparator, char* str2) {
-	printf("comparing %s %s %s\n", str1, comparator, str2);
 	if(str1 != NULL && comparator != NULL && str2 != NULL) {
 		if(strcmp(comparator, "=") == 0 || strcmp(comparator, "==") == 0)
 			return strcmp(str1, str2) == 0;
