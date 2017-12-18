@@ -731,7 +731,6 @@ int insertEntity(listOfLines* entity, char* filePath) {
  */
 int insertListOfEntities(listOfEntities* entities, char* filePath) {
 	listOfEntities* tempEntity;
-	FILE* fp;
 
 	if(filePath != NULL) {
 		while ( (tempEntity = entities) != NULL) {

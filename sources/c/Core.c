@@ -390,7 +390,6 @@ void valuesUpdateQuery(char *buffer, char *tablename) {
     count = 1;
     error = 0;
     sprintf(path, "resources\\%s\\%s\\data.yaml", CURRENT_DATABASE, tablename);
-    printf("The path : %s\n", path);
     while (1) {
         if( strcpy(key, updateSplitWord(buffer, count, 1)) == NULL) {
 			printf("break1\n");
@@ -398,28 +397,21 @@ void valuesUpdateQuery(char *buffer, char *tablename) {
         } else {
             if ( strcpy(value, updateSplitWord(buffer, count, 2)) == NULL) {
                 printf("Erreur\n");
-                free(key);
-                free(value);
                 error = 1;
                 break;
             }
             if (count == 1) {
-				printf("creating...\n");
                 tabKeysToUpdate = createArrayOfStrings(1);
                 tabNewValues = createArrayOfStrings(1);
-				printf("done\n");
             } else {
-				printf("updating...\n");
-                tabKeysToUpdate = updateArrayOfStrings(tabKeysToUpdate, 1);
-                tabNewValues = updateArrayOfStrings(tabNewValues, 1);
-				printf("done\n");
+                updateArrayOfStrings(&tabKeysToUpdate, 1);
+                updateArrayOfStrings(&tabNewValues, 1);
             }
             printf("copying %s\n", key);
-            if(tabKeysToUpdate.array == NULL)
-				printf("	NANI\n");
             strcpy(tabKeysToUpdate.array[count], key);
-            printf("copying %s\n", value);
+            printf("done\ncopying %s\n", value);
             strcpy(tabNewValues.array[count], value);
+            printf("done\n");
             count++;
         }
     }

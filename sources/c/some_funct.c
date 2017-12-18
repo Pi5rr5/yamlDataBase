@@ -423,7 +423,7 @@ char *insertSplit(char *buffer, int number) {
             } else {
                 count++;
             }
-        } else if(buffer[i] != 32) {
+        } else if(buffer[i] != 32 && buffer[i] != ',') {
 			printf("error point : buffer[%d/%d] = %c\n", i, strlen(buffer), buffer[i]);
 			return NULL;
         }
@@ -587,26 +587,30 @@ arrayOfStrings createArrayOfStrings(int nbOfStrings) {
  *
  * @see arrayOfStrings
  */
-arrayOfStrings updateArrayOfStrings(arrayOfStrings arrayToUpdate, int nbOfNewStrings) {
+int updateArrayOfStrings(arrayOfStrings* arrayToUpdate, int nbOfNewStrings) {
 	int i;
 	char** temp;
 
-	if ( (temp = malloc(sizeof(char*)*arrayToUpdate.stringsNb + nbOfNewStrings)) != NULL ) {
-		for(i=0 ; i < arrayToUpdate.stringsNb + nbOfNewStrings ; i++) {
-			if ( (temp[i] = malloc(sizeof(char)*MAX)) == NULL ) {
-				while(--i >= 0) {
-					if(temp[i] != NULL)
-						free(temp[i]);
+	if(arrayToUpdate != NULL) {
+		if ( (temp = malloc(sizeof(char*) * ( (*arrayToUpdate).stringsNb + nbOfNewStrings) ) ) != NULL ) {
+			for(i=0 ; i < (*arrayToUpdate).stringsNb + nbOfNewStrings ; i++) {
+				if ( (temp[i] = malloc(sizeof(char)*MAX)) == NULL ) {
+					while(--i >= 0) {
+						if(temp[i] != NULL)
+							free(temp[i]);
+					}
+					if(temp != NULL)
+						free(temp);
+					break;
+				} else if(i < (*arrayToUpdate).stringsNb) {
+					temp[i] = (*arrayToUpdate).array[i];
 				}
-				if(temp != NULL)
-					free(temp);
-				break;
-			} else if(i < arrayToUpdate.stringsNb) {
-				temp[i] = arrayToUpdate.array[i];
 			}
+			free((*arrayToUpdate).array);
+			(*arrayToUpdate).array = temp;
+		} else {
+			error("Allocation error.\n");
 		}
-		free(arrayToUpdate.array);
-		arrayToUpdate.array = temp;
 	}
 	return arrayToUpdate;
 }
@@ -651,6 +655,7 @@ void freeArrayOfStrings(arrayOfStrings* arrayToFree) {
  * @return (if false or error) 0
  */
 int compare(char* str1, char* comparator, char* str2) {
+	printf("comparing %s %s %s\n", str1, comparator, str2);
 	if(str1 != NULL && comparator != NULL && str2 != NULL) {
 		if(strcmp(comparator, "=") == 0 || strcmp(comparator, "==") == 0)
 			return strcmp(str1, str2) == 0;

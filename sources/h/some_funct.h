@@ -49,7 +49,7 @@ int strSearchInArray(char *, arrayOfStrings);
 
 arrayOfStrings createArrayOfStrings(int);
 
-arrayOfStrings updateArrayOfStrings(arrayOfStrings, int);
+int updateArrayOfStrings(arrayOfStrings*, int);
 
 void freeArrayOfStrings(arrayOfStrings *);
 
