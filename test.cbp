@@ -2,21 +2,24 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="treeView" />
+		<Option title="test" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="bin/Debug/treeView" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Debug/test" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
+				<Linker>
+					<Add library="C:/gtk2.24_win32/lib/gdk_pixbuf-2.0.lib" />
+				</Linker>
 			</Target>
 			<Target title="Release">
-				<Option output="bin/Release/treeView" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Release/test" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Release/" />
 				<Option type="0" />
 				<Option compiler="gcc" />
@@ -31,22 +34,22 @@
 		<Compiler>
 			<Add option="-mms-bitfields" />
 			<Add option="-Wall" />
-			<Add directory="C:/gtk3.4.2_win32/include" />
-			<Add directory="C:/gtk3.4.2_win32/include/gtk-3.0" />
-			<Add directory="C:/gtk3.4.2_win32/include/cairo" />
-			<Add directory="C:/gtk3.4.2_win32/include/gdk" />
-			<Add directory="C:/gtk3.4.2_win32/include/glib-2.0" />
-			<Add directory="C:/gtk3.4.2_win32/lib/glib-2.0/include" />
-			<Add directory="C:/gtk3.4.2_win32/include/pango-1.0" />
-			<Add directory="C:/gtk3.4.2_win32/lib/gtk-3.0/include" />
-			<Add directory="C:/gtk3.4.2_win32/include/atk-1.0" />
-			<Add directory="C:/gtk3.4.2_win32/include/gdk-pixbuf-2.0" />
+			<Add directory="C:/gtk2.24_win32/include" />
+			<Add directory="C:/gtk2.24_win32/include/gtk-2.0" />
+			<Add directory="C:/gtk2.24_win32/include/cairo" />
+			<Add directory="C:/gtk2.24_win32/include/gdk" />
+			<Add directory="C:/gtk2.24_win32/include/glib-2.0" />
+			<Add directory="C:/gtk2.24_win32/lib/glib-2.0/include" />
+			<Add directory="C:/gtk2.24_win32/include/pango-1.0" />
+			<Add directory="C:/gtk2.24_win32/lib/gtk-2.0/include" />
+			<Add directory="C:/gtk2.24_win32/include/atk-1.0" />
+			<Add directory="C:/gtk2.24_win32/include/gdk-pixbuf-2.0" />
 		</Compiler>
 		<Linker>
-			<Add library="gtk-win32-3.0" />
+			<Add library="gtk-win32-2.0" />
 			<Add library="gobject-2.0" />
 			<Add library="glib-2.0" />
-			<Add directory="C:/gtk3.4.2_win32/lib" />
+			<Add directory="C:/gtk2.24_win32/lib" />
 		</Linker>
 		<Unit filename="barreoutils.c">
 			<Option compilerVar="CC" />
