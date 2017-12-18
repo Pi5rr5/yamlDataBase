@@ -163,3 +163,5 @@ __L'interface est découpé en trois parties :__
 * Les actions possibles : *nouveau fichier, ouvrir, enregistrer, enregistrer sous, fermer le fichier, quitter*
 * L'arborescence disque
 * Le contenu du fichier
+## Bilan THE END
+BLA BLA
