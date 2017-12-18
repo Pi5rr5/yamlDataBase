@@ -23,7 +23,7 @@
    Le stockage sur le disque des fichier yaml est découpé par dossier ou une dossier représente une database. Dans une database il peut y avoir une liste de table représentée par un dossier chacune, et dans une table deux fichier générique data.yaml et structure.yaml
 * __Parser yaml__
 
-   BLABLA
+   La gestion de fichier YAML se fait principalement par le biais de manipulation de listes chaînées qui simulent l'arborescence que fourni le YAML. Permettant ici une simple lecture unique du fichier suivit, après une ou plusieurs manipulations coté programme, d'une seule et une écriture pour mettre à jour le fichier.
 * __Parser SQL__
 
    Permet de rediriger la requête en fonction de son type (create, use, drop,...).
