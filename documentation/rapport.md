@@ -33,7 +33,7 @@
 * __Fonctions Générique__
 
    Toutes les fonctions annexes utilisées par les Parsers YAML & SQL ainsi que par le système.
-## Fonctions principales
+## Fonctions principales :joystick: 
 ### Fonction système
 ```C
 extern char CURRENT_DATABASE[MAX];
@@ -133,7 +133,7 @@ int updateArrayOfStrings(arrayOfStrings*, int);
 void freeArrayOfStrings(arrayOfStrings *);
 int compare(char *, char *, char *);
 ```
-## Documentation
+## Documentation :clipboard: 
 ### Partie 1 à 3 : yamlDB en ligne de commande
 __Syntaxe SQL__
 ```SQL
