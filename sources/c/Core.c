@@ -521,10 +521,11 @@ void querySelectAll(char *buffer) {
             }
         }
     } else if(countArgs(buffer, delim) == 1) {
+        table = splitWord(buffer, delim);
         sprintf(path, "resources\\%s\\%s\\data.yaml", CURRENT_DATABASE, table);
         listRes = getAllFrom(path);
         displayListOfEntities(listRes);
-        freeListOfEntities(listRes);
+        freeListOfEntities(&listRes);
         if (table != NULL) {
             free(table);
         }
