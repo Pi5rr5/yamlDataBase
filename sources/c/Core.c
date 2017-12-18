@@ -390,7 +390,6 @@ void valuesUpdateQuery(char *buffer, char *tablename) {
     count = 1;
     error = 0;
     sprintf(path, "resources\\%s\\%s\\data.yaml", CURRENT_DATABASE, tablename);
-    printf("The path : %s\n", path);
     while (1) {
         if( strcpy(key, updateSplitWord(buffer, count, 1)) == NULL) {
 			printf("break1\n");
@@ -471,9 +470,7 @@ void queryDelete(char *buffer) {
             printf("Error: Not an alpha-numeric argument");
             error = 1;
         }
-        if (table != NULL) {
-            free(table);
-        }
+
         if (!error) {
             if (!strncmp(upWord(deleteQuery), "WHERE ", 6)) {
                 condDeleteQuery(deleteQuery + 6);
@@ -481,6 +478,9 @@ void queryDelete(char *buffer) {
         }
     } else {
         printf("Error : Not enough args");
+    }
+    if (table != NULL) {
+        free(table);
     }
 }
 
@@ -491,3 +491,61 @@ void condDeleteQuery(char *buffer) {
 
 }
 
+//********************************************************************************************
+//Partie 3
+
+
+void querySelectAll(char *buffer) {
+    char *table;
+    listOfEntities *listRes;
+    int error;
+    char path[MAX] = {'\0'};
+    char selectQuery[MAX] = "";
+    const char delim[2] = " ";
+    error = 0;
+    if (countArgs(buffer, delim) > 1) {
+        table = splitWord(buffer, delim);
+        if (isAlphaNum(table)) {
+            strncpy(selectQuery, buffer + strlen(table), strlen(buffer) - strlen(table));
+        } else {
+            printf("Error: Not an alpha-numeric argument");
+            error = 1;
+        }
+
+        if (!error) {
+            if (!strncmp(upWord(selectQuery), " WHERE ", 7)) {
+                condSelectQuery(selectQuery + 6);
+                if (table != NULL) {
+                    free(table);
+                }
+            }
+        }
+    } else if(countArgs(buffer, delim) == 1) {
+        sprintf(path, "resources\\%s\\%s\\data.yaml", CURRENT_DATABASE, table);
+        listRes = getAllFrom(path);
+        displayListOfEntities(listRes);
+        freeListOfEntities(listRes);
+        if (table != NULL) {
+            free(table);
+        }
+    }
+    else {
+        printf("Error : Not enough args");
+    }
+
+
+}
+
+void condSelectQuery(char *buffer) {
+char *key;
+    char* value;
+    key = updateSplitWord(buffer, 1, 1);
+    value = updateSplitWord(buffer, 1, 2);
+    printf("key:%s -- value:%s", key, value);
+    if (key != NULL) {
+        free(key);
+    }
+    if (value != NULL) {
+        free(value);
+    }
+}

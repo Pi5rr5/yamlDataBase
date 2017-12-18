@@ -472,9 +472,9 @@ char *updateSplitWord(char *buffer, int number, int type) {
     int constraint = 0;
     int start = 0;
     int end = 1;
-    char word[MAX];
+    char *word;
+    word = malloc(sizeof(char) * MAX);
     int count = 1;
-
     for (i = 0; i < strlen(buffer); i++) {
         if (buffer[i] == 61 && control == 1) {
             end = (buffer[i - 1] == 32) ? end - 2 : end - 1;
