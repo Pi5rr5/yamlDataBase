@@ -87,6 +87,7 @@ void queryError(char *);
 ```
 ### Core programme
 ```C
+#define YAMLDATABASE_CORE_H
 void queryUse(char *);
 void queryCreateDatabase(char *);
 void queryDropDatabase(char *);
@@ -95,16 +96,20 @@ void queryCreateTable(char *);
 void queryInsert(char *);
 void queryUpdate(char *);
 void queryDelete(char *);
-void insertSqlValues(char *);
-void splitCreateQuery(char *, const char *);
-void goSplitCreateQuery(char *, const char *);
+void querySelectAll(char *);
+void insertSqlValues(char*, char*);
+void splitCreateQuery(char *, const char *, char *);
+void goSplitCreateQuery(char *, const char *, char *);
 char *strtok1(char *, const char *);
-void valuesUpdateQuery(char *);
+void valuesUpdateQuery(char *, char *);
 void condDeleteQuery(char *);
+void condSelectQuery(char *);
 ```
 ### Fonctions Générique
 ```C
+#define YAML_SOME_FUNCT_H
 void menu();
+extern int FILE_LINE_COUNTER;
 char *upWord(char *);
 char *cleanQuery(char *);
 int isAlphaNum(char *);
@@ -123,8 +128,8 @@ int fSize(FILE *);
 int freadLine(char *, unsigned int, FILE *);
 int countTab(char *);
 int strSearchInArray(char *, arrayOfStrings);
-arrayOfStrings createArrayOfStrings(unsigned int);
-arrayOfStrings updateArrayOfStrings(arrayOfStrings, unsigned int);
+arrayOfStrings createArrayOfStrings(int);
+int updateArrayOfStrings(arrayOfStrings*, int);
 void freeArrayOfStrings(arrayOfStrings *);
 int compare(char *, char *, char *);
 ```
