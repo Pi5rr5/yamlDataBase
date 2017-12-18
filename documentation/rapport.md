@@ -3,17 +3,19 @@
 *QUERET Olivier, LINCK Hugo, SIMON Pierre*
 ## Outils utilisé
 ### Partage & Communication
+![](https://image.flaticon.com/icons/png/512/25/25231.png | width=100)
+
 <center>
     <a href="https://github.com/rypall/yamlDataBase/tree/part4/gtk">
-        <img src="https://image.flaticon.com/icons/png/512/25/25231.png" style="width: 200px;"/>
+        <img src="https://image.flaticon.com/icons/png/512/25/25231.png" width="200" height="auto"/>
     </a>
-    <img src="https://pbs.twimg.com/media/DCEe9aPXYAA4joh.png" style="width:200px;"/>
+    <img src="https://pbs.twimg.com/media/DCEe9aPXYAA4joh.png" width="200" height="auto"/>
 </center>
 
 ### IDE
 <center>
-    <img src="https://confluence.jetbrains.com/download/attachments/54342479/CLION?version=3&modificationDate=1449748289000&api=v2" style="width: 173px;"/>
-    <img src="https://i.imgur.com/q603VZ3.png" style="width:400px;"/>
+    <img src="https://confluence.jetbrains.com/download/attachments/54342479/CLION?version=3&modificationDate=1449748289000&api=v2" width="173" height="auto"/>
+    <img src="https://i.imgur.com/q603VZ3.png" width="400" height="auto"/>
 </center>
 
 ## Découpage & choix d'implémentations gloable du projet
@@ -156,10 +158,10 @@ __Syntaxe YAML__
 ```
 ### Partie 4 : GTK pour une belle interface
 <center>
-    <img src="https://i.imgur.com/HMziues.png" style="width:800px;"/>
+    <img src="https://i.imgur.com/HMziues.png" width="800" height="auto"/>
 </center>
 
-L'interface est découpé en trois parties :
+__L'interface est découpé en trois parties :__
 * Les actions possibles : *nouveau fichier, ouvrir, enregistrer, enregistrer sous, fermer le fichier, quitter*
 * L'arborescence disque
 * Le contenu du fichier
